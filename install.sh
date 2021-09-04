@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 ## generate .env file
-SECRET=$(openssl rand 128 | openssl sha256 | sed 's/(stdin)= //')
-sed "s/APP_HASH_SECRET=.*/APP_HASH_SECRET=${SECRET}/" .env.example > .env
+if [ ! -f .env ]; then
+    SECRET=$(openssl rand 128 | openssl sha256 | sed 's/(stdin)= //')
+    sed "s/APP_HASH_SECRET=.*/APP_HASH_SECRET=${SECRET}/" .env.example > .env
+fi
 
 # get containers ready
 docker-compose pull
@@ -64,6 +66,9 @@ docker-compose down
 docker-compose up -d
 
 # set colors if script is executed by a tty
+GREEN=
+YELLOW=
+NC=
 if [ -t 1 ]; then
     GREEN="$(tput setf 2)"
     YELLOW="$(tput setf 3)"
