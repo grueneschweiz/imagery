@@ -22,7 +22,7 @@ design.
 1. Clone this repo `git clone https://github.com/cyrillbolliger/imagery`
 1. `cd` into the folder containing the repo
 1. Execute `bash install.sh` and have a ☕️ while it installs.
-1. Visit [localhost:8000/](http://localhost:8000/)
+1. Visit [localhost:3000/](http://localhost:3000/)
 1. Use `superadmin@user.login` and `password` to login.
 1. As the font used in the corporate design is proprietary, you'll need to get a 
    licenced copy of the Sanuk font (fat and bold). Store it as follows:
@@ -55,7 +55,8 @@ The frontend is built with [VueJS](https://vuejs.org/) and the image processing
 is done with the [canvas](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API)
 element. It's all bundled by [Webpack](https://webpack.js.org/) using 
 [Laravel Mix](https://laravel-mix.com/). Have a look at the `package.json`
-if you want to dig deeper.
+if you want to dig deeper. [Browsersync](https://browsersync.io/) (which is
+provided by Laravel Mix) acts as reverse proxy in front of the app container. 
 
 ### Tooling
 #### Docker Cheat Sheet
@@ -88,7 +89,7 @@ on [localhost:8020](http://localhost:8020)
 
 #### Crowdin
 All translation is done with [crowdin](https://crowdin.com). To translate 
-in-context visit [localhost:8000/?translate=true&lang=zu](https://localhost:8000/?translate=true&lang=zu).
+in-context visit [localhost:3000/?translate=true&lang=zu](https://localhost:3000/?translate=true&lang=zu).
 
 **Crowdin integration**
 
