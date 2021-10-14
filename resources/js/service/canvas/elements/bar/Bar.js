@@ -1,4 +1,4 @@
-import {Alignments, BarSchemes as Schemes, BarTypes as Types} from "./../Constants"
+import {Alignments, BarSchemes as Schemes, BarTypes as Types} from "./../../Constants"
 
 export default class Bar {
     constructor() {

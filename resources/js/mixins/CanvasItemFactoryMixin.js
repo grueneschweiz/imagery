@@ -1,6 +1,6 @@
 import {StyleSetTypes} from "../service/canvas/Constants";
-import BarGreen from "../service/canvas/elements/BarGreen";
-import BarYoung from "../service/canvas/elements/BarYoung";
+import BarGreen from "../service/canvas/elements/bar/BarGreen";
+import BarYoung from "../service/canvas/elements/bar/BarYoung";
 
 
 export default {

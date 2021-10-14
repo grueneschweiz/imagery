@@ -1,4 +1,4 @@
-import {Alignments, BarSchemes as Schemes, BarSizeFactor, BarTypes as Types} from "./../Constants";
+import {Alignments, BarSchemes as Schemes, BarSizeFactor, BarTypes as Types} from "./../../Constants";
 import Bar from "./Bar";
 
 
