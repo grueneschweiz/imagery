@@ -29,17 +29,17 @@
 
     const sublineHeadlineSizeRatio = 0.4;
 
-    import Bar from "../../service/canvas/elements/Bar";
     import {BarTypes as Types, BarSchemes as Schemes} from "../../service/canvas/Constants";
     import FontFaceObserver from "fontfaceobserver";
+    import CanvasItemFactoryMixin from "../../mixins/CanvasItemFactoryMixin";
 
     export default {
         name: "ABar",
-        mixins: [SnackbarMixin],
+        mixins: [SnackbarMixin, CanvasItemFactoryMixin],
         data() {
             return {
                 text: '',
-                bar: new Bar(),
+                bar: this.createBar(),
             }
         },
 
@@ -100,6 +100,10 @@
             inputClass() {
                 return this.schema === Schemes.magenta ? 'magenta' : 'green';
             },
+
+            styleSet() {
+                return this.$store.getters['canvas/getStyleSet']
+            }
         },
 
         mounted() {
@@ -165,6 +169,11 @@
             imageWidth() {
                 this.draw('imageWidth');
             },
+            styleSet() {
+                this.bar = this.createBar();
+                this.draw('font');
+                this.$emit('paddingChanged', this.bar.padding);
+            }
         }
     }
 </script>

@@ -1,3 +1,8 @@
+export const StyleSetTypes = {
+    green: 'green',
+    young: 'young'
+}
+
 export const Alignments = {
     left: -1,
     center: 0,
@@ -32,8 +37,8 @@ export const ColorSchemes = {
 };
 
 export const BarTypes = {
-    headline: 'SanukFat',
-    subline: 'SanukBold'
+    headline: 'headline',
+    subline: 'subline',
 };
 
 export const LogoTypes = {

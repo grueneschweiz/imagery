@@ -1,6 +1,10 @@
 <template>
     <div class="o-imagery" ref="container">
         <div class="o-imagery__controls-1">
+
+            <MStyleSetBlock/>
+            <!-- todo: link style set block with users permissions -->
+
             <MLogoBlock
                 :image-height="height"
                 :image-width="width"
@@ -100,6 +104,7 @@
     import MBorderBlock from "../molecules/MBorderBlock";
     import BorderLayer from "../../service/canvas/layers/BorderLayer";
     import MLogoBlock from "../molecules/MLogoBlock";
+    import MStyleSetBlock from "../molecules/MStyleSetBlock";
     import LogoLayer from "../../service/canvas/layers/LogoLayer";
     import MSizeBlock from "../molecules/MSizeBlock";
     import MAlignment from "../molecules/MAlignment";
@@ -119,6 +124,7 @@
             MBarBlock,
             MColorScheme,
             MLogoBlock,
+            MStyleSetBlock,
         },
 
         data() {
