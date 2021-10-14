@@ -6,7 +6,6 @@
             <!-- todo: link style set block with users permissions -->
 
             <MLogoBlock
-                :color-schema="schema"
                 @drawn="updateLogoLayer($event)"
             />
 
@@ -45,7 +44,6 @@
 
         <div class="o-imagery__controls-2">
             <MBarBlock
-                :color-schema="schema"
                 @drawn="updateBarLayer($event)"
                 @textChanged="keywords = $event"
                 @paddingChanged="textPadding = $event"
@@ -62,7 +60,6 @@
 
             <MColorScheme
                 v-if="this.backgroundType !== backgroundTypes.gradient"
-                v-model="schema"
             />
 
             <MBorderBlock
@@ -115,7 +112,6 @@
         data() {
             return {
                 canvas: null,
-                schema: ColorSchemes.white,
                 fontSize: 50,
                 textPadding: 0,
                 backgroundType: BackgroundTypes.gradient,
@@ -432,11 +428,10 @@
 
         watch: {
             backgroundType(value) {
-                if (BackgroundTypes.gradient === value) {
-                    this.schema = ColorSchemes.white;
-                } else {
-                    this.schema = ColorSchemes.green;
-                }
+                const schema = BackgroundTypes.gradient === value
+                    ? ColorSchemes.white
+                    : ColorSchemes.green
+                this.$store.dispatch('canvas/setColorSchema', schema)
 
                 this.setCanvasPos();
             },

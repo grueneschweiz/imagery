@@ -3,7 +3,6 @@
         <AButtonGroup
             :options="options"
             :title="$t('images.create.colorScheme')"
-            @input="$emit('input', $event)"
             v-model="scheme"
         ></AButtonGroup>
         <small v-if="scheme === schemes.greengreen"
@@ -19,7 +18,6 @@
         components: {AButtonGroup},
         data() {
             return {
-                scheme: this.value,
                 schemes: ColorSchemes,
                 options: [
                     {value: ColorSchemes.white, text: this.$t('images.create.white')},
@@ -28,15 +26,15 @@
                 ],
             }
         },
-        props: {
-            value: {
-                required: true,
-            },
-        },
-        watch: {
-            value(value) {
-                this.scheme = value;
+        computed: {
+            scheme: {
+                get() {
+                    return this.$store.getters['canvas/getColorSchema']
+                },
+                set(val) {
+                    this.$store.dispatch('canvas/setColorSchema', val)
+                }
             }
-        }
+        },
     }
 </script>

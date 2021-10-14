@@ -123,17 +123,12 @@
             }
         },
 
-        props: {
-            colorSchema: {
-                required: true,
-            },
-        },
-
         computed: {
             ...mapGetters({
                 alignment: 'canvas/getAlignment',
                 imageHeight: 'canvas/getImageHeight',
                 imageWidth: 'canvas/getImageWidth',
+                colorSchema: 'canvas/getColorSchema',
             }),
 
             schemaHeadlinePrimary() {

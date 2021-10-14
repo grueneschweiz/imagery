@@ -1,10 +1,11 @@
-import {Alignments, StyleSetTypes} from "../../service/canvas/Constants";
+import {Alignments, ColorSchemes, StyleSetTypes} from "../../service/canvas/Constants";
 
 const state = {
     styleSet: StyleSetTypes.young,
     alignment: Alignments.left,
     imageHeight: 0,
     imageWidth: 0,
+    colorSchema: ColorSchemes.white,
 };
 
 const getters = {
@@ -12,6 +13,7 @@ const getters = {
     getAlignment: state => state.alignment,
     getImageHeight: state => state.imageHeight,
     getImageWidth: state => state.imageWidth,
+    getColorSchema: state => state.colorSchema,
 };
 
 const mutations = {
@@ -19,6 +21,7 @@ const mutations = {
     setAlignment: (state, alignment) => state.alignment = alignment,
     setImageHeight: (state, height) => state.imageHeight = height,
     setImageWidth: (state, width) => state.imageWidth = width,
+    setColorSchema: (state, schema) => state.colorSchema = schema,
 };
 
 const actions = {
@@ -33,6 +36,9 @@ const actions = {
     },
     setImageWidth({commit}, width) {
         commit('setImageWidth', width)
+    },
+    setColorSchema({commit}, schema) {
+        commit('setColorSchema', schema)
     },
 };
 

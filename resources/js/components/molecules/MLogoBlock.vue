@@ -72,12 +72,6 @@
             }
         },
 
-        props: {
-            colorSchema: {
-                required: true,
-            }
-        },
-
         computed: {
             ...mapGetters({
                 logos: 'logosUsable/getAll',
@@ -85,6 +79,7 @@
                 loadingLogos: 'logosUsable/loading',
                 imageHeight: 'canvas/getImageHeight',
                 imageWidth: 'canvas/getImageWidth',
+                colorSchema: 'canvas/getColorSchema',
             }),
 
             logoIdDefault() {
