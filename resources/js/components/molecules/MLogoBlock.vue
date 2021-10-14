@@ -63,7 +63,6 @@
             return {
                 logo: new Logo(),
                 block: new LogoBlock(),
-                logoIdSelected: null,
                 logoObjSelected: null,
                 logoImage: null,
                 logoChoices: [],
@@ -81,6 +80,15 @@
                 imageWidth: 'canvas/getImageWidth',
                 colorSchema: 'canvas/getColorSchema',
             }),
+
+            logoIdSelected: {
+                get() {
+                    return this.$store.getters['canvas/getLogoId']
+                },
+                set(val) {
+                    return this.$store.dispatch('canvas/setLogoId', val)
+                }
+            },
 
             logoIdDefault() {
                 return this.$store.getters['user/object'].default_logo;
@@ -114,12 +122,7 @@
 
                 this.block.logo = this.drawLogo();
 
-                const data = {
-                    block: this.block.draw(),
-                    id: this.logoIdSelected
-                };
-
-                this.$emit('drawn', data);
+                this.$emit('drawn', this.block.draw());
             },
 
             drawLogo() {

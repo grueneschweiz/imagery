@@ -196,7 +196,7 @@
 
             uploadFinalImageMeta() {
                 const payload = {
-                    logo_id: this.imageData.logoId,
+                    logo_id: this.$store.getters['canvas/getLogoId'],
                     background: this.imageData.backgroundType,
                     type: 'final',
                     original_id: this.imageData.originalId,

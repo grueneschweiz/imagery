@@ -121,7 +121,6 @@
                 colorCopyrightBorder: '#666666',
                 colorCopyrightNoBorder: '#ffffff',
                 hasBorder: true,
-                logoId: null,
                 keywords: '',
 
                 viewHeight: document.documentElement.clientHeight,
@@ -282,19 +281,12 @@
                 this.draw();
             },
 
-            updateLogoLayer(data) {
-                if (!data) {
-                    this.logoBlock = null;
-                    this.logoId = null;
-                } else {
-                    this.logoBlock = data.block;
-                    this.logoId = data.id;
-                }
-
+            updateLogoLayer(logoBlock) {
                 if (!this.logoLayer) {
                     return;
                 }
 
+                this.logoBlock = logoBlock;
                 this.logoLayer.block = this.logoBlock;
                 this.draw();
             },
@@ -420,7 +412,6 @@
                     canvas: this.canvas,
                     backgroundType: this.backgroundType,
                     rawImage: this.rawImage,
-                    logoId: this.logoId,
                     keywords: this.keywords,
                 });
             },

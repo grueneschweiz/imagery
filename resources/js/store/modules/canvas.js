@@ -6,6 +6,7 @@ const state = {
     imageHeight: 0,
     imageWidth: 0,
     colorSchema: ColorSchemes.white,
+    logoId: null,
 };
 
 const getters = {
@@ -14,6 +15,7 @@ const getters = {
     getImageHeight: state => state.imageHeight,
     getImageWidth: state => state.imageWidth,
     getColorSchema: state => state.colorSchema,
+    getLogoId: state => state.logoId,
 };
 
 const mutations = {
@@ -22,6 +24,7 @@ const mutations = {
     setImageHeight: (state, height) => state.imageHeight = height,
     setImageWidth: (state, width) => state.imageWidth = width,
     setColorSchema: (state, schema) => state.colorSchema = schema,
+    setLogoId: (state, logoId) => state.logoId = logoId,
 };
 
 const actions = {
@@ -39,6 +42,9 @@ const actions = {
     },
     setColorSchema({commit}, schema) {
         commit('setColorSchema', schema)
+    },
+    setLogoId({commit}, logoId) {
+        commit('setLogoId', logoId)
     },
 };
 
