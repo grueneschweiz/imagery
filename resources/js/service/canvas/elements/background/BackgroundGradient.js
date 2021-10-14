@@ -1,4 +1,4 @@
-import {RotationAngle} from "./../Constants";
+import {RotationAngle} from "../../Constants";
 import Background from "./Background";
 
 const gradientColorDark = '#66971c';

@@ -68,9 +68,9 @@
 <script>
     import {BackgroundTypes as Types} from "../../service/canvas/Constants";
     import SnackbarMixin from "../../mixins/SnackbarMixin";
-    import BackgroundGradient from "../../service/canvas/elements/BackgroundGradient";
-    import BackgroundTransparent from "../../service/canvas/elements/BackgroundTransparent";
-    import BackgroundImage from "../../service/canvas/elements/BackgroundImage";
+    import BackgroundGradient from "../../service/canvas/elements/background/BackgroundGradient";
+    import BackgroundTransparent from "../../service/canvas/elements/background/BackgroundTransparent";
+    import BackgroundImage from "../../service/canvas/elements/background/BackgroundImage";
     import loadImage from "blueimp-load-image";
     import {mapGetters} from "vuex";
 
