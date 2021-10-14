@@ -186,6 +186,7 @@
             "width": "Width (px)",
             "height": "Height (px)",
             "oversizeWarning": "Large images may slow down your browsers performance.",
+            "oversizeError": "The maximum image size is {maxWidth}x{maxHeight} pixels.",
             "preview": "Preview",
             "dragHelpBar": "Drag the bars into the position of your desire.",
             "dragHelp": "Drag the bars and the image into the position of your desire.",

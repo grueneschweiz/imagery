@@ -14,6 +14,7 @@
 
 <script>
     import {Copyright} from "../../service/canvas/elements/Copyright";
+    import {mapGetters} from "vuex";
 
     export default {
         name: "MCopyright",
@@ -26,18 +27,17 @@
         },
 
         props: {
-            imageWidth: {
-                required: true,
-                type: Number,
-            },
-            imageHeight: {
-                required: true,
-                type: Number,
-            },
             color: {
                 required: true,
                 type: String,
             },
+        },
+
+        computed: {
+          ...mapGetters({
+            imageHeight: 'canvas/getImageHeight',
+            imageWidth: 'canvas/getImageWidth',
+          }),
         },
 
         mounted() {

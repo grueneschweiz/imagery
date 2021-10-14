@@ -73,14 +73,6 @@
         },
 
         props: {
-            imageWidth: {
-                required: true,
-                type: Number,
-            },
-            imageHeight: {
-                required: true,
-                type: Number
-            },
             colorSchema: {
                 required: true,
             }
@@ -91,6 +83,8 @@
                 logos: 'logosUsable/getAll',
                 getLogoById: 'logosUsable/getById',
                 loadingLogos: 'logosUsable/loading',
+                imageHeight: 'canvas/getImageHeight',
+                imageWidth: 'canvas/getImageWidth',
             }),
 
             logoIdDefault() {

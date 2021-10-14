@@ -28,7 +28,6 @@
                 :base-font-size="fontSize"
                 :cloneable="headlinesCount < 3"
                 :deletable="headlinesPrimaryCount > 1"
-                :image-width="imageWidth"
                 :initialText="initialText ? initialText : 'Headline 1'"
                 :key="`headlinePrimary-${n}`"
                 :schema="schemaHeadlinePrimary"
@@ -46,7 +45,6 @@
                 :base-font-size="fontSize"
                 :cloneable="headlinesCount < 3"
                 :deletable="headlinesSecondaryCount > 1"
-                :image-width="imageWidth"
                 :initialText="initialText ? initialText : 'Headline 2'"
                 :key="`headlineSecondary-${n}`"
                 :schema="schemaHeadlineSecondary"
@@ -63,7 +61,6 @@
                 :base-font-size="fontSize"
                 :cloneable="sublinesCount < 2"
                 :deletable="sublinesCount > 0"
-                :image-width="imageWidth"
                 :initialText="initialText ? initialText : 'Subline'"
                 :key="`subline-${n}`"
                 :schema="schemaSubline"
@@ -92,6 +89,8 @@
 </template>
 
 <script>
+    import {mapGetters} from "vuex";
+
     const minFontSizeFactor = 0.08; // the correct 175% would be 0.0925
     const maxFontSizeFactor = 1.08;
 
@@ -128,17 +127,15 @@
             colorSchema: {
                 required: true,
             },
-            imageWidth: {
-                required: true,
-                type: Number,
-            },
-            imageHeight: {
-                required: true,
-                type: Number
-            }
         },
 
         computed: {
+            ...mapGetters({
+                alignment: 'canvas/getAlignment',
+                imageHeight: 'canvas/getImageHeight',
+                imageWidth: 'canvas/getImageWidth',
+            }),
+
             schemaHeadlinePrimary() {
                 if (ColorSchemes.white === this.colorSchema) {
                     return Schemes.white;
@@ -190,10 +187,6 @@
                 return this.headlinesPrimaryCount
                     + this.headlinesSecondaryCount;
             },
-
-            alignment() {
-                return this.$store.getters['canvas/getAlignment']
-            }
         },
 
         created() {

@@ -6,19 +6,13 @@
             <!-- todo: link style set block with users permissions -->
 
             <MLogoBlock
-                :image-height="height"
-                :image-width="width"
                 :color-schema="schema"
                 @drawn="updateLogoLayer($event)"
             />
 
-            <MSizeBlock
-                @sizeChanged="setSize($event)"
-            />
+            <MSizeBlock/>
 
             <MBackgroundBlock
-                :image-height="height"
-                :image-width="width"
                 @drawn="updateBackgroundLayer($event)"
                 @imageChanged="rawImage = $event"
                 @typeChanged="backgroundType = $event"
@@ -52,8 +46,6 @@
         <div class="o-imagery__controls-2">
             <MBarBlock
                 :color-schema="schema"
-                :image-height="height"
-                :image-width="width"
                 @drawn="updateBarLayer($event)"
                 @textChanged="keywords = $event"
                 @paddingChanged="textPadding = $event"
@@ -62,8 +54,6 @@
 
             <MCopyright
                 :color="hasBorder ? colorCopyrightBorder : colorCopyrightNoBorder"
-                :image-height="height"
-                :image-width="width"
                 @drawn="updateCopyrightLayer($event)"
                 v-if="hasImageBackground"
             />
@@ -76,8 +66,6 @@
             />
 
             <MBorderBlock
-                :image-height="height"
-                :image-width="width"
                 @drawn="updateBorderLayer($event)"
                 @widthChanged="borderWidth = $event"
                 @borderSettingChanged="hasBorder = $event"
@@ -108,6 +96,7 @@
     import debounce from 'lodash/debounce';
     import MCopyright from "../molecules/MCopyright";
     import CopyrightLayer from "../../service/canvas/layers/CopyrightLayer";
+    import {mapGetters} from "vuex";
 
     export default {
         name: "OImagery",
@@ -127,8 +116,6 @@
             return {
                 canvas: null,
                 schema: ColorSchemes.white,
-                width: 1080,
-                height: 1080,
                 fontSize: 50,
                 textPadding: 0,
                 backgroundType: BackgroundTypes.gradient,
@@ -167,6 +154,12 @@
         },
 
         computed: {
+            ...mapGetters({
+                alignment: 'canvas/getAlignment',
+                height: 'canvas/getImageHeight',
+                width: 'canvas/getImageWidth',
+            }),
+
             canvasClasses() {
                 return {
                     'bar-dragging': this.dragObj,
@@ -203,10 +196,6 @@
             hasImageBackground() {
                 return this.backgroundType === BackgroundTypes.image && this.rawImage;
             },
-
-            alignment() {
-                return this.$store.getters['canvas/getAlignment']
-            }
         },
 
         created() {
@@ -339,11 +328,6 @@
                     this.copyrightLayer.border = this.hasBorder;
                     this.copyrightLayer.draw();
                 }
-            },
-
-            setSize(dims) {
-                this.width = dims.width;
-                this.height = dims.height;
             },
 
             setCanvasZoneLeft: debounce(function () {

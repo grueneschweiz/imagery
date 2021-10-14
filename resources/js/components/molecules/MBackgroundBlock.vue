@@ -72,6 +72,7 @@
     import BackgroundTransparent from "../../service/canvas/elements/BackgroundTransparent";
     import BackgroundImage from "../../service/canvas/elements/BackgroundImage";
     import loadImage from "blueimp-load-image";
+    import {mapGetters} from "vuex";
 
     const mimeTypesAllowed = [
         'image/jpeg',
@@ -98,18 +99,12 @@
             }
         },
 
-        props: {
-            imageWidth: {
-                required: true,
-                type: Number,
-            },
-            imageHeight: {
-                required: true,
-                type: Number
-            }
-        },
-
         computed: {
+            ...mapGetters({
+                imageHeight: 'canvas/getImageHeight',
+                imageWidth: 'canvas/getImageWidth',
+            }),
+
             imageTooSmall() {
                 if (!this.image) {
                     return false;

@@ -32,6 +32,7 @@
     import {BarTypes as Types, BarSchemes as Schemes} from "../../service/canvas/Constants";
     import FontFaceObserver from "fontfaceobserver";
     import CanvasItemFactoryMixin from "../../mixins/CanvasItemFactoryMixin";
+    import {mapGetters} from "vuex";
 
     export default {
         name: "ABar",
@@ -54,10 +55,6 @@
                 required: true,
                 type: Number,
             },
-            imageWidth: {
-                required: true,
-                type: Number,
-            },
             deletable: {
                 required: true,
                 type: Boolean,
@@ -73,6 +70,12 @@
         },
 
         computed: {
+            ...mapGetters({
+                styleSet: 'canvas/getStyleSet',
+                alignment: 'canvas/getAlignment',
+                imageWidth: 'canvas/getImageWidth',
+            }),
+
             fontSize() {
                 if (this.type === Types.headline) {
                     return this.baseFontSize;
@@ -97,14 +100,6 @@
             inputClass() {
                 return this.schema === Schemes.magenta ? 'magenta' : 'green';
             },
-
-            styleSet() {
-                return this.$store.getters['canvas/getStyleSet']
-            },
-
-            alignment() {
-                return this.$store.getters['canvas/getAlignment']
-            }
         },
 
         mounted() {

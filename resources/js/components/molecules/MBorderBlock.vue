@@ -26,6 +26,7 @@
 <script>
     import {Border} from "../../service/canvas/elements/Border";
     import ASelect from "../atoms/ASelect";
+    import {mapGetters} from "vuex";
 
     export default {
         name: "MBorderBlock",
@@ -37,15 +38,11 @@
             }
         },
 
-        props: {
-            imageWidth: {
-                required: true,
-                type: Number,
-            },
-            imageHeight: {
-                required: true,
-                type: Number
-            }
+        computed: {
+            ...mapGetters({
+                imageHeight: 'canvas/getImageHeight',
+                imageWidth: 'canvas/getImageWidth',
+            }),
         },
 
         mounted() {
