@@ -57,7 +57,7 @@
             <MAlignment/>
 
             <MColorScheme
-                v-if="this.backgroundType !== backgroundTypes.gradient"
+                v-if="backgroundType !== backgroundTypes.gradient"
             />
 
             <MBorderBlock
