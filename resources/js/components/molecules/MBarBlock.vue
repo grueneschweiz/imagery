@@ -25,7 +25,6 @@
             >{{$t('images.create.bars')}}</label>
 
             <ABar
-                :alignment="alignment"
                 :base-font-size="fontSize"
                 :cloneable="headlinesCount < 3"
                 :deletable="headlinesPrimaryCount > 1"
@@ -44,7 +43,6 @@
             />
 
             <ABar
-                :alignment="alignment"
                 :base-font-size="fontSize"
                 :cloneable="headlinesCount < 3"
                 :deletable="headlinesSecondaryCount > 1"
@@ -62,7 +60,6 @@
             />
 
             <ABar
-                :alignment="alignment"
                 :base-font-size="fontSize"
                 :cloneable="sublinesCount < 2"
                 :deletable="sublinesCount > 0"
@@ -128,9 +125,6 @@
         },
 
         props: {
-            alignment: {
-                required: true,
-            },
             colorSchema: {
                 required: true,
             },
@@ -195,6 +189,10 @@
             headlinesCount() {
                 return this.headlinesPrimaryCount
                     + this.headlinesSecondaryCount;
+            },
+
+            alignment() {
+                return this.$store.getters['canvas/getAlignment']
             }
         },
 

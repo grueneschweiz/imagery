@@ -16,21 +16,20 @@
         components: {AButtonGroup},
         data() {
             return {
-                alignment: this.value,
                 options: [
                     {value: Alignments.left, text: this.$t('images.create.barsLeft')},
                     {value: Alignments.right, text: this.$t('images.create.barsRight')},
                 ],
             }
         },
-        props: {
-            value: {
-                required: true,
-            },
-        },
-        watch: {
-            value(value) {
-                this.alignment = value;
+        computed: {
+            alignment: {
+                get() {
+                    return this.$store.getters['canvas/getAlignment']
+                },
+                set(value) {
+                    this.$store.commit('canvas/setAlignment', value)
+                }
             }
         }
     }

@@ -44,9 +44,6 @@
         },
 
         props: {
-            alignment: {
-                required: true,
-            },
             type: {
                 required: true,
             },
@@ -103,6 +100,10 @@
 
             styleSet() {
                 return this.$store.getters['canvas/getStyleSet']
+            },
+
+            alignment() {
+                return this.$store.getters['canvas/getAlignment']
             }
         },
 

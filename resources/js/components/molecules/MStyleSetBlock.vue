@@ -42,7 +42,7 @@
                     return this.$store.getters['canvas/getStyleSet'];
                 },
                 set(value) {
-                    return this.$store.commit('canvas/setStyleSet', value);
+                    this.$store.commit('canvas/setStyleSet', value);
                 },
             },
         },

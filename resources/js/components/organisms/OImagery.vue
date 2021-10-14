@@ -8,7 +8,6 @@
             <MLogoBlock
                 :image-height="height"
                 :image-width="width"
-                :alignment="alignment"
                 :color-schema="schema"
                 @drawn="updateLogoLayer($event)"
             />
@@ -52,7 +51,6 @@
 
         <div class="o-imagery__controls-2">
             <MBarBlock
-                :alignment="alignment"
                 :color-schema="schema"
                 :image-height="height"
                 :image-width="width"
@@ -70,9 +68,7 @@
                 v-if="hasImageBackground"
             />
 
-            <MAlignment
-                v-model="alignment"
-            />
+            <MAlignment/>
 
             <MColorScheme
                 v-if="this.backgroundType !== backgroundTypes.gradient"
@@ -96,7 +92,7 @@
 </template>
 
 <script>
-    import {Alignments, BackgroundTypes, ColorSchemes} from "../../service/canvas/Constants";
+    import {BackgroundTypes, ColorSchemes} from "../../service/canvas/Constants";
     import MBarBlock from "../molecules/MBarBlock";
     import BarLayer from "../../service/canvas/layers/BarLayer";
     import BackgroundLayer from "../../service/canvas/layers/BackgroundLayer";
@@ -130,7 +126,6 @@
         data() {
             return {
                 canvas: null,
-                alignment: Alignments.left,
                 schema: ColorSchemes.white,
                 width: 1080,
                 height: 1080,
@@ -207,6 +202,10 @@
 
             hasImageBackground() {
                 return this.backgroundType === BackgroundTypes.image && this.rawImage;
+            },
+
+            alignment() {
+                return this.$store.getters['canvas/getAlignment']
             }
         },
 
