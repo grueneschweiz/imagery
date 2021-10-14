@@ -212,8 +212,8 @@
             onImageLoaded(image) {
                 this.image = image;
                 this.$store.commit('legal/reset');
-                this.$emit('typeChanged', Types.image);
-                this.$emit('imageChanged', {image: image, mimeType: this.mimeType});
+                this.$store.dispatch('canvas/setBackgroundType', Types.image)
+                this.$store.dispatch('canvas/setBackgroundImage', {image: image, mimeType: this.mimeType})
             },
 
             mimeValidate(type) {
@@ -241,7 +241,7 @@
                     return;
                 }
 
-                this.$emit('typeChanged', value);
+                this.$store.dispatch('canvas/setBackgroundType', value)
                 this.draw();
             },
             image() {

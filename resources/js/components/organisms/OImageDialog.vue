@@ -45,6 +45,7 @@
     import ODialog from "../organisms/ODialog";
     import MLegalForm from "../molecules/MLegalForm";
     import UnauthorizedHandlerMixin from "../../mixins/UnauthorizedHandlerMixin";
+    import {mapGetters} from "vuex";
 
     const metaUploadProgress = 5;
     const legalUploadProgress = 5;
@@ -79,9 +80,15 @@
 
 
         computed: {
+            ...mapGetters({
+                logoId: 'canvas/getLogoId',
+                rawImage: 'canvas/getBackgroundImage',
+                backgroundType: 'canvas/getBackgroundType'
+            }),
+
             hasRawImage() {
-                return this.imageData.backgroundType === BackgroundTypes.image
-                    && this.imageData.rawImage;
+                return this.backgroundType === BackgroundTypes.image
+                    && this.rawImage;
             },
 
             uploadImagesTotalWeight() {
@@ -110,7 +117,7 @@
             },
 
             rawImageExportType() {
-                return 'image/jpeg' === this.imageData.rawImage.mimeType ? 'image/jpeg' : 'image/png';
+                return 'image/jpeg' === this.rawImage.mimeType ? 'image/jpeg' : 'image/png';
             },
 
             rawImageExtension() {
@@ -118,7 +125,7 @@
             },
 
             rawImageDataUrl() {
-                return this.imageData.rawImage.image.toDataURL(this.rawImageExportType);
+                return this.rawImage.image.toDataURL(this.rawImageExportType);
             },
 
             uploadStatus() {
@@ -196,8 +203,8 @@
 
             uploadFinalImageMeta() {
                 const payload = {
-                    logo_id: this.$store.getters['canvas/getLogoId'],
-                    background: this.imageData.backgroundType,
+                    logo_id: this.logoId,
+                    background: this.backgroundType,
                     type: 'final',
                     original_id: this.imageData.originalId,
                     filename: this.imageData.filenameFinal,
@@ -209,7 +216,7 @@
 
             uploadRawImageMeta() {
                 const payload = {
-                    background: this.imageData.backgroundType,
+                    background: this.backgroundType,
                     type: 'raw',
                     filename: this.imageData.filenameRaw,
                     keywords: this.imageData.keywords,

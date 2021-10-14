@@ -1,4 +1,4 @@
-import {Alignments, ColorSchemes, StyleSetTypes} from "../../service/canvas/Constants";
+import {Alignments, BackgroundTypes, ColorSchemes, StyleSetTypes} from "../../service/canvas/Constants";
 
 const state = {
     styleSet: StyleSetTypes.young,
@@ -7,6 +7,8 @@ const state = {
     imageWidth: 0,
     colorSchema: ColorSchemes.white,
     logoId: null,
+    backgroundType: BackgroundTypes.gradient,
+    backgroundImage: null,
 };
 
 const getters = {
@@ -16,6 +18,8 @@ const getters = {
     getImageWidth: state => state.imageWidth,
     getColorSchema: state => state.colorSchema,
     getLogoId: state => state.logoId,
+    getBackgroundType: state => state.backgroundType,
+    getBackgroundImage: state => state.backgroundImage,
 };
 
 const mutations = {
@@ -25,6 +29,8 @@ const mutations = {
     setImageWidth: (state, width) => state.imageWidth = width,
     setColorSchema: (state, schema) => state.colorSchema = schema,
     setLogoId: (state, logoId) => state.logoId = logoId,
+    setBackgroundType: (state, type) => state.backgroundType = type,
+    setBackgroundImage: (state, image) => state.backgroundImage = image,
 };
 
 const actions = {
@@ -46,6 +52,12 @@ const actions = {
     setLogoId({commit}, logoId) {
         commit('setLogoId', logoId)
     },
+    setBackgroundType({commit}, type) {
+        commit('setBackgroundType', type)
+    },
+    setBackgroundImage({commit}, image) {
+        commit('setBackgroundImage', image)
+    }
 };
 
 export default {

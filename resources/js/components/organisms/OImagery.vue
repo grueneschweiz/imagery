@@ -13,8 +13,6 @@
 
             <MBackgroundBlock
                 @drawn="updateBackgroundLayer($event)"
-                @imageChanged="rawImage = $event"
-                @typeChanged="backgroundType = $event"
             />
         </div>
 
@@ -114,9 +112,7 @@
                 canvas: null,
                 fontSize: 50,
                 textPadding: 0,
-                backgroundType: BackgroundTypes.gradient,
                 backgroundTypes: BackgroundTypes,
-                rawImage: null,
                 borderWidth: 0,
                 colorCopyrightBorder: '#666666',
                 colorCopyrightNoBorder: '#ffffff',
@@ -153,6 +149,8 @@
                 alignment: 'canvas/getAlignment',
                 height: 'canvas/getImageHeight',
                 width: 'canvas/getImageWidth',
+                backgroundType: 'canvas/getBackgroundType',
+                backgroundImage: 'canvas/getBackgroundImage',
             }),
 
             canvasClasses() {
@@ -189,7 +187,7 @@
             },
 
             hasImageBackground() {
-                return this.backgroundType === BackgroundTypes.image && this.rawImage;
+                return this.backgroundType === BackgroundTypes.image && this.backgroundImage;
             },
         },
 
@@ -410,8 +408,6 @@
             save() {
                 this.$emit('save', {
                     canvas: this.canvas,
-                    backgroundType: this.backgroundType,
-                    rawImage: this.rawImage,
                     keywords: this.keywords,
                 });
             },
