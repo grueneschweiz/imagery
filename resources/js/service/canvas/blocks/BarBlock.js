@@ -71,10 +71,18 @@ export default class BarBlock {
     }
 
     _drawBar(bar, y) {
-        let x = 0;
+        let x;
 
-        if (this._alignment === Alignments.right) {
-            x = this._canvas.width - bar.width;
+        switch (this._alignment) {
+            case Alignments.right:
+                x = this._canvas.width - bar.width
+                break
+            case Alignments.center:
+                x = (this._canvas.width - bar.width) / 2
+                break
+            case Alignments.left:
+            default:
+                x = 0
         }
 
         this._context.drawImage(bar, x, y);

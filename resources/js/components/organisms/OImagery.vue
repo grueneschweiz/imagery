@@ -49,7 +49,6 @@
             />
 
             <MCopyright
-                :color="hasBorder ? colorCopyrightBorder : colorCopyrightNoBorder"
                 @drawn="updateCopyrightLayer($event)"
                 v-if="hasImageBackground"
             />
@@ -111,8 +110,6 @@
                 fontSize: 50,
                 textPadding: 0,
                 backgroundTypes: BackgroundTypes,
-                colorCopyrightBorder: '#666666',
-                colorCopyrightNoBorder: '#ffffff',
                 keywords: '',
 
                 viewHeight: document.documentElement.clientHeight,

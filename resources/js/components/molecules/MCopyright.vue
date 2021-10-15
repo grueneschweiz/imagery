@@ -16,6 +16,9 @@
     import {Copyright} from "../../service/canvas/elements/Copyright";
     import {mapGetters} from "vuex";
 
+    const colorCopyrightBorder = '#666666'
+    const colorCopyrightNoBorder = '#ffffff'
+
     export default {
         name: "MCopyright",
 
@@ -26,18 +29,15 @@
             }
         },
 
-        props: {
-            color: {
-                required: true,
-                type: String,
-            },
-        },
-
         computed: {
-          ...mapGetters({
-            imageHeight: 'canvas/getImageHeight',
-            imageWidth: 'canvas/getImageWidth',
-          }),
+            ...mapGetters({
+                imageHeight: 'canvas/getImageHeight',
+                imageWidth: 'canvas/getImageWidth',
+                hasBorder: 'canvas/getHasBorder',
+            }),
+            color() {
+                return this.hasBorder ? colorCopyrightBorder : colorCopyrightNoBorder
+            }
         },
 
         mounted() {
