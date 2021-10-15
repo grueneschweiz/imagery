@@ -29,7 +29,6 @@ export default class BarYoung extends Bar {
     }
 
     draw() {
-        console.log('sub: '+ this._font, this instanceof BarYoung)
         this._setFont();
         this._setTextDims();
         this._setCanvasWidth();
