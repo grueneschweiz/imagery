@@ -150,6 +150,9 @@
     "images": {
         "create": {
             "title": "Create Image",
+            "styleSet": "Style",
+            "styleSetGreen": "GREEN",
+            "styleSetYoung": "Young Green",
             "logo": "Logo",
             "logoDefault": "Always preselect this logo",
             "logoDefaultSelected": "Preselected",
