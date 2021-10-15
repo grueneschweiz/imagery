@@ -34,7 +34,6 @@
         data() {
             return {
                 block: new Border(),
-                border: true
             }
         },
 
@@ -43,11 +42,19 @@
                 imageHeight: 'canvas/getImageHeight',
                 imageWidth: 'canvas/getImageWidth',
             }),
+
+            border: {
+                get() {
+                    return this.$store.getters['canvas/getHasBorder']
+                },
+                set(val) {
+                    this.$store.dispatch('canvas/setHasBorder', val)
+                }
+            }
         },
 
         mounted() {
             this.draw();
-            this.$emit('widthChanged', this.block.borderWidth);
         },
 
         methods: {
@@ -56,21 +63,19 @@
                 this.block.height = this.imageHeight;
                 this.block.border = this.border;
                 this.$emit('drawn', this.block.draw());
+                this.$store.dispatch('canvas/setBorderWidth', this.block.borderWidth)
             },
         },
 
         watch: {
             imageWidth() {
                 this.draw();
-                this.$emit('widthChanged', this.block.borderWidth);
             },
             imageHeight() {
                 this.draw();
-                this.$emit('widthChanged', this.block.borderWidth);
             },
             border() {
                 this.draw();
-                this.$emit('borderSettingChanged', this.border);
             }
         },
     }

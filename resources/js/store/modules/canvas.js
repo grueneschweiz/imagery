@@ -9,6 +9,8 @@ const state = {
     logoId: null,
     backgroundType: BackgroundTypes.gradient,
     backgroundImage: null,
+    hasBorder: true,
+    borderWidth: 0,
 };
 
 const getters = {
@@ -20,6 +22,8 @@ const getters = {
     getLogoId: state => state.logoId,
     getBackgroundType: state => state.backgroundType,
     getBackgroundImage: state => state.backgroundImage,
+    getHasBorder: state => state.hasBorder,
+    getBorderWidth: state => state.borderWidth,
 };
 
 const mutations = {
@@ -31,6 +35,8 @@ const mutations = {
     setLogoId: (state, logoId) => state.logoId = logoId,
     setBackgroundType: (state, type) => state.backgroundType = type,
     setBackgroundImage: (state, image) => state.backgroundImage = image,
+    setHasBorder: (state, border) => state.hasBorder = border,
+    setBorderWidth: (state, width) => state.borderWidth = width,
 };
 
 const actions = {
@@ -57,7 +63,13 @@ const actions = {
     },
     setBackgroundImage({commit}, image) {
         commit('setBackgroundImage', image)
-    }
+    },
+    setHasBorder({commit}, border) {
+        commit('setHasBorder', border)
+    },
+    setBorderWidth({commit}, width) {
+        commit('setBorderWidth', width)
+    },
 };
 
 export default {

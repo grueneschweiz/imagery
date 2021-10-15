@@ -62,8 +62,6 @@
 
             <MBorderBlock
                 @drawn="updateBorderLayer($event)"
-                @widthChanged="borderWidth = $event"
-                @borderSettingChanged="hasBorder = $event"
             />
 
             <button
@@ -113,10 +111,8 @@
                 fontSize: 50,
                 textPadding: 0,
                 backgroundTypes: BackgroundTypes,
-                borderWidth: 0,
                 colorCopyrightBorder: '#666666',
                 colorCopyrightNoBorder: '#ffffff',
-                hasBorder: true,
                 keywords: '',
 
                 viewHeight: document.documentElement.clientHeight,
@@ -151,6 +147,8 @@
                 width: 'canvas/getImageWidth',
                 backgroundType: 'canvas/getBackgroundType',
                 backgroundImage: 'canvas/getBackgroundImage',
+                hasBorder: 'canvas/getHasBorder',
+                borderWidth: 'canvas/getBorderWidth',
             }),
 
             canvasClasses() {
