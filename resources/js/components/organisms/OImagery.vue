@@ -43,8 +43,6 @@
         <div class="o-imagery__controls-2">
             <MBarBlock
                 @drawn="updateBarLayer($event)"
-                @textChanged="keywords = $event"
-                @paddingChanged="textPadding = $event"
                 class="mt-2"
             />
 
@@ -108,9 +106,7 @@
             return {
                 canvas: null,
                 fontSize: 50,
-                textPadding: 0,
                 backgroundTypes: BackgroundTypes,
-                keywords: '',
 
                 viewHeight: document.documentElement.clientHeight,
                 viewWidth: document.documentElement.clientWidth,
@@ -146,6 +142,7 @@
                 backgroundImage: 'canvas/getBackgroundImage',
                 hasBorder: 'canvas/getHasBorder',
                 borderWidth: 'canvas/getBorderWidth',
+                bars: 'canvas/getBars',
             }),
 
             canvasClasses() {
@@ -184,6 +181,14 @@
             hasImageBackground() {
                 return this.backgroundType === BackgroundTypes.image && this.backgroundImage;
             },
+
+            textPadding() {
+                if (!this.bars.length) {
+                    return 0
+                }
+
+                return this.bars[0].padding
+            }
         },
 
         created() {
@@ -403,7 +408,6 @@
             save() {
                 this.$emit('save', {
                     canvas: this.canvas,
-                    keywords: this.keywords,
                 });
             },
         },

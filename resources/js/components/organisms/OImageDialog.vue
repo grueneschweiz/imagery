@@ -83,8 +83,15 @@
             ...mapGetters({
                 logoId: 'canvas/getLogoId',
                 rawImage: 'canvas/getBackgroundImage',
-                backgroundType: 'canvas/getBackgroundType'
+                backgroundType: 'canvas/getBackgroundType',
             }),
+
+            keywords() {
+                return this.$store.getters['canvas/getBars']
+                    .map(bar => bar.text)
+                    .reduce((concatenated, barText) => concatenated + ' ' + barText, '')
+                    .trim()
+            },
 
             hasRawImage() {
                 return this.backgroundType === BackgroundTypes.image
@@ -208,7 +215,7 @@
                     type: 'final',
                     original_id: this.imageData.originalId,
                     filename: this.imageData.filenameFinal,
-                    keywords: this.imageData.keywords,
+                    keywords: this.keywords,
                 };
 
                 return this.uploadImageMeta(payload);
@@ -219,7 +226,7 @@
                     background: this.backgroundType,
                     type: 'raw',
                     filename: this.imageData.filenameRaw,
-                    keywords: this.imageData.keywords,
+                    keywords: this.keywords,
                 };
 
                 const cb = resp => this.imageData.originalId = resp.data.id;

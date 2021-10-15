@@ -6,62 +6,51 @@
                 class="form-control col"
                 type="text"
                 v-model="text"
-                @input="$emit('textChanged', text)"
-            >
+            />
             <button
                 :class="buttonClass"
                 :title="$t('images.create.barAdd')"
-                @click="$emit('clone', text)"
+                :disabled="!cloneable"
                 class="btn ml-1"
-                v-if="cloneable"><i class="mdi mdi-add"></i></button>
+                @click="clone"><i class="mdi mdi-add"></i></button>
             <button
                 :class="buttonClass"
                 :title="$t('images.create.barRemove')"
-                @click="$emit('remove')"
+                :disabled="!deletable"
                 class="btn ml-1"
-                v-if="deletable"><i class="mdi mdi-remove"></i></button>
+                @click="remove"><i class="mdi mdi-remove"></i></button>
         </div>
     </div>
 </template>
 
 <script>
     import SnackbarMixin from "../../mixins/SnackbarMixin";
-
-    const sublineHeadlineSizeRatio = 0.4;
-
-    import {BarTypes as Types, BarSchemes as Schemes} from "../../service/canvas/Constants";
+    import {
+        BarTypes as Types,
+        BarSchemes,
+        BarTypes,
+        ColorSchemes
+    } from "../../service/canvas/Constants";
     import FontFaceObserver from "fontfaceobserver";
     import CanvasItemFactoryMixin from "../../mixins/CanvasItemFactoryMixin";
     import {mapGetters} from "vuex";
 
+    const sublineHeadlineSizeRatio = 0.4;
+
     export default {
         name: "ABar",
         mixins: [SnackbarMixin, CanvasItemFactoryMixin],
+
         data() {
             return {
-                text: '',
-                bar: this.createBar(),
+                drawObj: this.createBar(),
             }
         },
 
         props: {
-            type: {
+            index: {
                 required: true,
-            },
-            schema: {
-                required: true,
-            },
-            deletable: {
-                required: true,
-                type: Boolean,
-            },
-            cloneable: {
-                required: true,
-                type: Boolean
-            },
-            initialText: {
-                required: true,
-                type: String
+                type: Number
             },
         },
 
@@ -71,61 +60,120 @@
                 alignment: 'canvas/getAlignment',
                 imageWidth: 'canvas/getImageWidth',
                 baseFontSize: 'canvas/getFontSize',
+                bars: 'canvas/getBars',
+                colorSchema: 'canvas/getColorSchema'
             }),
 
+            bar() {
+                return this.bars[this.index]
+            },
+
+            text: {
+                get() {
+                    return this.bar.text
+                },
+                set(val) {
+                    this.$set(this.bar, 'text', val)
+                    this.draw()
+                }
+            },
+
             fontSize() {
-                if (this.type === Types.headline) {
+                if (this.bar.type === Types.headline) {
                     return this.baseFontSize;
                 } else {
                     return this.baseFontSize * sublineHeadlineSizeRatio;
                 }
             },
 
+            barSchema() {
+                if (BarSchemes.magenta === this.bar.schema) {
+                    return this.bar.schema
+                }
+
+                if (BarTypes.headline === this.bar.type) {
+                    return ColorSchemes.white === this.colorSchema
+                        ? BarSchemes.white
+                        : BarSchemes.green
+                }
+
+                if (BarTypes.subline === this.bar.type) {
+                    return ColorSchemes.greengreen === this.colorSchema
+                        ? BarSchemes.green
+                        : BarSchemes.white
+                }
+
+                return BarSchemes.green
+            },
+
             buttonClass() {
-                switch (this.schema) {
-                    case Schemes.green:
+                switch (this.barSchema) {
+                    case BarSchemes.green:
                         return 'btn-secondary';
 
-                    case Schemes.magenta:
-                        return 'btn-primary';
+                    case BarSchemes.magenta:
+                        return this.colorSchema === ColorSchemes.white
+                            ? 'btn-outline-primary'
+                            : 'btn-primary';
 
-                    case Schemes.white:
+                    case BarSchemes.white:
                         return 'btn-outline-secondary';
                 }
             },
 
             inputClass() {
-                return this.schema === Schemes.magenta ? 'magenta' : 'green';
+                return this.barSchema === BarSchemes.magenta ? 'magenta' : 'green';
+            },
+
+            cloneable() {
+                if (this.bar.type === BarTypes.headline) {
+                    return this.bars
+                        .filter(bar => bar.type === BarTypes.headline)
+                        .length < 3
+                }
+                if (this.bar.type === BarTypes.subline) {
+                    return this.bars
+                        .filter(bar => bar.type === BarTypes.subline)
+                        .length < 2
+                }
+                return false
+            },
+
+            deletable() {
+                if (this.bar.type === BarTypes.headline) {
+                    return this.bars
+                        .filter(bar =>
+                            bar.type === this.bar.type
+                            && bar.schema === this.bar.schema
+                        )
+                        .length > 1
+                }
+                return this.bar.type === BarTypes.subline
             },
         },
 
         mounted() {
-            this.text = this.initialText;
-            this.draw('create');
-            this.loadFonts().then(() => {
-                this.draw('font');
-                this.$emit('paddingChanged', this.bar.padding);
-            });
-        },
-
-        destroyed() {
-            this.$emit('removed');
+            this.draw()
+            this.loadFonts().then(this.draw)
         },
 
         methods: {
-            draw(action) {
-                this.bar.text = this.text;
-                this.bar.alignment = this.alignment;
-                this.bar.type = this.type;
-                this.bar.schema = this.schema;
-                this.bar.fontSize = this.fontSize;
-                this.bar.imageWidth = this.imageWidth;
+            draw() {
+                this.drawObj.text = this.bar.text;
+                this.drawObj.alignment = this.alignment;
+                this.drawObj.type = this.bar.type;
+                this.drawObj.schema = this.barSchema;
+                this.drawObj.fontSize = this.fontSize;
+                this.drawObj.imageWidth = this.imageWidth;
 
-                this.$emit('drawn', this.bar.draw(), action);
+                this.bar.canvas = this.drawObj.draw()
 
-                if ('baseFontSize' === action) {
-                    this.$emit('paddingChanged', this.bar.padding);
-                }
+                this.bar.padding = this.drawObj.padding;
+
+                this.$store.dispatch(
+                    'canvas/setBar',
+                    {index: this.index, bar: {...this.bar}}
+                )
             },
 
             loadFonts() {
@@ -141,31 +189,43 @@
                         )
                     );
             },
+
+            remove() {
+                this.$store.dispatch('canvas/removeBar', {index: this.index})
+            },
+
+            clone() {
+                if (this.bar.type === BarTypes.headline
+                    && this.bar.schema === BarSchemes.magenta) {
+                    const message = this.$t('images.create.headlineSecondaryAdd')
+                    if (confirm(message)) {
+                        return
+                    }
+                }
+
+                this.$store.dispatch(
+                    'canvas/addBar',
+                    {index: this.index, bar: {...this.bar}}
+                )
+            }
         },
 
         watch: {
-            text() {
-                this.draw('text');
-            },
             alignment() {
-                this.draw('alignment');
-            },
-            type() {
-                this.draw('type');
-            },
-            schema() {
-                this.draw('schema');
+                this.draw()
             },
             baseFontSize() {
-                this.draw('baseFontSize');
+                this.draw()
             },
             imageWidth() {
-                this.draw('imageWidth');
+                this.draw()
             },
             styleSet() {
-                this.bar = this.createBar();
-                this.draw('font');
-                this.$emit('paddingChanged', this.bar.padding);
+                this.drawObj = this.createBar()
+                this.draw()
+            },
+            colorSchema() {
+                this.draw()
             }
         }
     }

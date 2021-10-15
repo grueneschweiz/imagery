@@ -1,15 +1,11 @@
-import {Alignments} from "./../Constants";
+import {Alignments} from "../Constants";
 
 export default class BarBlock {
-    constructor(primary, secondary, sublines) {
+    constructor(bars) {
         this._canvas = document.createElement('canvas');
         this._context = this._canvas.getContext('2d');
 
-        this._primary = primary;
-        this._secondary = secondary;
-        this._sublines = sublines;
-
-        this._bars = [];
+        this._bars = bars;
     }
 
     set alignment(alignment) {
@@ -21,10 +17,6 @@ export default class BarBlock {
     }
 
     draw() {
-        this._bars = this._primary
-            .concat(this._secondary)
-            .concat(this._sublines);
-
         this._setWidth();
         this._setHeight();
         this._clear();

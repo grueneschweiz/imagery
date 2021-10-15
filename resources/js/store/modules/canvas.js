@@ -1,4 +1,10 @@
-import {Alignments, BackgroundTypes, ColorSchemes, StyleSetTypes} from "../../service/canvas/Constants";
+import {
+    Alignments,
+    BackgroundTypes, BarSchemes,
+    BarTypes as Types,
+    ColorSchemes,
+    StyleSetTypes
+} from "../../service/canvas/Constants";
 
 const state = {
     styleSet: StyleSetTypes.young,
@@ -12,7 +18,29 @@ const state = {
     hasBorder: true,
     borderWidth: 0,
     fontSize: 100,
-    // bars: [],
+    bars: [
+        {
+            type: Types.headline,
+            schema: BarSchemes.white,
+            text: 'Headline 1',
+            canvas: null,
+            padding: 0,
+        },
+        {
+            type: Types.headline,
+            schema: BarSchemes.magenta,
+            text: 'Headline 2',
+            canvas: null,
+            padding: 0,
+        },
+        {
+            type: Types.subline,
+            schema: BarSchemes.white,
+            text: 'Subline',
+            canvas: null,
+            padding: 0,
+        },
+    ],
 };
 
 const getters = {
@@ -27,7 +55,7 @@ const getters = {
     getHasBorder: state => state.hasBorder,
     getBorderWidth: state => state.borderWidth,
     getFontSize: state => state.fontSize,
-    // getBars: state => state.bars,
+    getBars: state => state.bars,
 };
 
 const mutations = {
@@ -42,7 +70,9 @@ const mutations = {
     setHasBorder: (state, border) => state.hasBorder = border,
     setBorderWidth: (state, width) => state.borderWidth = width,
     setFontSize: (state, size) => state.fontSize = size,
-    // setBars: (state, bars) => state.bars = bars,
+    addBar: (state, payload) => state.bars.splice(payload.index, 0, payload.bar),
+    removeBar: (state, payload) => state.bars.splice(payload.index, 1),
+    setBar: (state, payload) => state.bars.splice(payload.index, 1, payload.bar),
 };
 
 const actions = {
@@ -79,9 +109,15 @@ const actions = {
     setFontSize({commit}, size) {
         commit('setFontSize', size)
     },
-    // setBars({commit}, bars) {
-    //     commit('setBars', bars)
-    // },
+    addBar({commit}, payload) {
+        commit('addBar', payload)
+    },
+    removeBar({commit}, payload) {
+        commit('removeBar', payload)
+    },
+    setBar({commit}, payload) {
+        commit('setBar', payload)
+    },
 };
 
 export default {
