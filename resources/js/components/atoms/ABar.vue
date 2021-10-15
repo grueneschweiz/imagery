@@ -51,10 +51,6 @@
             schema: {
                 required: true,
             },
-            baseFontSize: {
-                required: true,
-                type: Number,
-            },
             deletable: {
                 required: true,
                 type: Boolean,
@@ -74,6 +70,7 @@
                 styleSet: 'canvas/getStyleSet',
                 alignment: 'canvas/getAlignment',
                 imageWidth: 'canvas/getImageWidth',
+                baseFontSize: 'canvas/getFontSize',
             }),
 
             fontSize() {

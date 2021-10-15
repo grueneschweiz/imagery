@@ -11,6 +11,8 @@ const state = {
     backgroundImage: null,
     hasBorder: true,
     borderWidth: 0,
+    fontSize: 100,
+    // bars: [],
 };
 
 const getters = {
@@ -24,6 +26,8 @@ const getters = {
     getBackgroundImage: state => state.backgroundImage,
     getHasBorder: state => state.hasBorder,
     getBorderWidth: state => state.borderWidth,
+    getFontSize: state => state.fontSize,
+    // getBars: state => state.bars,
 };
 
 const mutations = {
@@ -37,6 +41,8 @@ const mutations = {
     setBackgroundImage: (state, image) => state.backgroundImage = image,
     setHasBorder: (state, border) => state.hasBorder = border,
     setBorderWidth: (state, width) => state.borderWidth = width,
+    setFontSize: (state, size) => state.fontSize = size,
+    // setBars: (state, bars) => state.bars = bars,
 };
 
 const actions = {
@@ -70,6 +76,12 @@ const actions = {
     setBorderWidth({commit}, width) {
         commit('setBorderWidth', width)
     },
+    setFontSize({commit}, size) {
+        commit('setFontSize', size)
+    },
+    // setBars({commit}, bars) {
+    //     commit('setBars', bars)
+    // },
 };
 
 export default {

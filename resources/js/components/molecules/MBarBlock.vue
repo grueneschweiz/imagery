@@ -25,7 +25,6 @@
             >{{$t('images.create.bars')}}</label>
 
             <ABar
-                :base-font-size="fontSize"
                 :cloneable="headlinesCount < 3"
                 :deletable="headlinesPrimaryCount > 1"
                 :initialText="initialText ? initialText : 'Headline 1'"
@@ -42,7 +41,6 @@
             />
 
             <ABar
-                :base-font-size="fontSize"
                 :cloneable="headlinesCount < 3"
                 :deletable="headlinesSecondaryCount > 1"
                 :initialText="initialText ? initialText : 'Headline 2'"
@@ -58,7 +56,6 @@
             />
 
             <ABar
-                :base-font-size="fontSize"
                 :cloneable="sublinesCount < 2"
                 :deletable="sublinesCount > 0"
                 :initialText="initialText ? initialText : 'Subline'"
@@ -111,7 +108,6 @@
                 headlinesSecondaryCount: 1,
                 sublinesCount: 1,
                 fontSizeMax: 100,
-                fontSize: 100,
                 typeHeadline: Types.headline,
                 typeSubline: Types.subline,
                 tooMuchText: false,
@@ -130,6 +126,17 @@
                 imageWidth: 'canvas/getImageWidth',
                 colorSchema: 'canvas/getColorSchema',
             }),
+
+            fontSize: {
+                get() {
+                    return this.$store.getters['canvas/getFontSize']
+                },
+                set(val) {
+                    if (val > 0) {
+                        this.$store.dispatch('canvas/setFontSize', val)
+                    }
+                }
+            },
 
             schemaHeadlinePrimary() {
                 if (ColorSchemes.white === this.colorSchema) {
