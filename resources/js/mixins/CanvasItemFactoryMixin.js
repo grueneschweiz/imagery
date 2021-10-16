@@ -3,6 +3,8 @@ import BarGreen from "../service/canvas/elements/bar/BarGreen";
 import BarYoung from "../service/canvas/elements/bar/BarYoung";
 import BarLayerGreen from "../service/canvas/layers/bar/BarLayerGreen";
 import BarLayerYoung from "../service/canvas/layers/bar/BarLayerYoung";
+import BarBlockYoung from "../service/canvas/blocks/bar/BarBlockYoung";
+import BarBlockGreen from "../service/canvas/blocks/bar/BarBlockGreen";
 
 
 export default {
@@ -13,6 +15,15 @@ export default {
                     return new BarYoung();
                 default:
                     return new BarGreen();
+            }
+        },
+
+        createBarBlock(bars) {
+            switch (this._getStyleSet()) {
+                case StyleSetTypes.young:
+                    return new BarBlockYoung(bars);
+                default:
+                    return new BarBlockGreen(bars);
             }
         },
 

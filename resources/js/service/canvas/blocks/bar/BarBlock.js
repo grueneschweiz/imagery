@@ -1,4 +1,4 @@
-import {Alignments} from "../Constants";
+import {Alignments} from "../../Constants";
 
 export default class BarBlock {
     constructor(bars) {
@@ -14,6 +14,14 @@ export default class BarBlock {
 
     get width() {
         return this._canvas.width;
+    }
+
+    get minFontSizeFactor() {
+        return 0.1
+    }
+
+    get maxFontSizeFactor() {
+        return 1
     }
 
     draw() {

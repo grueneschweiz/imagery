@@ -53,15 +53,16 @@
         BarTypes as Types,
         ColorSchemes
     } from "../../service/canvas/Constants";
-    import BarBlock from "../../service/canvas/blocks/BarBlock";
     import ABar from "../atoms/ABar";
+    import CanvasItemFactoryMixin from "../../mixins/CanvasItemFactoryMixin";
 
-    const minFontSizeFactor = 0.08; // the correct 175% would be 0.0925
-    const maxFontSizeFactor = 1.08;
+    const defaultMinFontSizeFactor = 0.1
+    const defaultMaxFontSizeFactor = 0.9
 
     export default {
         name: "MBarBlock",
         components: {ABar},
+        mixins: [CanvasItemFactoryMixin],
 
         data() {
             return {
@@ -73,6 +74,7 @@
 
         computed: {
             ...mapGetters({
+                styleSet: 'canvas/getStyleSet',
                 alignment: 'canvas/getAlignment',
                 imageHeight: 'canvas/getImageHeight',
                 imageWidth: 'canvas/getImageWidth',
@@ -100,6 +102,8 @@
             },
 
             fontSizeMin() {
+                const minFontSizeFactor = this.block?.minFontSizeFactor || defaultMinFontSizeFactor
+
                 // base the minimal font size on a normalized side length of
                 // the image.
                 // to get a normalized side length, square the image width,
@@ -128,7 +132,7 @@
             setupBlock() {
                 const canvases = this.bars.map(bar => bar.canvas)
                 if (canvases.length) {
-                    this.block = new BarBlock(canvases)
+                    this.block = this.createBarBlock(canvases)
                 } else {
                     this.block = null
                 }
@@ -152,6 +156,7 @@
             },
 
             adjustFontSize() {
+                const maxFontSizeFactor = this.block?.maxFontSizeFactor || defaultMaxFontSizeFactor
                 const min = this.fontSizeMin;
                 const maxWidth = this.imageWidth * maxFontSizeFactor;
                 const imageToBlockRatio = maxWidth / this.block.width;
@@ -207,6 +212,9 @@
                 this.draw();
             },
             bars() {
+                this.draw()
+            },
+            styleSet() {
                 this.draw()
             },
         }
