@@ -72,9 +72,8 @@
 </template>
 
 <script>
-import {BackgroundTypes, ColorSchemes, RotationAngle, StyleSetTypes} from "../../service/canvas/Constants";
+    import {BackgroundTypes, ColorSchemes, StyleSetTypes} from "../../service/canvas/Constants";
     import MBarBlock from "../molecules/MBarBlock";
-    import BarLayer from "../../service/canvas/layers/BarLayer";
     import BackgroundLayer from "../../service/canvas/layers/BackgroundLayer";
     import MBackgroundBlock from "../molecules/MBackgroundBlock";
     import MBorderBlock from "../molecules/MBorderBlock";
@@ -89,9 +88,11 @@ import {BackgroundTypes, ColorSchemes, RotationAngle, StyleSetTypes} from "../..
     import MCopyright from "../molecules/MCopyright";
     import CopyrightLayer from "../../service/canvas/layers/CopyrightLayer";
     import {mapGetters} from "vuex";
+    import CanvasItemFactoryMixin from "../../mixins/CanvasItemFactoryMixin";
 
     export default {
         name: "OImagery",
+        mixins: [CanvasItemFactoryMixin],
         components: {
             MCopyright,
             MAlignment,
@@ -214,7 +215,7 @@ import {BackgroundTypes, ColorSchemes, RotationAngle, StyleSetTypes} from "../..
 
                 this.backgroundLayer = new BackgroundLayer(this.canvas);
                 this.borderLayer = new BorderLayer(this.canvas);
-                this.barLayer = new BarLayer(this.canvas);
+                this.barLayer = this.createBarLayer(this.canvas);
                 this.logoLayer = new LogoLayer(this.canvas);
                 this.copyrightLayer = new CopyrightLayer(this.canvas);
 
@@ -432,6 +433,9 @@ import {BackgroundTypes, ColorSchemes, RotationAngle, StyleSetTypes} from "../..
             height(value) {
                 this.canvas.height = value;
                 this.setCanvasPos();
+            },
+            styleSet() {
+                this.barLayer = this.createBarLayer(this.canvas);
             }
         }
     }
