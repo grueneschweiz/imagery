@@ -31,7 +31,6 @@ export default class BarLayerYoung extends BarLayer {
     _drawBlockConcrete() {
         const x = this._getBlockXpos()
         const y = this._getBlockYpos()
-        console.log(x,y)
 
         this._context.drawImage(this._block, x, y);
     }
