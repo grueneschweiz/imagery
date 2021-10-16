@@ -131,11 +131,16 @@ export default class BarLayer extends Layer {
     }
 
     _getBlockXpos() {
-        if (this._alignment === Alignments.left) {
-            return -this._getBlockOversize();
+        switch (this._alignment) {
+            case Alignments.left:
+                return -this._getBlockOversize()
+            case Alignments.right:
+                return this._canvas.width
+                    - this._block.width
+                    + this._getBlockOversize()
+            default:
+                return (this._canvas.width - this._block.width) / 2
         }
-
-        return this._canvas.width - this._block.width + this._getBlockOversize();
     }
 
     _getBlockOversize() {

@@ -51,7 +51,9 @@
                 v-if="hasImageBackground"
             />
 
-            <MAlignment/>
+            <MAlignment
+                v-if="styleSet === styleSetTypes.green"
+            />
 
             <MColorScheme
                 v-if="backgroundType !== backgroundTypes.gradient"
@@ -70,7 +72,7 @@
 </template>
 
 <script>
-    import {BackgroundTypes, ColorSchemes} from "../../service/canvas/Constants";
+import {BackgroundTypes, ColorSchemes, RotationAngle, StyleSetTypes} from "../../service/canvas/Constants";
     import MBarBlock from "../molecules/MBarBlock";
     import BarLayer from "../../service/canvas/layers/BarLayer";
     import BackgroundLayer from "../../service/canvas/layers/BackgroundLayer";
@@ -107,6 +109,7 @@
                 canvas: null,
                 fontSize: 50,
                 backgroundTypes: BackgroundTypes,
+                styleSetTypes: StyleSetTypes,
 
                 viewHeight: document.documentElement.clientHeight,
                 viewWidth: document.documentElement.clientWidth,
@@ -136,6 +139,7 @@
         computed: {
             ...mapGetters({
                 alignment: 'canvas/getAlignment',
+                styleSet: 'canvas/getStyleSet',
                 height: 'canvas/getImageHeight',
                 width: 'canvas/getImageWidth',
                 backgroundType: 'canvas/getBackgroundType',
@@ -188,7 +192,7 @@
                 }
 
                 return this.bars[0].padding
-            }
+            },
         },
 
         created() {
