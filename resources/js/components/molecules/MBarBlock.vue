@@ -118,15 +118,13 @@
             },
 
             showAddSublineBtn() {
-                return this.styleSet === StyleSetTypes.green
-                    && this.bars
+                return this.bars
                     .filter(bar => bar.type === BarTypes.subline)
                     .length === 0
             }
         },
 
         mounted() {
-            this.maybeRemoveSublines()
             this.draw()
         },
 
@@ -204,15 +202,6 @@
                     {index: this.bars.length, bar: subline}
                 )
             },
-
-            maybeRemoveSublines() {
-                if (StyleSetTypes.young === this.styleSet) {
-                    this.bars
-                        .map((bar, index) => BarTypes.subline === bar.type ? index : null)
-                        .filter(index => index)
-                        .forEach(index => this.$store.dispatch('canvas/removeBar', {index}))
-                }
-            }
         },
 
         watch: {
@@ -226,7 +215,6 @@
                 this.draw()
             },
             styleSet() {
-                this.maybeRemoveSublines()
                 this.draw()
             },
         }
