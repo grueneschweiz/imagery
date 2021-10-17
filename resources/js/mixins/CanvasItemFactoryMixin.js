@@ -5,6 +5,8 @@ import BarLayerGreen from "../service/canvas/layers/bar/BarLayerGreen";
 import BarLayerYoung from "../service/canvas/layers/bar/BarLayerYoung";
 import BarBlockYoung from "../service/canvas/blocks/bar/BarBlockYoung";
 import BarBlockGreen from "../service/canvas/blocks/bar/BarBlockGreen";
+import LogoLayerYoung from "../service/canvas/layers/logo/LogoLayerYoung";
+import LogoLayerGreen from "../service/canvas/layers/logo/LogoLayerGreen";
 
 
 export default {
@@ -33,6 +35,15 @@ export default {
                     return new BarLayerYoung(canvas);
                 default:
                     return new BarLayerGreen(canvas);
+            }
+        },
+
+        createLogoLayer(canvas) {
+            switch (this._getStyleSet()) {
+                case StyleSetTypes.young:
+                    return new LogoLayerYoung(canvas);
+                default:
+                    return new LogoLayerGreen(canvas);
             }
         },
 

@@ -80,7 +80,6 @@
     import BorderLayer from "../../service/canvas/layers/BorderLayer";
     import MLogoBlock from "../molecules/MLogoBlock";
     import MStyleSetBlock from "../molecules/MStyleSetBlock";
-    import LogoLayer from "../../service/canvas/layers/LogoLayer";
     import MSizeBlock from "../molecules/MSizeBlock";
     import MAlignment from "../molecules/MAlignment";
     import MColorScheme from "../molecules/MColorScheme";
@@ -216,7 +215,7 @@
                 this.backgroundLayer = new BackgroundLayer(this.canvas);
                 this.borderLayer = new BorderLayer(this.canvas);
                 this.barLayer = this.createBarLayer(this.canvas);
-                this.logoLayer = new LogoLayer(this.canvas);
+                this.logoLayer = this.createLogoLayer(this.canvas);
                 this.copyrightLayer = new CopyrightLayer(this.canvas);
 
                 this.updateBackgroundLayer(this.backgroundBlock);
@@ -436,6 +435,8 @@
             },
             styleSet() {
                 this.barLayer = this.createBarLayer(this.canvas);
+                this.logoLayer = this.createLogoLayer(this.canvas);
+                this.updateLogoLayer(this.logoBlock);
             }
         }
     }
