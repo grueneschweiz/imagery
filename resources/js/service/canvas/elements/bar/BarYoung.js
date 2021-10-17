@@ -1,4 +1,5 @@
 import Bar from "./Bar";
+import {BarSchemes, BarTypes as Types} from "../../Constants";
 
 /**
  * If we multiply the font size with factor we should get the height of
@@ -16,16 +17,35 @@ const realCharHeightFactor = 0.7;
  */
 const charPaddingFactor = 0.275;
 
-const fontFamily = 'Bowlby One SC';
+/**
+ * Specifies the margin above each subline in relation to the subline's height.
+ *
+ * @type {number}
+ */
+const sublineMarginFactor = 0.2;
+
+const fontFamily = {
+    headline: 'Bowlby One SC',
+    subline: 'Mada',
+}
 
 export default class BarYoung extends Bar {
     constructor() {
         super();
-        this._font = fontFamily;
+        this._font = fontFamily.headline;
     }
 
     set type(type) {
-        this._font = fontFamily;
+        switch (type) {
+            case Types.headline:
+                this._font = fontFamily.headline
+                break;
+            case Types.subline:
+                this._font = fontFamily.subline
+                break;
+            default:
+                throw new Error(`BarType ${type} is not implemented.`)
+        }
     }
 
     draw() {
@@ -59,19 +79,25 @@ export default class BarYoung extends Bar {
     }
 
     _setCanvasHeight() {
+        const innerHeight = this._getBarHeight();
+
+        this._canvas.height = innerHeight * (1 + this._getBarMarginFactor());
+    }
+
+    _getBarHeight() {
         const textHeight = this._textDims.height;
         const padding = this._textDims.padding;
 
-        this._canvas.height = textHeight + 2 * padding;
+        return textHeight + 2 * padding;
     }
 
     _drawBackground() {
         this._context.fillStyle = this._schema.background;
-        this._context.fillRect(0, 0, this._canvas.width, this._canvas.height);
+        this._context.fillRect(0, 0, this._canvas.width, this._getBarHeight());
     }
 
     _drawFont() {
-        const y = this._canvas.height - this._textDims.padding;
+        const y = this._getBarHeight() - this._textDims.padding;
         const x = this._textDims.padding;
 
         this._context.fillStyle = this._schema.text;
@@ -79,5 +105,13 @@ export default class BarYoung extends Bar {
         this._context.textBaseline = 'alphabetic';
 
         this._context.fillText(this._text, x, y);
+    }
+
+    _getBarMarginFactor() {
+        if (this._schema === BarSchemes.magenta) {
+            return sublineMarginFactor
+        }
+
+        return 0
     }
 }

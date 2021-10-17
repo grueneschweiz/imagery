@@ -9,7 +9,7 @@ export default class Bar {
         this._fontSize = 16
         this._alignment = Alignments.left
         this._schema = Schemes.green
-        this._font = Types.headline
+        this._font = ''
 
         this._imageWidth = 0
         this._textDims = {
@@ -36,7 +36,7 @@ export default class Bar {
     }
 
     set type(type) {
-        this._font = type
+        throw new Error("Method 'draw()' must be implemented.")
     }
 
     set imageWidth(width) {

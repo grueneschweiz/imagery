@@ -27,7 +27,11 @@ export const BarSchemes = {
     magenta: {
         background: '#e10078',
         text: '#ffffff',
-    }
+    },
+    transparent: {
+        background: 'rgba(0,0,0,0)',
+        text: '#ffffff',
+    },
 };
 
 export const ColorSchemes = {

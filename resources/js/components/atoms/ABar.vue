@@ -29,7 +29,7 @@
         BarTypes as Types,
         BarSchemes,
         BarTypes,
-        ColorSchemes
+        ColorSchemes, StyleSetTypes
     } from "../../service/canvas/Constants";
     import FontFaceObserver from "fontfaceobserver";
     import CanvasItemFactoryMixin from "../../mixins/CanvasItemFactoryMixin";
@@ -98,6 +98,10 @@
                 }
 
                 if (BarTypes.subline === this.bar.type) {
+                    if (StyleSetTypes.young === this.styleSet) {
+                        return BarSchemes.transparent
+                    }
+
                     return ColorSchemes.greengreen === this.colorSchema
                         ? BarSchemes.green
                         : BarSchemes.white
@@ -109,20 +113,32 @@
             buttonClass() {
                 switch (this.barSchema) {
                     case BarSchemes.green:
-                        return 'btn-secondary';
+                        return 'btn-secondary'
 
                     case BarSchemes.magenta:
                         return this.colorSchema === ColorSchemes.white
                             ? 'btn-outline-primary'
-                            : 'btn-primary';
+                            : 'btn-primary'
 
                     case BarSchemes.white:
-                        return 'btn-outline-secondary';
+                        return 'btn-outline-secondary'
+
+                    case BarSchemes.transparent:
+                        return 'btn-outline-dark'
                 }
             },
 
             inputClass() {
-                return this.barSchema === BarSchemes.magenta ? 'magenta' : 'green';
+                switch (this.barSchema) {
+                    case BarSchemes.magenta:
+                        return 'magenta'
+
+                    case BarSchemes.transparent:
+                        return 'dark'
+
+                    default:
+                        return 'green'
+                }
             },
 
             cloneable() {
@@ -178,14 +194,16 @@
 
             loadFonts() {
                 const timeout = 10000;
-                const fat = new FontFaceObserver('SanukFat');
-                const bold = new FontFaceObserver('SanukBold');
-                const young = new FontFaceObserver('Bowlby One SC');
+                const sanukFat = new FontFaceObserver('SanukFat');
+                const sanukBold = new FontFaceObserver('SanukBold');
+                const bowlbyOneSc = new FontFaceObserver('Bowlby One SC');
+                const madaBold = new FontFaceObserver('Mada');
 
                 return Promise.all([
-                    fat.load(null, timeout),
-                    bold.load(null, timeout),
-                    young.load(null, timeout),
+                    sanukFat.load(null, timeout),
+                    sanukBold.load(null, timeout),
+                    bowlbyOneSc.load(null, timeout),
+                    madaBold.load(null, timeout),
                 ])
                     .catch(
                         error => this.snackErrorDismiss(
