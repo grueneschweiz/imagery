@@ -180,8 +180,13 @@
                 const timeout = 10000;
                 const fat = new FontFaceObserver('SanukFat');
                 const bold = new FontFaceObserver('SanukBold');
+                const young = new FontFaceObserver('Bowlby One SC');
 
-                return Promise.all([fat.load(null, timeout), bold.load(null, timeout)])
+                return Promise.all([
+                    fat.load(null, timeout),
+                    bold.load(null, timeout),
+                    young.load(null, timeout),
+                ])
                     .catch(
                         error => this.snackErrorDismiss(
                             error,
