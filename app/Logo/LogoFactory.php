@@ -27,6 +27,9 @@ class LogoFactory
             case 'alternative-risch':
                 $compositor = new AlternativeRisch();
                 break;
+            case 'giovani-verdi':
+                $compositor = new GiovaniVerdi();
+                break;
             case 'gruene':
                 $compositor = new Gruene(...$args);
                 break;
@@ -35,6 +38,12 @@ class LogoFactory
                 break;
             case 'gruene-verts':
                 $compositor = new GrueneVerts(...$args);
+                break;
+            case 'jeunes-vert-e-s':
+                $compositor = new JeunesVertes();
+                break;
+            case 'junge-gruene':
+                $compositor = new JungeGruene();
                 break;
             case 'verda':
                 $compositor = new Verda(...$args);
