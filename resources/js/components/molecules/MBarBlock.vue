@@ -50,8 +50,8 @@
     import {
         BarSchemes,
         BarTypes,
-        BarTypes as Types,
-        ColorSchemes
+        ColorSchemes,
+        StyleSetTypes
     } from "../../service/canvas/Constants";
     import ABar from "../atoms/ABar";
     import CanvasItemFactoryMixin from "../../mixins/CanvasItemFactoryMixin";
@@ -125,6 +125,7 @@
         },
 
         mounted() {
+            this.maybeRemoveSubline()
             this.draw()
         },
 
@@ -190,7 +191,7 @@
 
             addSubline() {
                 const subline = {
-                    type: Types.subline,
+                    type: BarTypes.subline,
                     schema: BarSchemes.white,
                     text: 'Subline',
                     canvas: null,
@@ -201,6 +202,17 @@
                     'canvas/addBar',
                     {index: this.bars.length, bar: subline}
                 )
+            },
+
+            maybeRemoveSubline() {
+                // remove sublines for style set young
+                if (this.styleSet === StyleSetTypes.young) {
+                    this.bars.forEach((bar, idx) => {
+                        if (bar.type === BarTypes.subline) {
+                            this.$store.dispatch('canvas/removeBar', {index: idx})
+                        }
+                    })
+                }
             },
         },
 
