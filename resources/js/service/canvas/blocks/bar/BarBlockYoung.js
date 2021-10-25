@@ -1,7 +1,7 @@
 import {Alignments} from "../../Constants";
 import BarBlock from "./BarBlock";
 
-const minFontSizeFactor = 0.08
+const minFontSizeFactor = 0.07
 const maxFontSizeFactor = 0.9
 
 export default class BarBlockYoung extends BarBlock {
