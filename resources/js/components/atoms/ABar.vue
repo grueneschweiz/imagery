@@ -7,18 +7,20 @@
                 type="text"
                 v-model="text"
             />
-            <button
-                :class="buttonClass"
-                :title="$t('images.create.barAdd')"
-                :disabled="!cloneable"
-                class="btn ml-1"
-                @click="clone"><i class="mdi mdi-add"></i></button>
-            <button
-                :class="buttonClass"
-                :title="$t('images.create.barRemove')"
-                :disabled="!deletable"
-                class="btn ml-1"
-                @click="remove"><i class="mdi mdi-remove"></i></button>
+            <template v-if="!isStyleYoung || isSubline">
+                <button
+                    :class="buttonClass"
+                    :disabled="!cloneable"
+                    :title="$t('images.create.barAdd')"
+                    class="btn ml-1"
+                    @click="clone"><i class="mdi mdi-add"></i></button>
+                <button
+                    :class="buttonClass"
+                    :disabled="!deletable"
+                    :title="$t('images.create.barRemove')"
+                    class="btn ml-1"
+                    @click="remove"><i class="mdi mdi-remove"></i></button>
+            </template>
         </div>
     </div>
 </template>
@@ -26,7 +28,6 @@
 <script>
     import SnackbarMixin from "../../mixins/SnackbarMixin";
     import {
-        BarTypes as Types,
         BarSchemes,
         BarTypes,
         ColorSchemes, StyleSetTypes
@@ -79,7 +80,7 @@
             },
 
             fontSize() {
-                if (this.bar.type === Types.headline) {
+                if (this.isHeadline) {
                     return this.baseFontSize;
                 } else {
                     return this.baseFontSize * sublineHeadlineSizeRatio;
@@ -91,14 +92,14 @@
                     return this.bar.schema
                 }
 
-                if (BarTypes.headline === this.bar.type) {
+                if (this.isHeadline) {
                     return ColorSchemes.white === this.colorSchema
                         ? BarSchemes.white
                         : BarSchemes.green
                 }
 
-                if (BarTypes.subline === this.bar.type) {
-                    if (StyleSetTypes.young === this.styleSet) {
+                if (this.isSubline) {
+                    if (this.isStyleYoung) {
                         return BarSchemes.transparent
                     }
 
@@ -141,13 +142,17 @@
                 }
             },
 
+            headlineMax() {
+                return this.isStyleYoung ? 2 : 3
+            },
+
             cloneable() {
-                if (this.bar.type === BarTypes.headline) {
+                if (this.isHeadline) {
                     return this.bars
                         .filter(bar => bar.type === BarTypes.headline)
-                        .length < 3
+                        .length < this.headlineMax
                 }
-                if (this.bar.type === BarTypes.subline) {
+                if (this.isSubline) {
                     return this.bars
                         .filter(bar => bar.type === BarTypes.subline)
                         .length < 2
@@ -156,7 +161,7 @@
             },
 
             deletable() {
-                if (this.bar.type === BarTypes.headline) {
+                if (this.isHeadline) {
                     return this.bars
                         .filter(bar =>
                             bar.type === this.bar.type
@@ -164,6 +169,18 @@
                         )
                         .length > 1
                 }
+                return this.isSubline
+            },
+
+            isStyleYoung() {
+                return this.styleSet === StyleSetTypes.young
+            },
+
+            isHeadline() {
+                return this.bar.type === BarTypes.headline
+            },
+
+            isSubline() {
                 return this.bar.type === BarTypes.subline
             },
         },
@@ -218,7 +235,7 @@
             },
 
             clone() {
-                if (this.bar.type === BarTypes.headline
+                if (this.isHeadline
                     && this.bar.schema === BarSchemes.magenta) {
                     const message = this.$t('images.create.headlineSecondaryAdd')
                     if (confirm(message)) {
@@ -230,6 +247,15 @@
                     'canvas/addBar',
                     {index: this.index, bar: {...this.bar}}
                 )
+            },
+
+            maybeRemoveBar() {
+                if ( this.isStyleYoung
+                    && this.isHeadline
+                    && this.deletable
+                ) {
+                    this.remove()
+                }
             }
         },
 
@@ -244,6 +270,7 @@
                 this.draw()
             },
             styleSet() {
+                this.maybeRemoveBar()
                 this.drawObj = this.createBar()
                 this.draw()
             },
