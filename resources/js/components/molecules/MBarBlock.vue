@@ -94,10 +94,13 @@
             },
 
             buttonClassSubline() {
-                if (ColorSchemes.greengreen === this.colorSchema) {
-                    return 'btn-secondary';
-                } else {
-                    return 'btn-outline-secondary';
+                switch (this.colorSchema) {
+                    case ColorSchemes.white:
+                        return 'btn-outline-dark'
+                    case ColorSchemes.greengreen:
+                        return 'btn-secondary'
+                    default:
+                        return 'btn-outline-secondary'
                 }
             },
 
