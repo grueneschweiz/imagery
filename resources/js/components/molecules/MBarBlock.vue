@@ -51,7 +51,7 @@
         BarSchemes,
         BarTypes,
         BarTypes as Types,
-        ColorSchemes, StyleSetTypes
+        ColorSchemes
     } from "../../service/canvas/Constants";
     import ABar from "../atoms/ABar";
     import CanvasItemFactoryMixin from "../../mixins/CanvasItemFactoryMixin";
