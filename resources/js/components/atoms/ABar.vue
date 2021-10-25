@@ -9,13 +9,13 @@
             />
             <template v-if="!isStyleYoung || isSubline">
                 <button
-                    :class="buttonClass"
+                    :class="buttonClassAdd"
                     :disabled="!cloneable"
                     :title="$t('images.create.barAdd')"
                     class="btn ml-1"
                     @click="clone"><i class="mdi mdi-add"></i></button>
                 <button
-                    :class="buttonClass"
+                    :class="buttonClassRemove"
                     :disabled="!deletable"
                     :title="$t('images.create.barRemove')"
                     class="btn ml-1"
@@ -109,6 +109,22 @@
                 }
 
                 return BarSchemes.green
+            },
+
+            buttonClassAdd() {
+                if (!this.cloneable) {
+                    return 'btn-disabled'
+                }
+
+                return this.buttonClass
+            },
+
+            buttonClassRemove() {
+                if (!this.deletable) {
+                    return 'btn-disabled'
+                }
+
+                return this.buttonClass
             },
 
             buttonClass() {
@@ -294,5 +310,10 @@
             border-color: $secondary;
             box-shadow: 0 0 0 0.2rem $lightGreen;
         }
+    }
+
+    .btn-disabled {
+        color: rgba($dark, 0.4);
+        border-color: rgba($dark, 0.4);
     }
 </style>
