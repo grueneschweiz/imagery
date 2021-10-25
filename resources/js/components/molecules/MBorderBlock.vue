@@ -1,5 +1,5 @@
 <template>
-    <div class="form-group">
+    <div v-if="!isStyleYoung" class="form-group">
         <label
             class="mb-0"
             for="border-switch"
@@ -27,6 +27,7 @@
     import {Border} from "../../service/canvas/elements/Border";
     import ASelect from "../atoms/ASelect";
     import {mapGetters} from "vuex";
+    import {StyleSetTypes} from "../../service/canvas/Constants";
 
     export default {
         name: "MBorderBlock",
@@ -41,6 +42,7 @@
             ...mapGetters({
                 imageHeight: 'canvas/getImageHeight',
                 imageWidth: 'canvas/getImageWidth',
+                styleSet: 'canvas/getStyleSet',
             }),
 
             border: {
@@ -50,11 +52,20 @@
                 set(val) {
                     this.$store.dispatch('canvas/setHasBorder', val)
                 }
+            },
+
+            isStyleYoung() {
+                return StyleSetTypes.young === this.styleSet
             }
         },
 
         mounted() {
-            this.draw();
+            this.draw()
+
+            // enable / disable border only in next tick so the border with is
+            // calculated and set first, as the placement of the bars depends
+            // on it.
+            this.$nextTick(() => this.border = ! this.isStyleYoung)
         },
 
         methods: {
@@ -76,6 +87,9 @@
             },
             border() {
                 this.draw();
+            },
+            styleSet() {
+                this.border = ! this.isStyleYoung
             }
         },
     }
