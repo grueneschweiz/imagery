@@ -7,7 +7,7 @@ import BarLayer from "./BarLayer";
  *
  * @type {number}
  */
-const borderMarginFactor = 4;
+const borderMarginFactor = 3;
 
 export default class BarLayerYoung extends BarLayer {
     constructor(canvas) {
