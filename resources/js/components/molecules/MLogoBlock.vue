@@ -51,7 +51,7 @@
     import {mapGetters} from "vuex";
     import PrepareSelectMixin from "../../mixins/PrepareSelectMixin";
     import {LogoBlock} from "../../service/canvas/blocks/LogoBlock";
-    import {ColorSchemes} from "../../service/canvas/Constants";
+    import {ColorSchemes, StyleSetTypes} from "../../service/canvas/Constants";
     import ADefaultLogo from "../atoms/ADefaultLogo";
 
     export default {
@@ -79,6 +79,7 @@
                 imageHeight: 'canvas/getImageHeight',
                 imageWidth: 'canvas/getImageWidth',
                 colorSchema: 'canvas/getColorSchema',
+                styleSet: 'canvas/getStyleSet',
             }),
 
             logoIdSelected: {
@@ -95,6 +96,10 @@
             },
 
             color() {
+                if (StyleSetTypes.young === this.styleSet) {
+                    return 'white';
+                }
+
                 return ColorSchemes.white === this.colorSchema ? 'white' : 'green';
             },
 
