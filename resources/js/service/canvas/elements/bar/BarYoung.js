@@ -33,8 +33,9 @@ const sublineHeadlineSizeRatio = 0.5;
 
 export default class BarYoung extends Bar {
     constructor() {
-        super();
-        this._font = fontFamily.headline;
+        super()
+        this._font = fontFamily.headline
+        this._hasMargin = false
     }
 
     set type(type) {
@@ -96,7 +97,7 @@ export default class BarYoung extends Bar {
     _setCanvasHeight() {
         const innerHeight = this._getBarHeight();
 
-        this._canvas.height = innerHeight * (1 + this._getBarMarginFactor());
+        this._canvas.height = innerHeight + this._getMargin();
     }
 
     _getBarHeight() {
@@ -108,11 +109,11 @@ export default class BarYoung extends Bar {
 
     _drawBackground() {
         this._context.fillStyle = this._schema.background;
-        this._context.fillRect(0, 0, this._canvas.width, this._getBarHeight());
+        this._context.fillRect(0, this._getMargin(), this._canvas.width, this._getBarHeight());
     }
 
     _drawFont() {
-        const y = this._getBarHeight() - this._textDims.padding;
+        const y = this._getBarHeight() - this._textDims.padding + this._getMargin();
         const x = this._textDims.padding;
 
         this._context.fillStyle = this._schema.text;
@@ -122,9 +123,9 @@ export default class BarYoung extends Bar {
         this._context.fillText(this._text, x, y);
     }
 
-    _getBarMarginFactor() {
-        if (this._schema === BarSchemes.magenta) {
-            return sublineMarginFactor
+    _getMargin() {
+        if (this._hasMargin) {
+            return marginFactor * this._getBarHeight()
         }
 
         return 0

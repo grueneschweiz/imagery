@@ -190,6 +190,10 @@
             isSubline() {
                 return this.bar.type === BarTypes.subline
             },
+
+            isFirstSubline() {
+                return this.index === this.bars.findIndex(bar => bar.type === BarTypes.subline)
+            }
         },
 
         mounted() {
@@ -205,6 +209,7 @@
                 this.drawObj.schema = this.barSchema;
                 this.drawObj.baseFontSize = this.baseFontSize;
                 this.drawObj.imageWidth = this.imageWidth;
+                this.drawObj.isFirstSubline = this.isFirstSubline;
 
                 this.bar.canvas = this.drawObj.draw()
 
