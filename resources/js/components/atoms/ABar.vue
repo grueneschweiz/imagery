@@ -30,13 +30,12 @@
     import {
         BarSchemes,
         BarTypes,
-        ColorSchemes, StyleSetTypes
+        ColorSchemes,
+        StyleSetTypes
     } from "../../service/canvas/Constants";
     import FontFaceObserver from "fontfaceobserver";
     import CanvasItemFactoryMixin from "../../mixins/CanvasItemFactoryMixin";
     import {mapGetters} from "vuex";
-
-    const sublineHeadlineSizeRatio = 0.4;
 
     export default {
         name: "ABar",
@@ -76,14 +75,6 @@
                 set(val) {
                     this.$set(this.bar, 'text', val)
                     this.draw()
-                }
-            },
-
-            fontSize() {
-                if (this.isHeadline) {
-                    return this.baseFontSize;
-                } else {
-                    return this.baseFontSize * sublineHeadlineSizeRatio;
                 }
             },
 
@@ -212,7 +203,7 @@
                 this.drawObj.alignment = this.alignment;
                 this.drawObj.type = this.bar.type;
                 this.drawObj.schema = this.barSchema;
-                this.drawObj.fontSize = this.fontSize;
+                this.drawObj.baseFontSize = this.baseFontSize;
                 this.drawObj.imageWidth = this.imageWidth;
 
                 this.bar.canvas = this.drawObj.draw()

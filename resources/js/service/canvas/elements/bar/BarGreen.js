@@ -33,6 +33,8 @@ const fontFamily = {
     subline: 'SanukBold',
 }
 
+const sublineHeadlineSizeRatio = 0.4;
+
 export default class BarGreen extends Bar {
     constructor() {
         super();
@@ -55,6 +57,15 @@ export default class BarGreen extends Bar {
             default:
                 throw new Error(`BarType ${type} is not implemented.`)
         }
+    }
+
+    set baseFontSize(fontSize) {
+        if (this._font === fontFamily.subline) {
+            this._fontSize = fontSize * sublineHeadlineSizeRatio
+            return
+        }
+
+        this._fontSize = fontSize
     }
 
     draw() {

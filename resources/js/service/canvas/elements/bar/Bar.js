@@ -23,7 +23,7 @@ export default class Bar {
         this._text = text.trim()
     }
 
-    set fontSize(fontSize) {
+    set baseFontSize(fontSize) {
         this._fontSize = fontSize
     }
 

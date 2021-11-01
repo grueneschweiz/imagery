@@ -1,5 +1,5 @@
 import Bar from "./Bar";
-import {BarSchemes, BarTypes as Types} from "../../Constants";
+import {BarTypes} from "../../Constants";
 
 /**
  * If we multiply the font size with factor we should get the height of
@@ -22,12 +22,14 @@ const charPaddingFactor = 0.275;
  *
  * @type {number}
  */
-const sublineMarginFactor = 0.2;
+const marginFactor = 0.4;
 
 const fontFamily = {
     headline: 'Bowlby One SC',
     subline: 'Mada',
 }
+
+const sublineHeadlineSizeRatio = 0.5;
 
 export default class BarYoung extends Bar {
     constructor() {
@@ -37,15 +39,28 @@ export default class BarYoung extends Bar {
 
     set type(type) {
         switch (type) {
-            case Types.headline:
+            case BarTypes.headline:
                 this._font = fontFamily.headline
                 break;
-            case Types.subline:
+            case BarTypes.subline:
                 this._font = fontFamily.subline
                 break;
             default:
                 throw new Error(`BarType ${type} is not implemented.`)
         }
+    }
+
+    set baseFontSize(fontSize) {
+        if (this._font === fontFamily.subline) {
+            this._fontSize = fontSize * sublineHeadlineSizeRatio
+            return
+        }
+
+        this._fontSize = fontSize
+    }
+
+    set isFirstSubline(val) {
+        this._hasMargin = val
     }
 
     draw() {
