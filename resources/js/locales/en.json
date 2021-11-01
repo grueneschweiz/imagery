@@ -172,6 +172,7 @@
             "backgroundGreen": "Green",
             "backgroundTransparent": "Transparent",
             "backgroundImage": "Image",
+            "placeholderWatermark": "Use a background image, {first_name}.",
             "selectImage": "Click to select image to upload",
             "browse": "Browse",
             "imageTooSmall": "The selected image is too small to fill the canvas. Use a bigger one.",

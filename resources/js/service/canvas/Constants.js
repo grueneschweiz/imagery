@@ -10,6 +10,7 @@ export const Alignments = {
 };
 
 export const BackgroundTypes = {
+    placeholder: 'placeholder',
     gradient: 'gradient',
     transparent: 'transparent',
     image: 'custom'

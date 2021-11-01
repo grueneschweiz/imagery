@@ -1,7 +1,8 @@
 import {
     Alignments,
-    BackgroundTypes, BarSchemes,
-    BarTypes as Types,
+    BackgroundTypes,
+    BarSchemes,
+    BarTypes,
     ColorSchemes,
     StyleSetTypes
 } from "../../service/canvas/Constants";
@@ -20,21 +21,21 @@ const state = {
     fontSize: 100,
     bars: [
         {
-            type: Types.headline,
+            type: BarTypes.headline,
             schema: BarSchemes.white,
             text: 'Headline 1',
             canvas: null,
             padding: 0,
         },
         {
-            type: Types.headline,
+            type: BarTypes.headline,
             schema: BarSchemes.magenta,
             text: 'Headline 2',
             canvas: null,
             padding: 0,
         },
         {
-            type: Types.subline,
+            type: BarTypes.subline,
             schema: BarSchemes.white,
             text: 'Subline',
             canvas: null,

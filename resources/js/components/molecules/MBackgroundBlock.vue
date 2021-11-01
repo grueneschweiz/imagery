@@ -2,28 +2,29 @@
     <div class="form-group">
         <label class="mb-0 d-block">{{$t('images.create.background')}}</label>
         <div class="btn-group btn-group-toggle">
-            <label :class="{'active': background === types.gradient}"
+            <label v-if="gradientBackgroundAvailable"
+                   :class="{'active': background === backgroundTypes.gradient}"
                    class="btn btn-secondary btn-sm">
                 <input
-                    :value="types.gradient"
+                    :value="backgroundTypes.gradient"
                     name="background"
                     type="radio"
                     v-model="background"
                 >{{$t('images.create.backgroundGreen')}}
             </label>
-            <label :class="{'active': background === types.transparent}"
+            <label :class="{'active': background === backgroundTypes.transparent}"
                    class="btn btn-secondary btn-sm">
                 <input
-                    :value="types.transparent"
+                    :value="backgroundTypes.transparent"
                     name="background"
                     type="radio"
                     v-model="background"
                 >{{$t('images.create.backgroundTransparent')}}
             </label>
-            <label :class="{'active': background === types.image}"
+            <label :class="{'active': background === backgroundTypes.image}"
                    class="btn btn-secondary btn-sm">
                 <input
-                    :value="types.image"
+                    :value="backgroundTypes.image"
                     name="background"
                     type="radio"
                     v-model="background"
@@ -32,7 +33,7 @@
             </label>
         </div>
 
-        <div class="form-group" v-if="background === types.image && image && !imageTooSmall">
+        <div v-if="background === backgroundTypes.image && image && !imageTooSmall" class="form-group">
             <label
                 class="mb-0 mt-2"
                 for="image-zoom"
@@ -59,20 +60,21 @@
         <div
             class="alert alert-warning"
             role="alert"
-            v-if="background === types.image && imageTooSmall">
+            v-if="background === backgroundTypes.image && imageTooSmall">
             {{$t('images.create.imageTooSmall')}}
         </div>
     </div>
 </template>
 
 <script>
-    import {BackgroundTypes as Types} from "../../service/canvas/Constants";
+    import {BackgroundTypes, StyleSetTypes} from "../../service/canvas/Constants";
     import SnackbarMixin from "../../mixins/SnackbarMixin";
     import BackgroundGradient from "../../service/canvas/elements/background/BackgroundGradient";
     import BackgroundTransparent from "../../service/canvas/elements/background/BackgroundTransparent";
     import BackgroundImage from "../../service/canvas/elements/background/BackgroundImage";
     import loadImage from "blueimp-load-image";
     import {mapGetters} from "vuex";
+    import BackgroundPlaceholder from "../../service/canvas/elements/background/BackgroundPlaceholder";
 
     const mimeTypesAllowed = [
         'image/jpeg',
@@ -91,10 +93,9 @@
         data() {
             return {
                 block: null,
-                background: Types.gradient,
                 image: null,
                 mimeType: null,
-                types: Types,
+                backgroundTypes: BackgroundTypes,
                 zoom: 0,
             }
         },
@@ -103,7 +104,22 @@
             ...mapGetters({
                 imageHeight: 'canvas/getImageHeight',
                 imageWidth: 'canvas/getImageWidth',
+                styleSet: 'canvas/getStyleSet',
+                user: 'user/object',
             }),
+
+            background: {
+                get() {
+                    return this.$store.getters['canvas/getBackgroundType']
+                },
+                set(value) {
+                    if (BackgroundTypes.image === value && !this.image) {
+                        return
+                    }
+
+                    this.$store.dispatch('canvas/setBackgroundType', value)
+                }
+            },
 
             imageTooSmall() {
                 if (!this.image) {
@@ -119,10 +135,18 @@
                 }
 
                 return false;
-            }
+            },
+
+            gradientBackgroundAvailable() {
+                return this.styleSet === StyleSetTypes.green;
+            },
         },
 
         mounted() {
+            if (this.styleSet === StyleSetTypes.young) {
+                this.background = BackgroundTypes.placeholder
+            }
+
             this.draw()
         },
 
@@ -131,20 +155,30 @@
                 let canvas;
 
                 switch (this.background) {
-                    case Types.gradient:
+                    case BackgroundTypes.placeholder:
+                        canvas = this.drawPlaceholder();
+                        break;
+
+                    case BackgroundTypes.gradient:
                         canvas = this.drawGradient();
                         break;
 
-                    case Types.transparent:
+                    case BackgroundTypes.transparent:
                         canvas = this.drawTransparent();
                         break;
 
-                    case Types.image:
+                    case BackgroundTypes.image:
                         canvas = this.drawImage();
                         break;
                 }
 
                 this.$emit('drawn', canvas);
+            },
+
+            drawPlaceholder() {
+                this.block = this.backgroundFactory(BackgroundPlaceholder)
+                this.block.watermarkText = this.$t('images.create.placeholderWatermark', {first_name: this.user.first_name})
+                return this.block.draw()
             },
 
             drawGradient() {
@@ -210,10 +244,10 @@
             },
 
             onImageLoaded(image) {
-                this.image = image;
-                this.$store.commit('legal/reset');
-                this.$store.dispatch('canvas/setBackgroundType', Types.image)
+                this.image = image
+                this.background = BackgroundTypes.image
                 this.$store.dispatch('canvas/setBackgroundImage', {image: image, mimeType: this.mimeType})
+                this.$store.commit('legal/reset')
             },
 
             mimeValidate(type) {
@@ -236,12 +270,7 @@
         },
 
         watch: {
-            background(value) {
-                if (Types.image === value && !this.image) {
-                    return;
-                }
-
-                this.$store.dispatch('canvas/setBackgroundType', value)
+            background() {
                 this.draw();
             },
             image() {
@@ -256,6 +285,14 @@
                 this.adjustZoom(valueNew, valueOld);
                 this.draw();
             },
+            styleSet(valueNew) {
+                if (StyleSetTypes.young === valueNew && BackgroundTypes.gradient === this.background) {
+                    this.background = BackgroundTypes.placeholder
+                }
+                if (StyleSetTypes.green === valueNew && BackgroundTypes.placeholder === this.background) {
+                    this.background = BackgroundTypes.gradient
+                }
+            }
         },
     }
 </script>
