@@ -19,8 +19,8 @@ const state = {
     hasBorder: true,
     borderWidth: 0,
     fontSize: 100,
-    hasTopShadow: false,
-    hasBottomShadow: false,
+    hasTopShadow: true,
+    hasBottomShadow: true,
     bars: [
         {
             type: BarTypes.headline,
