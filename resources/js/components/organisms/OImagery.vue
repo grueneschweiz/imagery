@@ -305,7 +305,7 @@
             updateShadowLayer(shadowBlock) {
                 this.shadowBlock = shadowBlock;
 
-                if (!this.shadowBlock) {
+                if (!this.shadowBlock || ! this.shadowLayer) {
                     return;
                 }
 
