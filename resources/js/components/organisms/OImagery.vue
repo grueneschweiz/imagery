@@ -463,6 +463,7 @@
             styleSet() {
                 this.barLayer = this.createBarLayer(this.canvas);
                 this.logoLayer = this.createLogoLayer(this.canvas);
+                this.updateBarLayer(this.barLayer);
                 this.updateLogoLayer(this.logoBlock);
             }
         }
