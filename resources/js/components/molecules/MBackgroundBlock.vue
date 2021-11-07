@@ -271,7 +271,7 @@
 
         watch: {
             background() {
-                this.draw();
+                this.$nextTick(this.draw)
             },
             image() {
                 this.zoom = 0;
