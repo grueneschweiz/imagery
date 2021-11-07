@@ -1,7 +1,7 @@
 import {Alignments} from "../../Constants";
 import LogoLayer from "./LogoLayer";
 
-const marginFactor = 0.055;
+const marginFactor = 0.04;
 
 export default class LogoLayerYoung extends LogoLayer {
     constructor(canvas) {
