@@ -68,10 +68,18 @@
                 @drawn="updateBorderLayer($event)"
             />
 
-            <button
-                @click="save()"
-                class="btn btn-primary mb-3">{{$t('images.create.generate')}}
-            </button>
+            <div class="d-sm-flex align-items-center mb-3">
+                <button
+                    :disabled="backgroundType === backgroundTypes.placeholder"
+                    class="btn btn-primary"
+                    @click="save()">{{$t('images.create.generate')}}
+                </button>
+                <small
+                    v-if="backgroundType === backgroundTypes.placeholder"
+                    class="d-block ml-sm-2"
+                >{{ $t('images.create.placeholderDisabledSave') }}</small>
+            </div>
+
         </div>
     </div>
 </template>
