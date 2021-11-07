@@ -147,7 +147,7 @@
                 this.background = BackgroundTypes.placeholder
             }
 
-            this.draw()
+            this.$nextTick(this.draw)
         },
 
         methods: {
