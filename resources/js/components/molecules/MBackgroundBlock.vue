@@ -177,7 +177,7 @@
 
             drawPlaceholder() {
                 this.block = this.backgroundFactory(BackgroundPlaceholder)
-                this.block.watermarkText = this.$t('images.create.placeholderWatermark', {first_name: this.user.first_name})
+                this.block.watermarkText = this.$t('images.create.placeholderWatermark', {first_name: this.user?.first_name ?? ''})
                 return this.block.draw()
             },
 
