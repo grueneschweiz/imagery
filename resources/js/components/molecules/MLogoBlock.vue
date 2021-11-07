@@ -187,7 +187,7 @@
             imageHeight() {
                 this.setLogo(this.logoIdSelected);
             },
-            colorSchema() {
+            color() {
                 this.setLogo(this.logoIdSelected);
             },
         },
