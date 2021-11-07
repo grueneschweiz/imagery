@@ -203,6 +203,10 @@
 
         methods: {
             draw() {
+                if (! this.bar) {
+                    return;
+                }
+
                 this.drawObj.text = this.bar.text;
                 this.drawObj.alignment = this.alignment;
                 this.drawObj.type = this.bar.type;
