@@ -19,6 +19,8 @@ const state = {
     hasBorder: true,
     borderWidth: 0,
     fontSize: 100,
+    hasTopShadow: false,
+    hasBottomShadow: false,
     bars: [
         {
             type: BarTypes.headline,
@@ -57,6 +59,8 @@ const getters = {
     getBorderWidth: state => state.borderWidth,
     getFontSize: state => state.fontSize,
     getBars: state => state.bars,
+    getHasTopShadow: state => state.hasTopShadow,
+    getHasBottomShadow: state => state.hasBottomShadow,
 };
 
 const mutations = {
@@ -74,6 +78,8 @@ const mutations = {
     addBar: (state, payload) => state.bars.splice(payload.index, 0, payload.bar),
     removeBar: (state, payload) => state.bars.splice(payload.index, 1),
     setBar: (state, payload) => state.bars.splice(payload.index, 1, payload.bar),
+    setHasTopShadow: (state, shadow) => state.hasTopShadow = shadow,
+    setHasBottomShadow: (state, shadow) => state.hasBottomShadow = shadow,
 };
 
 const actions = {
@@ -118,6 +124,12 @@ const actions = {
     },
     setBar({commit}, payload) {
         commit('setBar', payload)
+    },
+    setHasTopShadow({commit}, shadow) {
+        commit('setHasTopShadow', shadow)
+    },
+    setHasBottomShadow({commit}, shadow) {
+        commit('setHasBottomShadow', shadow)
     },
 };
 

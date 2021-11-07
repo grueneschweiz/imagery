@@ -59,6 +59,11 @@
                 v-if="backgroundType !== backgroundTypes.gradient"
             />
 
+            <MShadowBlock
+                v-if="styleSet === styleSetTypes.young"
+                @drawn="updateShadowLayer($event)"
+            />
+
             <MBorderBlock
                 @drawn="updateBorderLayer($event)"
             />
@@ -83,11 +88,13 @@
     import MSizeBlock from "../molecules/MSizeBlock";
     import MAlignment from "../molecules/MAlignment";
     import MColorScheme from "../molecules/MColorScheme";
+    import MShadowBlock from "../molecules/MShadowBlock";
     import debounce from 'lodash/debounce';
     import MCopyright from "../molecules/MCopyright";
     import CopyrightLayer from "../../service/canvas/layers/CopyrightLayer";
     import {mapGetters} from "vuex";
     import CanvasItemFactoryMixin from "../../mixins/CanvasItemFactoryMixin";
+    import ShadowLayer from "../../service/canvas/layers/ShadowLayer";
 
     export default {
         name: "OImagery",
@@ -102,6 +109,7 @@
             MColorScheme,
             MLogoBlock,
             MStyleSetBlock,
+            MShadowBlock,
         },
 
         data() {
@@ -131,6 +139,7 @@
                 backgroundLayer: null,
                 logoLayer: null,
                 copyrightLayer: null,
+                shadowBlock: null,
 
                 dragObj: null,
             }
@@ -217,8 +226,10 @@
                 this.barLayer = this.createBarLayer(this.canvas);
                 this.logoLayer = this.createLogoLayer(this.canvas);
                 this.copyrightLayer = new CopyrightLayer(this.canvas);
+                this.shadowLayer = new ShadowLayer(this.canvas);
 
                 this.updateBackgroundLayer(this.backgroundBlock);
+                this.updateShadowLayer(this.shadowBlock);
                 this.updateBorderLayer(this.borderBlock);
                 this.updateBarLayer(this.barBlock);
                 this.updateLogoLayer(this.logoBlock);
@@ -283,6 +294,17 @@
                 this.draw();
             },
 
+            updateShadowLayer(shadowBlock) {
+                this.shadowBlock = shadowBlock;
+
+                if (!this.shadowBlock) {
+                    return;
+                }
+
+                this.shadowLayer.block = this.shadowBlock;
+                this.draw();
+            },
+
             updateLogoLayer(logoBlock) {
                 if (!this.logoLayer) {
                     return;
@@ -306,6 +328,11 @@
 
             draw() {
                 this.backgroundLayer.draw();
+
+                if (this.styleSet === StyleSetTypes.young) {
+                    this.shadowLayer.draw();
+                }
+
                 this.borderLayer.draw();
                 this.barLayer.draw();
 
