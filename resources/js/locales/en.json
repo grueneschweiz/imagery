@@ -210,7 +210,7 @@
             "imageCopyInfo": "© Photo: {photographer}",
             "generate": "Generate Image",
             "save": "Save Image",
-            "placeholderDisabledSave": "Replace the images background, to save the image.",
+            "placeholderDisabledSave": "Replace the image's background, to save the image.",
             "sizes": {
                 "square": "Square",
                 "fbTimeline": "Facebook Timeline Image",
