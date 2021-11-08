@@ -9,6 +9,7 @@ import groups from "./modules/groups";
 import counter from "./modules/counter";
 import legal from "./modules/legal";
 import logos from "./modules/logos";
+import canvas from "./modules/canvas";
 
 Vue.use(Vuex);
 
@@ -23,5 +24,6 @@ export const store = new Vuex.Store({
         logosManageable: logos('manageable'),
         logosUsable: logos('usable'),
         legal,
+        canvas
     }
 });

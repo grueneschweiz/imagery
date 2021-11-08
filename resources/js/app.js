@@ -39,7 +39,7 @@ Vue.use(VueMasonryPlugin);
  * Initialize Vue
  */
 const app = new Vue({
-    el: '#app',
+    el: '#spa-root',
     render: h => h(App),
     store,
     router,

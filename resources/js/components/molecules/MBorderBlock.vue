@@ -1,5 +1,5 @@
 <template>
-    <div class="form-group">
+    <div v-if="!isStyleYoung" class="form-group">
         <label
             class="mb-0"
             for="border-switch"
@@ -26,6 +26,8 @@
 <script>
     import {Border} from "../../service/canvas/elements/Border";
     import ASelect from "../atoms/ASelect";
+    import {mapGetters} from "vuex";
+    import {StyleSetTypes} from "../../service/canvas/Constants";
 
     export default {
         name: "MBorderBlock",
@@ -33,24 +35,37 @@
         data() {
             return {
                 block: new Border(),
-                border: true
             }
         },
 
-        props: {
-            imageWidth: {
-                required: true,
-                type: Number,
+        computed: {
+            ...mapGetters({
+                imageHeight: 'canvas/getImageHeight',
+                imageWidth: 'canvas/getImageWidth',
+                styleSet: 'canvas/getStyleSet',
+            }),
+
+            border: {
+                get() {
+                    return this.$store.getters['canvas/getHasBorder']
+                },
+                set(val) {
+                    this.$store.dispatch('canvas/setHasBorder', val)
+                }
             },
-            imageHeight: {
-                required: true,
-                type: Number
+
+            isStyleYoung() {
+                return StyleSetTypes.young === this.styleSet
             }
         },
 
         mounted() {
-            this.draw();
-            this.$emit('widthChanged', this.block.borderWidth);
+            this.draw()
+
+            // enable / disable border only in next tick so the border with is
+            // calculated and set first, as the placement of the bars depends
+            // on it.
+            this.$nextTick(() => this.border = ! this.isStyleYoung)
         },
 
         methods: {
@@ -59,21 +74,22 @@
                 this.block.height = this.imageHeight;
                 this.block.border = this.border;
                 this.$emit('drawn', this.block.draw());
+                this.$store.dispatch('canvas/setBorderWidth', this.block.borderWidth)
             },
         },
 
         watch: {
             imageWidth() {
                 this.draw();
-                this.$emit('widthChanged', this.block.borderWidth);
             },
             imageHeight() {
                 this.draw();
-                this.$emit('widthChanged', this.block.borderWidth);
             },
             border() {
                 this.draw();
-                this.$emit('borderSettingChanged', this.border);
+            },
+            styleSet() {
+                this.border = ! this.isStyleYoung
             }
         },
     }

@@ -12,7 +12,10 @@ if (!mix.inProduction()) {
 mix.disableSuccessNotifications();
 
 // load browsersync with this domain
-mix.browserSync('localhost:8000');
+mix.browserSync({
+    proxy: 'app',
+    open: false,
+});
 
 // compile js
 mix.js('resources/js/app.js', 'public/js').vue({

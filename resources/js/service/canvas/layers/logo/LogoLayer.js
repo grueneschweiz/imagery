@@ -1,7 +1,5 @@
-import {Alignments} from "./../Constants";
-import Layer from "./Layer";
-
-const marginFactor = 0.2;
+import {Alignments} from "../../Constants";
+import Layer from "../Layer";
 
 export default class LogoLayer extends Layer {
     constructor(canvas) {
@@ -53,7 +51,7 @@ export default class LogoLayer extends Layer {
     }
 
     _setMargin() {
-        this._margin = this._block.width * marginFactor;
+        throw new Error("Method '_setMargin()' must be implemented.")
     }
 
     _determinePos(top = true) {

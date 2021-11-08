@@ -4,8 +4,8 @@ services:
   app:
     build:
       context: .docker
-    ports:
-      - '8000:80'
+    expose:
+      - 80
     volumes:
       - .:/var/www/html
       - .docker/php.ini:/usr/local/etc/php/php.ini
@@ -36,7 +36,7 @@ services:
       - '8020:8025'
 
   node:
-    image: node
+    image: node:lts
     working_dir: /home/node/app
     user: node
     environment:
@@ -45,6 +45,12 @@ services:
       - ./:/home/node/app:cached
     command: yarn watch
     container_name: imagery_node
+    ports:
+      - '3000:3000'
+      - '3001:3001'
+      - '9000:9000'
+    depends_on:
+      - app
 
 volumes:
   database:
