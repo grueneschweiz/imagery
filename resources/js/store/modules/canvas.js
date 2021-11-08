@@ -8,7 +8,7 @@ import {
 } from "../../service/canvas/Constants";
 
 const state = {
-    styleSet: StyleSetTypes.young,
+    styleSet: StyleSetTypes.green,
     alignment: Alignments.left,
     imageHeight: 0,
     imageWidth: 0,
