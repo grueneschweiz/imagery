@@ -139,6 +139,7 @@ sync() {
         --exclude='/tests' \
         --exclude='/.editorconfig' \
         --exclude='/.env*' \
+        --exclude='/.github' \
         --exclude='/deploy.*' \
         --exclude='/docker-compose.yml' \
         --exclude='/install.sh' \
