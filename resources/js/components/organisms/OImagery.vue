@@ -2,12 +2,11 @@
     <div class="o-imagery" ref="container">
         <div class="o-imagery__controls-1">
 
-            <MStyleSetBlock/>
-            <!-- todo: link style set block with users permissions -->
-
             <MLogoBlock
                 @drawn="updateLogoLayer($event)"
             />
+
+            <MStyleSetBlock/>
 
             <MSizeBlock/>
 
