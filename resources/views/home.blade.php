@@ -4,7 +4,7 @@
     <script>
         window.user = {!! json_encode(Auth::user()) !!}
     </script>
-    <div id="app">
+    <div id="spa-root">
         <div class="loader d-none">
             <div class="d-flex justify-content-center align-items-center min-vh-100 min-vw-100">
                 <div class="d-flex flex-column align-items-center">

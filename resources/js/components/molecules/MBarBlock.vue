@@ -9,7 +9,7 @@
                 :disabled="tooMuchText"
                 :max="fontSizeMax"
                 :min="fontSizeMin"
-                @input="draw()"
+                @input="draw"
                 class="form-control-range"
                 id="font-size"
                 step="1"
@@ -25,65 +25,16 @@
             >{{$t('images.create.bars')}}</label>
 
             <ABar
-                :alignment="alignment"
-                :base-font-size="fontSize"
-                :cloneable="headlinesCount < 3"
-                :deletable="headlinesPrimaryCount > 1"
-                :image-width="imageWidth"
-                :initialText="initialText ? initialText : 'Headline 1'"
-                :key="`headlinePrimary-${n}`"
-                :schema="schemaHeadlinePrimary"
-                :type="typeHeadline"
-                @clone="headlinesPrimaryAdd($event)"
-                @drawn="update(headlinesPrimary, n, ...arguments)"
-                @remove="headlinesPrimaryCount--"
-                @removed="remove('headlinesPrimary', n)"
-                @textChanged="updateText(`headlinesPrimary-${n}`, $event)"
-                @paddingChanged="updatePrimaryPadding($event)"
-                v-for="n in headlinesPrimaryCount"
-            />
-
-            <ABar
-                :alignment="alignment"
-                :base-font-size="fontSize"
-                :cloneable="headlinesCount < 3"
-                :deletable="headlinesSecondaryCount > 1"
-                :image-width="imageWidth"
-                :initialText="initialText ? initialText : 'Headline 2'"
-                :key="`headlineSecondary-${n}`"
-                :schema="schemaHeadlineSecondary"
-                :type="typeHeadline"
-                @clone="headlinesSecondaryAdd($event)"
-                @drawn="update(headlinesSecondary, n, ...arguments)"
-                @remove="headlinesSecondaryCount--"
-                @removed="remove('headlinesSecondary', n)"
-                @textChanged="updateText(`headlinesSecondary-${n}`, $event)"
-                v-for="n in headlinesSecondaryCount"
-            />
-
-            <ABar
-                :alignment="alignment"
-                :base-font-size="fontSize"
-                :cloneable="sublinesCount < 2"
-                :deletable="sublinesCount > 0"
-                :image-width="imageWidth"
-                :initialText="initialText ? initialText : 'Subline'"
-                :key="`subline-${n}`"
-                :schema="schemaSubline"
-                :type="typeSubline"
-                @clone="sublinesAdd($event)"
-                @drawn="update(sublines, n, ...arguments)"
-                @remove="sublinesCount--"
-                @removed="remove('sublines', n)"
-                @textChanged="updateText(`sublines-${n}`, $event)"
-                v-for="n in sublinesCount"
+                v-for="idx in bars.keys()"
+                :key="idx"
+                :index="idx"
             />
 
             <button
                 :class="buttonClassSubline"
-                @click="sublinesCount++"
+                v-if="showAddSublineBtn"
                 class="btn"
-                v-if="sublinesCount === 0"
+                @click="addSubline"
             >{{$t('images.create.sublineAdd')}}
             </button>
 
@@ -95,85 +46,67 @@
 </template>
 
 <script>
-    const minFontSizeFactor = 0.08; // the correct 175% would be 0.0925
-    const maxFontSizeFactor = 1.08;
-
-    import {BarSchemes as Schemes, BarTypes as Types, ColorSchemes} from "../../service/canvas/Constants";
-    import BarBlock from "../../service/canvas/blocks/BarBlock";
+    import {mapGetters} from "vuex";
+    import {
+        BarSchemes,
+        BarTypes,
+        ColorSchemes,
+        StyleSetTypes
+    } from "../../service/canvas/Constants";
     import ABar from "../atoms/ABar";
+    import CanvasItemFactoryMixin from "../../mixins/CanvasItemFactoryMixin";
+
+    const defaultMinFontSizeFactor = 0.1
+    const defaultMaxFontSizeFactor = 0.9
 
     export default {
         name: "MBarBlock",
         components: {ABar},
+        mixins: [CanvasItemFactoryMixin],
 
         data() {
             return {
-                headlinesPrimary: [],
-                headlinesSecondary: [],
-                sublines: [],
-                headlinesPrimaryCount: 1,
-                headlinesSecondaryCount: 1,
-                sublinesCount: 1,
                 fontSizeMax: 100,
-                fontSize: 100,
-                typeHeadline: Types.headline,
-                typeSubline: Types.subline,
                 tooMuchText: false,
                 block: null,
-                eventCounter: {},
-                initialText: null,
-                texts: {},
-                primaryPadding: 0,
-            }
-        },
-
-        props: {
-            alignment: {
-                required: true,
-            },
-            colorSchema: {
-                required: true,
-            },
-            imageWidth: {
-                required: true,
-                type: Number,
-            },
-            imageHeight: {
-                required: true,
-                type: Number
             }
         },
 
         computed: {
-            schemaHeadlinePrimary() {
-                if (ColorSchemes.white === this.colorSchema) {
-                    return Schemes.white;
-                } else {
-                    return Schemes.green;
-                }
-            },
+            ...mapGetters({
+                styleSet: 'canvas/getStyleSet',
+                alignment: 'canvas/getAlignment',
+                imageHeight: 'canvas/getImageHeight',
+                imageWidth: 'canvas/getImageWidth',
+                colorSchema: 'canvas/getColorSchema',
+                bars: 'canvas/getBars',
+            }),
 
-            schemaHeadlineSecondary() {
-                return Schemes.magenta;
-            },
-
-            schemaSubline() {
-                if (ColorSchemes.greengreen === this.colorSchema) {
-                    return Schemes.green;
-                } else {
-                    return Schemes.white;
+            fontSize: {
+                get() {
+                    return this.$store.getters['canvas/getFontSize']
+                },
+                set(val) {
+                    if (val > 0) {
+                        this.$store.dispatch('canvas/setFontSize', val)
+                    }
                 }
             },
 
             buttonClassSubline() {
-                if (ColorSchemes.greengreen === this.colorSchema) {
-                    return 'btn-secondary';
-                } else {
-                    return 'btn-outline-secondary';
+                switch (this.colorSchema) {
+                    case ColorSchemes.white:
+                        return 'btn-outline-dark'
+                    case ColorSchemes.greengreen:
+                        return 'btn-secondary'
+                    default:
+                        return 'btn-outline-secondary'
                 }
             },
 
             fontSizeMin() {
+                const minFontSizeFactor = this.block?.minFontSizeFactor || defaultMinFontSizeFactor
+
                 // base the minimal font size on a normalized side length of
                 // the image.
                 // to get a normalized side length, square the image width,
@@ -187,66 +120,35 @@
                 return Math.ceil(min);
             },
 
-            barCount() {
-                return this.headlinesCount
-                    + this.sublinesCount;
-            },
-
-            headlinesCount() {
-                return this.headlinesPrimaryCount
-                    + this.headlinesSecondaryCount;
+            showAddSublineBtn() {
+                return this.bars
+                    .filter(bar => bar.type === BarTypes.subline)
+                    .length === 0
             }
         },
 
-        created() {
-            this.block = new BarBlock(
-                this.headlinesPrimary,
-                this.headlinesSecondary,
-                this.sublines,
-            );
-        },
-
         mounted() {
+            this.maybeRemoveSubline()
             this.draw()
         },
 
         methods: {
-            update(array, index, bar, event) {
-                this.$set(array, index, bar);
-
-                if (this.isSingleBarEvent(event)) {
-                    this.draw();
-                    return;
+            setupBlock() {
+                const canvases = this.bars.map(bar => bar.canvas)
+                if (canvases.length) {
+                    this.block = this.createBarBlock(canvases)
+                } else {
+                    this.block = null
                 }
-
-                if (!this.eventCounter[event]) {
-                    this.eventCounter[event] = 0;
-                }
-
-                this.eventCounter[event]++;
-
-                if (this.eventCounter[event] === this.barCount) {
-                    this.eventCounter[event] = 0;
-                    this.draw();
-                }
-            },
-
-            remove(type, index) {
-                this.removeBar(this[type], index);
-                this.removeText(`${type}-${index}`);
-            },
-
-            removeBar(array, index) {
-                this.$delete(array, index);
-                this.draw();
-            },
-
-            removeText(index) {
-                this.$delete(this.texts, index);
-                this.updateText();
             },
 
             draw() {
+                this.setupBlock()
+
+                if (!this.block) {
+                    return
+                }
+
                 this.block.alignment = this.alignment;
 
                 this.block.draw(); // called twice. first call is needed to determine size for content based font adjustment
@@ -258,6 +160,7 @@
             },
 
             adjustFontSize() {
+                const maxFontSizeFactor = this.block?.maxFontSizeFactor || defaultMaxFontSizeFactor
                 const min = this.fontSizeMin;
                 const maxWidth = this.imageWidth * maxFontSizeFactor;
                 const imageToBlockRatio = maxWidth / this.block.width;
@@ -289,49 +192,31 @@
                 return true;
             },
 
-            isSingleBarEvent(event) {
-                return ['text', 'schema', 'create'].indexOf(event) !== -1;
-            },
-
-            headlinesPrimaryAdd(text) {
-                this.initialText = text;
-                this.headlinesPrimaryCount++;
-            },
-
-            headlinesSecondaryAdd(text) {
-                this.initialText = text;
-
-                const message = this.$t('images.create.headlineSecondaryAdd');
-
-                if (!confirm(message)) {
-                    this.headlinesSecondaryCount++;
-                }
-            },
-
-            sublinesAdd(text) {
-                this.initialText = text;
-                this.sublinesCount++;
-            },
-
-            updateText(key = null, text = null) {
-                if (key && text) {
-                    this.texts[key] = text;
+            addSubline() {
+                const subline = {
+                    type: BarTypes.subline,
+                    schema: BarSchemes.white,
+                    text: 'Subline',
+                    canvas: null,
+                    padding: 0,
                 }
 
-                let flatText = '';
-                Object.keys(this.texts)
-                    .sort()
-                    .forEach(key => flatText += ` ${this.texts[key]}`);
-
-                this.$emit('textChanged', flatText.trim());
+                this.$store.dispatch(
+                    'canvas/addBar',
+                    {index: this.bars.length, bar: subline}
+                )
             },
 
-            updatePrimaryPadding(value) {
-                if (this.primaryPadding !== value) {
-                    this.primaryPadding = value;
-                    this.$emit('paddingChanged', value);
+            maybeRemoveSubline() {
+                // remove sublines for style set young
+                if (this.styleSet === StyleSetTypes.young) {
+                    this.bars.forEach((bar, idx) => {
+                        if (bar.type === BarTypes.subline && 'Subline' === bar.text) {
+                            this.$store.dispatch('canvas/removeBar', {index: idx})
+                        }
+                    })
                 }
-            }
+            },
         },
 
         watch: {
@@ -340,7 +225,14 @@
             },
             imageHeight() {
                 this.draw();
-            }
+            },
+            bars() {
+                this.draw()
+            },
+            styleSet() {
+                this.maybeRemoveSubline()
+                this.draw()
+            },
         }
     }
 </script>

@@ -1,15 +1,11 @@
-import {Alignments} from "./../Constants";
+import {Alignments} from "../../Constants";
 
 export default class BarBlock {
-    constructor(primary, secondary, sublines) {
+    constructor(bars) {
         this._canvas = document.createElement('canvas');
         this._context = this._canvas.getContext('2d');
 
-        this._primary = primary;
-        this._secondary = secondary;
-        this._sublines = sublines;
-
-        this._bars = [];
+        this._bars = bars;
     }
 
     set alignment(alignment) {
@@ -20,11 +16,15 @@ export default class BarBlock {
         return this._canvas.width;
     }
 
-    draw() {
-        this._bars = this._primary
-            .concat(this._secondary)
-            .concat(this._sublines);
+    get minFontSizeFactor() {
+        return 0.1
+    }
 
+    get maxFontSizeFactor() {
+        return 1
+    }
+
+    draw() {
         this._setWidth();
         this._setHeight();
         this._clear();
@@ -71,10 +71,18 @@ export default class BarBlock {
     }
 
     _drawBar(bar, y) {
-        let x = 0;
+        let x;
 
-        if (this._alignment === Alignments.right) {
-            x = this._canvas.width - bar.width;
+        switch (this._alignment) {
+            case Alignments.right:
+                x = this._canvas.width - bar.width
+                break
+            case Alignments.center:
+                x = (this._canvas.width - bar.width) / 2
+                break
+            case Alignments.left:
+            default:
+                x = 0
         }
 
         this._context.drawImage(bar, x, y);

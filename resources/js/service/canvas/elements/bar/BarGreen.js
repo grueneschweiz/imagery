@@ -1,4 +1,5 @@
-import {Alignments, BarSchemes as Schemes, BarSizeFactor, BarTypes as Types} from "./../Constants";
+import {Alignments, BarSchemes as Schemes, BarSizeFactor, BarTypes as Types} from "./../../Constants";
+import Bar from "./Bar";
 
 
 /**
@@ -27,52 +28,44 @@ const charPaddingFactor = 0.2;
  */
 const barMarginFactor = 0.1;
 
-export default class Bar {
+const fontFamily = {
+    headline: 'SanukFat',
+    subline: 'SanukBold',
+}
+
+const sublineHeadlineSizeRatio = 0.4;
+
+export default class BarGreen extends Bar {
     constructor() {
-        this._canvas = document.createElement('canvas');
-        this._context = this._canvas.getContext('2d');
-
-        this._schema = Schemes.green;
-        this._alignment = Alignments.left;
-        this._fontSize = 16;
-        this._text = '';
-        this._font = Types.headline;
-
-        this._imageWidth = 0;
+        super();
+        this._font = fontFamily.headline;
         this._barOversize = 0;
-        this._textDims = {
-            width: null,
-            height: null,
-            padding: null,
-        };
     }
 
     set text(text) {
         this._text = text.toLocaleUpperCase().trim();
     }
 
-    set fontSize(fontSize) {
-        this._fontSize = fontSize;
-    }
-
-    set alignment(alignment) {
-        this._alignment = alignment;
-    }
-
-    set schema(schema) {
-        this._schema = schema;
-    }
-
     set type(type) {
-        this._font = type;
+        switch (type) {
+            case Types.headline:
+                this._font = fontFamily.headline
+                break;
+            case Types.subline:
+                this._font = fontFamily.subline
+                break;
+            default:
+                throw new Error(`BarType ${type} is not implemented.`)
+        }
     }
 
-    set imageWidth(width) {
-        this._imageWidth = width;
-    }
+    set baseFontSize(fontSize) {
+        if (this._font === fontFamily.subline) {
+            this._fontSize = fontSize * sublineHeadlineSizeRatio
+            return
+        }
 
-    get padding() {
-        return this._textDims.padding;
+        this._fontSize = fontSize
     }
 
     draw() {

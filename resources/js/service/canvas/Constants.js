@@ -1,3 +1,8 @@
+export const StyleSetTypes = {
+    green: 'green',
+    young: 'young'
+}
+
 export const Alignments = {
     left: -1,
     center: 0,
@@ -5,6 +10,7 @@ export const Alignments = {
 };
 
 export const BackgroundTypes = {
+    placeholder: 'placeholder',
     gradient: 'gradient',
     transparent: 'transparent',
     image: 'custom'
@@ -22,7 +28,11 @@ export const BarSchemes = {
     magenta: {
         background: '#e10078',
         text: '#ffffff',
-    }
+    },
+    transparent: {
+        background: 'rgba(0,0,0,0)',
+        text: '#ffffff',
+    },
 };
 
 export const ColorSchemes = {
@@ -32,16 +42,19 @@ export const ColorSchemes = {
 };
 
 export const BarTypes = {
-    headline: 'SanukFat',
-    subline: 'SanukBold'
+    headline: 'headline',
+    subline: 'subline',
 };
 
 export const LogoTypes = {
     alternative: 'alternative',
     'alternative-risch': 'alternative-risch',
+    'giovani-verdi': 'giovani-verdi',
     gruene: 'gruene',
     'gruene-vert-e-s': 'gruene-vert-e-s',
     'gruene-verts': 'gruene-verts',
+    'jeunes-vert-e-s': 'jeunes-vert-e-s',
+    'junge-gruene': 'junge-gruene',
     verda: 'verda',
     verdi: 'verdi',
     'vert-e-s': 'vert-e-s',
@@ -59,6 +72,11 @@ export const LogoSublineRatios = {
         left: 0.3,
         fontSize: 0.3
     },
+    [LogoTypes['giovani-verdi']]: {
+        topMargin: 0,
+        left: 0,
+        fontSize: 0.3
+    },
     [LogoTypes.gruene]: {
         topMargin: 0.032,
         left: 0.33,
@@ -73,6 +91,16 @@ export const LogoSublineRatios = {
         topMargin: 0.02175,
         left: 0.296,
         fontSize: 0.09375
+    },
+    [LogoTypes['jeunes-vert-e-s']]: {
+        topMargin: 0,
+        left: 0,
+        fontSize: 0.3
+    },
+    [LogoTypes['junge-gruene']]: {
+        topMargin: 0,
+        left: 0,
+        fontSize: 0.3
     },
     [LogoTypes.verda]: {
         topMargin: 0.0255,

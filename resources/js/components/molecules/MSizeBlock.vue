@@ -25,8 +25,8 @@
                     <input :disabled="!custom"
                            class="form-control"
                            id="canvas-width-setter"
-                           max="10000"
-                           min="100"
+                           :max="maxSize"
+                           :min="minSize"
                            step="1"
                            type="number"
                            v-model.number="width">
@@ -41,13 +41,19 @@
                     <input :disabled="!custom"
                            class="form-control"
                            id="canvas-height-setter"
-                           max="10000"
-                           min="100"
+                           :max="maxSize"
+                           :min="minSize"
                            step="1"
                            type="number"
                            v-model.number="height">
                 </div>
             </div>
+        </div>
+        <div
+            v-if="width > maxSize || height > maxSize"
+            class="alert alert-danger mt-3"
+            role="alert">
+          {{$t('images.create.oversizeError', {maxWidth: maxSize, maxHeight: maxSize})}}
         </div>
         <div
             class="alert alert-warning mt-3"
@@ -62,6 +68,8 @@
     import {ModelSelect} from 'vue-search-select'
 
     const customSize = '999-custom';
+    const minSize = 100
+    const maxSize = 10000
 
     export default {
         name: "MSizeBlock",
@@ -69,8 +77,8 @@
 
         data() {
             return {
-                width: 1080,
-                height: 1080,
+                width: 0,
+                height: 0,
                 custom: false,
                 sizes: [
                     {value: '1-1080x1080', text: this.$t('images.create.sizes.square')},
@@ -83,11 +91,13 @@
                     {value: customSize, text: this.$t('images.create.sizes.custom')},
                 ],
                 sizeSelected: null,
+                minSize,
+                maxSize,
             }
         },
 
         created() {
-            this.sizeSelected = this.sizes[0].value;
+            this.setSize(this.sizes[0].value);
         },
 
         methods: {
@@ -106,21 +116,27 @@
                 this.height = parseInt(dims[1]);
             },
 
-            emitSizeChanged() {
-                const width = this.width > 10 ? this.width : 10;
-                const height = this.height > 10 ? this.height : 10;
-
-                this.$emit('sizeChanged', {width, height});
+            sanitizeSize(value) {
+                const size = parseInt(value)
+                if (size >= minSize && size <= maxSize) {
+                    return size
+                }
+                if (size > maxSize) {
+                    return maxSize
+                }
+                return minSize
             }
         },
 
         watch: {
             width() {
-                this.emitSizeChanged();
+                const width = this.sanitizeSize(this.width)
+                this.$store.commit('canvas/setImageWidth', width)
             },
 
             height() {
-                this.emitSizeChanged();
+                const height = this.sanitizeSize(this.height)
+                this.$store.commit('canvas/setImageHeight', height)
             }
         }
     }

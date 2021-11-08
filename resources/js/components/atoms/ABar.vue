@@ -6,137 +6,238 @@
                 class="form-control col"
                 type="text"
                 v-model="text"
-                @input="$emit('textChanged', text)"
-            >
-            <button
-                :class="buttonClass"
-                :title="$t('images.create.barAdd')"
-                @click="$emit('clone', text)"
-                class="btn ml-1"
-                v-if="cloneable"><i class="mdi mdi-add"></i></button>
-            <button
-                :class="buttonClass"
-                :title="$t('images.create.barRemove')"
-                @click="$emit('remove')"
-                class="btn ml-1"
-                v-if="deletable"><i class="mdi mdi-remove"></i></button>
+            />
+            <template v-if="!isStyleYoung || isSubline">
+                <button
+                    :class="buttonClassAdd"
+                    :disabled="!cloneable"
+                    :title="$t('images.create.barAdd')"
+                    class="btn ml-1"
+                    @click="clone"><i class="mdi mdi-add"></i></button>
+                <button
+                    :class="buttonClassRemove"
+                    :disabled="!deletable"
+                    :title="$t('images.create.barRemove')"
+                    class="btn ml-1"
+                    @click="remove"><i class="mdi mdi-remove"></i></button>
+            </template>
         </div>
     </div>
 </template>
 
 <script>
     import SnackbarMixin from "../../mixins/SnackbarMixin";
-
-    const sublineHeadlineSizeRatio = 0.4;
-
-    import Bar from "../../service/canvas/elements/Bar";
-    import {BarTypes as Types, BarSchemes as Schemes} from "../../service/canvas/Constants";
+    import {
+        BarSchemes,
+        BarTypes,
+        ColorSchemes,
+        StyleSetTypes
+    } from "../../service/canvas/Constants";
     import FontFaceObserver from "fontfaceobserver";
+    import CanvasItemFactoryMixin from "../../mixins/CanvasItemFactoryMixin";
+    import {mapGetters} from "vuex";
 
     export default {
         name: "ABar",
-        mixins: [SnackbarMixin],
+        mixins: [SnackbarMixin, CanvasItemFactoryMixin],
+
         data() {
             return {
-                text: '',
-                bar: new Bar(),
+                drawObj: this.createBar(),
             }
         },
 
         props: {
-            alignment: {
+            index: {
                 required: true,
-            },
-            type: {
-                required: true,
-            },
-            schema: {
-                required: true,
-            },
-            baseFontSize: {
-                required: true,
-                type: Number,
-            },
-            imageWidth: {
-                required: true,
-                type: Number,
-            },
-            deletable: {
-                required: true,
-                type: Boolean,
-            },
-            cloneable: {
-                required: true,
-                type: Boolean
-            },
-            initialText: {
-                required: true,
-                type: String
+                type: Number
             },
         },
 
         computed: {
-            fontSize() {
-                if (this.type === Types.headline) {
-                    return this.baseFontSize;
-                } else {
-                    return this.baseFontSize * sublineHeadlineSizeRatio;
+            ...mapGetters({
+                styleSet: 'canvas/getStyleSet',
+                alignment: 'canvas/getAlignment',
+                imageWidth: 'canvas/getImageWidth',
+                baseFontSize: 'canvas/getFontSize',
+                bars: 'canvas/getBars',
+                colorSchema: 'canvas/getColorSchema'
+            }),
+
+            bar() {
+                return this.bars[this.index]
+            },
+
+            text: {
+                get() {
+                    return this.bar.text
+                },
+                set(val) {
+                    this.$set(this.bar, 'text', val)
+                    this.draw()
                 }
             },
 
+            barSchema() {
+                if (BarSchemes.magenta === this.bar.schema) {
+                    return this.bar.schema
+                }
+
+                if (this.isHeadline) {
+                    return ColorSchemes.white === this.colorSchema
+                        ? BarSchemes.white
+                        : BarSchemes.green
+                }
+
+                if (this.isSubline) {
+                    if (this.isStyleYoung) {
+                        return BarSchemes.transparent
+                    }
+
+                    return ColorSchemes.greengreen === this.colorSchema
+                        ? BarSchemes.green
+                        : BarSchemes.white
+                }
+
+                return BarSchemes.green
+            },
+
+            buttonClassAdd() {
+                if (!this.cloneable) {
+                    return 'btn-disabled'
+                }
+
+                return this.buttonClass
+            },
+
+            buttonClassRemove() {
+                if (!this.deletable) {
+                    return 'btn-disabled'
+                }
+
+                return this.buttonClass
+            },
+
             buttonClass() {
-                switch (this.schema) {
-                    case Schemes.green:
-                        return 'btn-secondary';
+                switch (this.barSchema) {
+                    case BarSchemes.green:
+                        return 'btn-secondary'
 
-                    case Schemes.magenta:
-                        return 'btn-primary';
+                    case BarSchemes.magenta:
+                        return this.colorSchema === ColorSchemes.white
+                            ? 'btn-outline-primary'
+                            : 'btn-primary'
 
-                    case Schemes.white:
-                        return 'btn-outline-secondary';
+                    case BarSchemes.white:
+                        return 'btn-outline-secondary'
+
+                    case BarSchemes.transparent:
+                        return 'btn-outline-dark'
                 }
             },
 
             inputClass() {
-                return this.schema === Schemes.magenta ? 'magenta' : 'green';
+                switch (this.barSchema) {
+                    case BarSchemes.magenta:
+                        return 'magenta'
+
+                    case BarSchemes.transparent:
+                        return 'dark'
+
+                    default:
+                        return 'green'
+                }
             },
+
+            headlineMax() {
+                return this.isStyleYoung ? 2 : 3
+            },
+
+            cloneable() {
+                if (this.isHeadline) {
+                    return this.bars
+                        .filter(bar => bar.type === BarTypes.headline)
+                        .length < this.headlineMax
+                }
+                if (this.isSubline) {
+                    return this.bars
+                        .filter(bar => bar.type === BarTypes.subline)
+                        .length < 2
+                }
+                return false
+            },
+
+            deletable() {
+                if (this.isHeadline) {
+                    return this.bars
+                        .filter(bar =>
+                            bar.type === this.bar.type
+                            && bar.schema === this.bar.schema
+                        )
+                        .length > 1
+                }
+                return this.isSubline
+            },
+
+            isStyleYoung() {
+                return this.styleSet === StyleSetTypes.young
+            },
+
+            isHeadline() {
+                return this.bar.type === BarTypes.headline
+            },
+
+            isSubline() {
+                return this.bar.type === BarTypes.subline
+            },
+
+            isFirstSubline() {
+                return this.index === this.bars.findIndex(bar => bar.type === BarTypes.subline)
+            }
         },
 
         mounted() {
-            this.text = this.initialText;
-            this.draw('create');
-            this.loadFonts().then(() => {
-                this.draw('font');
-                this.$emit('paddingChanged', this.bar.padding);
-            });
-        },
-
-        destroyed() {
-            this.$emit('removed');
+            this.draw()
+            this.loadFonts().then(this.draw)
         },
 
         methods: {
-            draw(action) {
-                this.bar.text = this.text;
-                this.bar.alignment = this.alignment;
-                this.bar.type = this.type;
-                this.bar.schema = this.schema;
-                this.bar.fontSize = this.fontSize;
-                this.bar.imageWidth = this.imageWidth;
-
-                this.$emit('drawn', this.bar.draw(), action);
-
-                if ('baseFontSize' === action) {
-                    this.$emit('paddingChanged', this.bar.padding);
+            draw() {
+                if (! this.bar) {
+                    return;
                 }
+
+                this.drawObj.text = this.bar.text;
+                this.drawObj.alignment = this.alignment;
+                this.drawObj.type = this.bar.type;
+                this.drawObj.schema = this.barSchema;
+                this.drawObj.baseFontSize = this.baseFontSize;
+                this.drawObj.imageWidth = this.imageWidth;
+                this.drawObj.isFirstSubline = this.isFirstSubline;
+
+                this.bar.canvas = this.drawObj.draw()
+
+                this.bar.padding = this.drawObj.padding;
+
+                this.$store.dispatch(
+                    'canvas/setBar',
+                    {index: this.index, bar: {...this.bar}}
+                )
             },
 
             loadFonts() {
                 const timeout = 10000;
-                const fat = new FontFaceObserver('SanukFat');
-                const bold = new FontFaceObserver('SanukBold');
+                const sanukFat = new FontFaceObserver('SanukFat');
+                const sanukBold = new FontFaceObserver('SanukBold');
+                const bowlbyOneSc = new FontFaceObserver('Bowlby One SC');
+                const madaBold = new FontFaceObserver('Mada');
 
-                return Promise.all([fat.load(null, timeout), bold.load(null, timeout)])
+                return Promise.all([
+                    sanukFat.load(null, timeout),
+                    sanukBold.load(null, timeout),
+                    bowlbyOneSc.load(null, timeout),
+                    madaBold.load(null, timeout),
+                ])
                     .catch(
                         error => this.snackErrorDismiss(
                             error,
@@ -144,27 +245,54 @@
                         )
                     );
             },
+
+            remove() {
+                this.$store.dispatch('canvas/removeBar', {index: this.index})
+            },
+
+            clone() {
+                if (this.isHeadline
+                    && this.bar.schema === BarSchemes.magenta) {
+                    const message = this.$t('images.create.headlineSecondaryAdd')
+                    if (confirm(message)) {
+                        return
+                    }
+                }
+
+                this.$store.dispatch(
+                    'canvas/addBar',
+                    {index: this.index, bar: {...this.bar}}
+                )
+            },
+
+            maybeRemoveBar() {
+                if ( this.isStyleYoung
+                    && this.isHeadline
+                    && this.deletable
+                ) {
+                    this.remove()
+                }
+            }
         },
 
         watch: {
-            text() {
-                this.draw('text');
-            },
             alignment() {
-                this.draw('alignment');
-            },
-            type() {
-                this.draw('type');
-            },
-            schema() {
-                this.draw('schema');
+                this.draw()
             },
             baseFontSize() {
-                this.draw('baseFontSize');
+                this.draw()
             },
             imageWidth() {
-                this.draw('imageWidth');
+                this.draw()
             },
+            styleSet() {
+                this.maybeRemoveBar()
+                this.drawObj = this.createBar()
+                this.draw()
+            },
+            colorSchema() {
+                this.draw()
+            }
         }
     }
 </script>
@@ -182,5 +310,10 @@
             border-color: $secondary;
             box-shadow: 0 0 0 0.2rem $lightGreen;
         }
+    }
+
+    .btn-disabled {
+        color: rgba($dark, 0.4);
+        border-color: rgba($dark, 0.4);
     }
 </style>

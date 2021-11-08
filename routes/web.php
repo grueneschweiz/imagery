@@ -1,5 +1,12 @@
 <?php
 
+// force route helpers to use APP_URL environment variable
+// so the route helpers also work behind a reverse proxy
+$app_url = config("app.url");
+if (!empty($app_url)) {
+    URL::forceRootUrl($app_url);
+}
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
