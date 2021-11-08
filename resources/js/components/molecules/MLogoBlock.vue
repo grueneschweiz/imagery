@@ -188,7 +188,9 @@
                 this.setLogo(this.logoIdSelected);
             },
             color() {
-                this.setLogo(this.logoIdSelected);
+                this.$nextTick(() => {
+                    this.setLogo(this.logoIdSelected);
+                });
             },
         },
     }
