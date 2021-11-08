@@ -211,7 +211,7 @@
                 // remove sublines for style set young
                 if (this.styleSet === StyleSetTypes.young) {
                     this.bars.forEach((bar, idx) => {
-                        if (bar.type === BarTypes.subline) {
+                        if (bar.type === BarTypes.subline && 'Subline' === bar.text) {
                             this.$store.dispatch('canvas/removeBar', {index: idx})
                         }
                     })
@@ -230,6 +230,7 @@
                 this.draw()
             },
             styleSet() {
+                this.maybeRemoveSubline()
                 this.draw()
             },
         }
