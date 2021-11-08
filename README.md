@@ -1,5 +1,6 @@
 # Imagery
-_Easily generate images in the corporate design of the swiss [GREENS](https://gruene.ch)._
+_Easily generate images in the corporate design of the swiss 
+[GREENS](https://gruene.ch) and the [young greens](https://jungegruene.ch)._
 
 [![Crowdin](https://badges.crowdin.net/cdgruenech/localized.svg)](https://crowdin.com/project/cdgruenech)
 
@@ -10,7 +11,7 @@ instructions are needed and no corporate design rules can be broken.
 
 ### Why?
 Not everybody has the software and skills to create corporate design images on 
-his own. And it's not everybodys hobby to learn all the rules of the corporate 
+his own. And it's not everybody's hobby to learn all the rules of the corporate 
 design.
 
 
@@ -18,13 +19,14 @@ design.
 ... is cool, simple and helps to make the 🌍 a better place 🤩
 
 ### Getting started
-1. Install [docker](https://store.docker.com/search?offering=community&type=edition) and [docker-compose](https://docs.docker.com/compose/install/).
-1. Clone this repo `git clone https://github.com/cyrillbolliger/imagery`
-1. `cd` into the folder containing the repo
-1. Execute `bash install.sh` and have a ☕️ while it installs.
-1. Visit [localhost:3000/](http://localhost:3000/)
-1. Use `superadmin@user.login` and `password` to login.
-1. As the font used in the corporate design is proprietary, you'll need to get a 
+1. Install [docker](https://store.docker.com/search?offering=community&type=edition)
+   and [docker-compose](https://docs.docker.com/compose/install/).
+2. Clone this repo `git clone https://github.com/grueneschweiz/cd.gruene.ch_v2`
+3. `cd` into the folder containing the repo
+4. Execute `bash install.sh` and have a ☕️ while it installs.
+5. Visit [localhost:3000/](http://localhost:3000/)
+6. Use `superadmin@user.login` and `password` to login.
+7. As the font used in the corporate design is proprietary, you'll need to get a 
    licenced copy of the Sanuk font (fat and bold). Store it as follows:
    ```
    storage
@@ -33,7 +35,7 @@ design.
              |-- SanukOT-Bold.otf
              |-- SanutOT-Fat.otf
    ```
-1. The indesign templates bundles for the logo suffer the limitations of the
+8. The indesign templates bundles for the logo suffer the limitations of the
    proprietary Sanuk font as well. If you've got a licenced copy of the Sanuk 
    font, we can provide you the bundles. Store them as follows:
    ```
@@ -101,13 +103,8 @@ See the Github Action [`.github/workflows/l10n.yml`](.github/workflows/l10n.yml)
   branch on any push to `dev` and on every pull request on `dev` or `master`.
   To get the new translations merge `l10n_crowdin` in your branch.
 
-### Logins
-Logins created by the demo seeder:
-* `superadmin@user.login`:`password`
-* `countryadmin@user.login`:`password`
-* `cantonadmin@user.login`:`password`
-* `localuser@user.login`:`password`
-
+### Login
+See the single sign-on docs [docs/sso.md](docs/sso.md).
 
 ## Github Actions
 We use actions to test the application and for the localization.
@@ -151,5 +148,5 @@ See the [crowdin](#crowdin) section.
 
 ## More Docs
 
-* Single-Sign on [docs/sso.md](docs/sso.md).
+* Single sign-on [docs/sso.md](docs/sso.md).
 * How to add a logo [docs/logo.md](docs/logo.md).
