@@ -51,7 +51,7 @@
     import {mapGetters} from "vuex";
     import PrepareSelectMixin from "../../mixins/PrepareSelectMixin";
     import {LogoBlock} from "../../service/canvas/blocks/LogoBlock";
-    import {ColorSchemes} from "../../service/canvas/Constants";
+    import {ColorSchemes, StyleSetTypes} from "../../service/canvas/Constants";
     import ADefaultLogo from "../atoms/ADefaultLogo";
 
     export default {
@@ -63,7 +63,6 @@
             return {
                 logo: new Logo(),
                 block: new LogoBlock(),
-                logoIdSelected: null,
                 logoObjSelected: null,
                 logoImage: null,
                 logoChoices: [],
@@ -72,32 +71,35 @@
             }
         },
 
-        props: {
-            imageWidth: {
-                required: true,
-                type: Number,
-            },
-            imageHeight: {
-                required: true,
-                type: Number
-            },
-            colorSchema: {
-                required: true,
-            }
-        },
-
         computed: {
             ...mapGetters({
                 logos: 'logosUsable/getAll',
                 getLogoById: 'logosUsable/getById',
                 loadingLogos: 'logosUsable/loading',
+                imageHeight: 'canvas/getImageHeight',
+                imageWidth: 'canvas/getImageWidth',
+                colorSchema: 'canvas/getColorSchema',
+                styleSet: 'canvas/getStyleSet',
             }),
+
+            logoIdSelected: {
+                get() {
+                    return this.$store.getters['canvas/getLogoId']
+                },
+                set(val) {
+                    return this.$store.dispatch('canvas/setLogoId', val)
+                }
+            },
 
             logoIdDefault() {
                 return this.$store.getters['user/object'].default_logo;
             },
 
             color() {
+                if (StyleSetTypes.young === this.styleSet) {
+                    return 'white';
+                }
+
                 return ColorSchemes.white === this.colorSchema ? 'white' : 'green';
             },
 
@@ -125,12 +127,7 @@
 
                 this.block.logo = this.drawLogo();
 
-                const data = {
-                    block: this.block.draw(),
-                    id: this.logoIdSelected
-                };
-
-                this.$emit('drawn', data);
+                this.$emit('drawn', this.block.draw());
             },
 
             drawLogo() {
@@ -190,8 +187,10 @@
             imageHeight() {
                 this.setLogo(this.logoIdSelected);
             },
-            colorSchema() {
-                this.setLogo(this.logoIdSelected);
+            color() {
+                this.$nextTick(() => {
+                    this.setLogo(this.logoIdSelected);
+                });
             },
         },
     }

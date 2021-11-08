@@ -3,9 +3,12 @@ import {LogoTypes} from "../Constants";
 const LogoTypeRatios = {
     [LogoTypes.alternative]: 4,
     [LogoTypes['alternative-risch']]: 4,
+    [LogoTypes['giovani-verdi']]: 2.75,
     [LogoTypes.gruene]: 4,
     [LogoTypes['gruene-vert-e-s']]: 4,
     [LogoTypes['gruene-verts']]: 4,
+    [LogoTypes['jeunes-vert-e-s']]: 2.4,
+    [LogoTypes['junge-gruene']]: 2.5,
     [LogoTypes.verda]: 4,
     [LogoTypes.verdi]: 4,
     [LogoTypes['vert-e-s']]: 4,

@@ -22,6 +22,13 @@ abstract class SimpleLogoCompositor implements LogoCompositor
     }
 
     /**
+     * Filename of the logo
+     *
+     * @return string
+     */
+    abstract protected function getBaseLogoName(): string;
+
+    /**
      * Path to the logo.
      *
      * The class properties $this->baseLogoDirPath and $this->colorScheme are
@@ -29,7 +36,12 @@ abstract class SimpleLogoCompositor implements LogoCompositor
      *
      * @return string
      */
-    abstract protected function getAbsLogoPath(): string;
+    protected function getAbsLogoPath(): string
+    {
+        return $this->baseLogoDirPath
+               . DIRECTORY_SEPARATOR
+               . $this->getBaseLogoName();
+    }
 
     public function setColorScheme(string $colorScheme): void
     {
@@ -39,5 +51,10 @@ abstract class SimpleLogoCompositor implements LogoCompositor
     public function setBaseLogoDirPath(string $path): void
     {
         $this->baseLogoDirPath = $path;
+    }
+
+    public function getLogoIdentifier(int $width): string
+    {
+        return $this->getBaseLogoName()."-{$width}";
     }
 }

@@ -1,24 +1,17 @@
 <template>
     <div class="o-imagery" ref="container">
         <div class="o-imagery__controls-1">
+
             <MLogoBlock
-                :image-height="height"
-                :image-width="width"
-                :alignment="alignment"
-                :color-schema="schema"
                 @drawn="updateLogoLayer($event)"
             />
 
-            <MSizeBlock
-                @sizeChanged="setSize($event)"
-            />
+            <MStyleSetBlock/>
+
+            <MSizeBlock/>
 
             <MBackgroundBlock
-                :image-height="height"
-                :image-width="width"
                 @drawn="updateBackgroundLayer($event)"
-                @imageChanged="rawImage = $event"
-                @typeChanged="backgroundType = $event"
             />
         </div>
 
@@ -48,68 +41,71 @@
 
         <div class="o-imagery__controls-2">
             <MBarBlock
-                :alignment="alignment"
-                :color-schema="schema"
-                :image-height="height"
-                :image-width="width"
                 @drawn="updateBarLayer($event)"
-                @textChanged="keywords = $event"
-                @paddingChanged="textPadding = $event"
                 class="mt-2"
             />
 
             <MCopyright
-                :color="hasBorder ? colorCopyrightBorder : colorCopyrightNoBorder"
-                :image-height="height"
-                :image-width="width"
                 @drawn="updateCopyrightLayer($event)"
                 v-if="hasImageBackground"
             />
 
             <MAlignment
-                v-model="alignment"
+                v-if="styleSet === styleSetTypes.green"
             />
 
             <MColorScheme
-                v-if="this.backgroundType !== backgroundTypes.gradient"
-                v-model="schema"
+                v-if="backgroundType !== backgroundTypes.gradient"
+            />
+
+            <MShadowBlock
+                v-if="styleSet === styleSetTypes.young"
+                @drawn="updateShadowLayer($event)"
             />
 
             <MBorderBlock
-                :image-height="height"
-                :image-width="width"
                 @drawn="updateBorderLayer($event)"
-                @widthChanged="borderWidth = $event"
-                @borderSettingChanged="hasBorder = $event"
             />
 
-            <button
-                @click="save()"
-                class="btn btn-primary mb-3">{{$t('images.create.generate')}}
-            </button>
+            <div class="d-sm-flex align-items-center mb-3">
+                <button
+                    :disabled="backgroundType === backgroundTypes.placeholder"
+                    class="btn btn-primary"
+                    @click="save()">{{$t('images.create.generate')}}
+                </button>
+                <small
+                    v-if="backgroundType === backgroundTypes.placeholder"
+                    class="d-block ml-sm-2"
+                >{{ $t('images.create.placeholderDisabledSave') }}</small>
+            </div>
+
         </div>
     </div>
 </template>
 
 <script>
-    import {Alignments, BackgroundTypes, ColorSchemes} from "../../service/canvas/Constants";
+    import {BackgroundTypes, ColorSchemes, StyleSetTypes} from "../../service/canvas/Constants";
     import MBarBlock from "../molecules/MBarBlock";
-    import BarLayer from "../../service/canvas/layers/BarLayer";
     import BackgroundLayer from "../../service/canvas/layers/BackgroundLayer";
     import MBackgroundBlock from "../molecules/MBackgroundBlock";
     import MBorderBlock from "../molecules/MBorderBlock";
     import BorderLayer from "../../service/canvas/layers/BorderLayer";
     import MLogoBlock from "../molecules/MLogoBlock";
-    import LogoLayer from "../../service/canvas/layers/LogoLayer";
+    import MStyleSetBlock from "../molecules/MStyleSetBlock";
     import MSizeBlock from "../molecules/MSizeBlock";
     import MAlignment from "../molecules/MAlignment";
     import MColorScheme from "../molecules/MColorScheme";
+    import MShadowBlock from "../molecules/MShadowBlock";
     import debounce from 'lodash/debounce';
     import MCopyright from "../molecules/MCopyright";
     import CopyrightLayer from "../../service/canvas/layers/CopyrightLayer";
+    import {mapGetters} from "vuex";
+    import CanvasItemFactoryMixin from "../../mixins/CanvasItemFactoryMixin";
+    import ShadowLayer from "../../service/canvas/layers/ShadowLayer";
 
     export default {
         name: "OImagery",
+        mixins: [CanvasItemFactoryMixin],
         components: {
             MCopyright,
             MAlignment,
@@ -119,26 +115,16 @@
             MBarBlock,
             MColorScheme,
             MLogoBlock,
+            MStyleSetBlock,
+            MShadowBlock,
         },
 
         data() {
             return {
                 canvas: null,
-                alignment: Alignments.left,
-                schema: ColorSchemes.white,
-                width: 1080,
-                height: 1080,
                 fontSize: 50,
-                textPadding: 0,
-                backgroundType: BackgroundTypes.gradient,
                 backgroundTypes: BackgroundTypes,
-                rawImage: null,
-                borderWidth: 0,
-                colorCopyrightBorder: '#666666',
-                colorCopyrightNoBorder: '#ffffff',
-                hasBorder: true,
-                logoId: null,
-                keywords: '',
+                styleSetTypes: StyleSetTypes,
 
                 viewHeight: document.documentElement.clientHeight,
                 viewWidth: document.documentElement.clientWidth,
@@ -160,12 +146,25 @@
                 backgroundLayer: null,
                 logoLayer: null,
                 copyrightLayer: null,
+                shadowBlock: null,
 
                 dragObj: null,
             }
         },
 
         computed: {
+            ...mapGetters({
+                alignment: 'canvas/getAlignment',
+                styleSet: 'canvas/getStyleSet',
+                height: 'canvas/getImageHeight',
+                width: 'canvas/getImageWidth',
+                backgroundType: 'canvas/getBackgroundType',
+                backgroundImage: 'canvas/getBackgroundImage',
+                hasBorder: 'canvas/getHasBorder',
+                borderWidth: 'canvas/getBorderWidth',
+                bars: 'canvas/getBars',
+            }),
+
             canvasClasses() {
                 return {
                     'bar-dragging': this.dragObj,
@@ -200,8 +199,16 @@
             },
 
             hasImageBackground() {
-                return this.backgroundType === BackgroundTypes.image && this.rawImage;
-            }
+                return this.backgroundType === BackgroundTypes.image && this.backgroundImage;
+            },
+
+            textPadding() {
+                if (!this.bars.length) {
+                    return 0
+                }
+
+                return this.bars[0].padding
+            },
         },
 
         created() {
@@ -223,11 +230,13 @@
 
                 this.backgroundLayer = new BackgroundLayer(this.canvas);
                 this.borderLayer = new BorderLayer(this.canvas);
-                this.barLayer = new BarLayer(this.canvas);
-                this.logoLayer = new LogoLayer(this.canvas);
+                this.barLayer = this.createBarLayer(this.canvas);
+                this.logoLayer = this.createLogoLayer(this.canvas);
                 this.copyrightLayer = new CopyrightLayer(this.canvas);
+                this.shadowLayer = new ShadowLayer(this.canvas);
 
                 this.updateBackgroundLayer(this.backgroundBlock);
+                this.updateShadowLayer(this.shadowBlock);
                 this.updateBorderLayer(this.borderBlock);
                 this.updateBarLayer(this.barBlock);
                 this.updateLogoLayer(this.logoBlock);
@@ -292,19 +301,23 @@
                 this.draw();
             },
 
-            updateLogoLayer(data) {
-                if (!data) {
-                    this.logoBlock = null;
-                    this.logoId = null;
-                } else {
-                    this.logoBlock = data.block;
-                    this.logoId = data.id;
+            updateShadowLayer(shadowBlock) {
+                this.shadowBlock = shadowBlock;
+
+                if (!this.shadowBlock || ! this.shadowLayer) {
+                    return;
                 }
 
+                this.shadowLayer.block = this.shadowBlock;
+                this.draw();
+            },
+
+            updateLogoLayer(logoBlock) {
                 if (!this.logoLayer) {
                     return;
                 }
 
+                this.logoBlock = logoBlock;
                 this.logoLayer.block = this.logoBlock;
                 this.draw();
             },
@@ -322,6 +335,11 @@
 
             draw() {
                 this.backgroundLayer.draw();
+
+                if (this.styleSet === StyleSetTypes.young) {
+                    this.shadowLayer.draw();
+                }
+
                 this.borderLayer.draw();
                 this.barLayer.draw();
 
@@ -334,11 +352,6 @@
                     this.copyrightLayer.border = this.hasBorder;
                     this.copyrightLayer.draw();
                 }
-            },
-
-            setSize(dims) {
-                this.width = dims.width;
-                this.height = dims.height;
             },
 
             setCanvasZoneLeft: debounce(function () {
@@ -433,21 +446,16 @@
             save() {
                 this.$emit('save', {
                     canvas: this.canvas,
-                    backgroundType: this.backgroundType,
-                    rawImage: this.rawImage,
-                    logoId: this.logoId,
-                    keywords: this.keywords,
                 });
             },
         },
 
         watch: {
             backgroundType(value) {
-                if (BackgroundTypes.gradient === value) {
-                    this.schema = ColorSchemes.white;
-                } else {
-                    this.schema = ColorSchemes.green;
-                }
+                const schema = BackgroundTypes.gradient === value
+                    ? ColorSchemes.white
+                    : ColorSchemes.green
+                this.$store.dispatch('canvas/setColorSchema', schema)
 
                 this.setCanvasPos();
             },
@@ -458,6 +466,12 @@
             height(value) {
                 this.canvas.height = value;
                 this.setCanvasPos();
+            },
+            styleSet() {
+                this.barLayer = this.createBarLayer(this.canvas);
+                this.logoLayer = this.createLogoLayer(this.canvas);
+                this.updateBarLayer(this.barLayer);
+                this.updateLogoLayer(this.logoBlock);
             }
         }
     }

@@ -4,9 +4,9 @@
 namespace App\Logo;
 
 
-class Alternative extends SimpleLogoCompositor
+class JungeGruene extends SimpleLogoCompositor
 {
-    private const BASE_LOGO_NAME = 'alternative-%s.svg';
+    private const BASE_LOGO_NAME = 'junge-gruene-%s.svg';
 
     protected function getBaseLogoName(): string
     {

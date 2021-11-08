@@ -94,9 +94,12 @@
                 types: [
                     {value: LogoTypes.alternative, text: 'Alternative Zug'},
                     {value: LogoTypes['alternative-risch'], text: 'Alternative Risch'},
+                    {value: LogoTypes['giovani-verdi'], text: 'giovani verdi'},
                     {value: LogoTypes.gruene, text: 'GRÜNE'},
                     {value: LogoTypes['gruene-vert-e-s'], text: 'GRÜNE - Les VERT.E.S'},
                     {value: LogoTypes['gruene-verts'], text: 'GRÜNE - Les VERTS'},
+                    {value: LogoTypes['jeunes-vert-e-s'], text: 'jeunes vert-e-s'},
+                    {value: LogoTypes['junge-gruene'], text: 'Junge Grüne'},
                     {value: LogoTypes.verda, text: 'VERDA'},
                     {value: LogoTypes.verdi, text: 'VERDI'},
                     {value: LogoTypes['vert-e-s'], text: 'VERT-E-S'},
@@ -123,10 +126,18 @@
             }),
 
             nameLabel() {
-                if (this.currentLogo.type === 'alternative' || this.currentLogo.type === 'alternative-risch') {
-                    return this.$t('logo.name');
+                const showNameFor = [
+                    LogoTypes.alternative,
+                    LogoTypes["alternative-risch"],
+                    LogoTypes["giovani-verdi"],
+                    LogoTypes["junge-gruene"],
+                    LogoTypes["jeunes-vert-e-s"],
+                ]
+
+                if (showNameFor.includes(this.currentLogo.type)) {
+                    return this.$t('logo.name')
                 } else {
-                    return this.$t('logo.subline');
+                    return this.$t('logo.subline')
                 }
             },
 
