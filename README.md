@@ -119,7 +119,7 @@ command (executed in the project root):
 ```
 tar -zcv \
     storage/app/fonts \ 
-    storage/app/vector_logo_templates_indesign \
+    storage/app/vector_logo_templates \
     | openssl enc \
       -e -aes256 \
       -md sha512 \

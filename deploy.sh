@@ -129,7 +129,7 @@ sync() {
         --include='/public/mix-manifest.json' \
         --include='/storage/app/base_logos/***' \
         --include='/storage/app/fonts/***' \
-        --include='/storage/app/vector_logo_templates_indesign/***' \
+        --include='/storage/app/vector_logo_templates/***' \
         --exclude='/storage/app/logo_cache' \
         --exclude='/storage/app/logo_package_cache' \
         --exclude='/storage/temp' \
