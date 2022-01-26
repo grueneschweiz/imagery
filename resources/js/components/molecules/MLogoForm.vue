@@ -94,6 +94,7 @@
                 types: [
                     {value: LogoTypes.alternative, text: 'Alternative Zug'},
                     {value: LogoTypes['alternative-risch'], text: 'Alternative Risch'},
+                    {value: LogoTypes.basta, text: 'BastA!'},
                     {value: LogoTypes['giovani-verdi'], text: 'giovani verdi'},
                     {value: LogoTypes.gruene, text: 'GRÜNE'},
                     {value: LogoTypes['gruene-vert-e-s'], text: 'GRÜNE - Les VERT.E.S'},
@@ -129,6 +130,7 @@
                 const showNameFor = [
                     LogoTypes.alternative,
                     LogoTypes["alternative-risch"],
+                    LogoTypes.basta,
                     LogoTypes["giovani-verdi"],
                     LogoTypes["junge-gruene"],
                     LogoTypes["jeunes-vert-e-s"],
