@@ -49,6 +49,7 @@ export const BarTypes = {
 export const LogoTypes = {
     alternative: 'alternative',
     'alternative-risch': 'alternative-risch',
+    basta: 'basta',
     'giovani-verdi': 'giovani-verdi',
     gruene: 'gruene',
     'gruene-vert-e-s': 'gruene-vert-e-s',
@@ -68,6 +69,11 @@ export const LogoSublineRatios = {
         fontSize: 0.3
     },
     [LogoTypes['alternative-risch']]: {
+        topMargin: 0.1,
+        left: 0.3,
+        fontSize: 0.3
+    },
+    [LogoTypes.basta]: {
         topMargin: 0.1,
         left: 0.3,
         fontSize: 0.3

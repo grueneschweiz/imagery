@@ -173,7 +173,8 @@ class LogoPackageService
 
     private function addTemplateFiles(): void
     {
-        $rootPath = $this->relToAbsPath(config('app.logo_template_path'));
+        $relPath = $this->logo->getRelTemplateFilePath();
+        $rootPath = $this->relToAbsPath($relPath);
 
         /** @var \SplFileInfo[] $files */
         $files = new \RecursiveIteratorIterator(

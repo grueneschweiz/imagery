@@ -6,6 +6,7 @@ namespace App\Logo;
 
 class Gruene extends AbstractFlowerLogo
 {
+    private const TEMPLATE_DIR_NAME = 'gruene';
     private const BASE_LOGO_NAME = 'gruene-%s.svg';
     private const REFERENCE_LOGO_NAME = 'gruene.svg';
 
@@ -42,5 +43,10 @@ class Gruene extends AbstractFlowerLogo
         return $this->getReferenceLogoDir()
                .DIRECTORY_SEPARATOR
                .self::REFERENCE_LOGO_NAME;
+    }
+
+    public function getTemplateDirName(): string
+    {
+        return self::TEMPLATE_DIR_NAME;
     }
 }

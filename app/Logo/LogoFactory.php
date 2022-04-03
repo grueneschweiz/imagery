@@ -19,47 +19,22 @@ class LogoFactory
     {
         Logo::validateColorScheme($color);
 
-        $compositor = null;
-        switch (mb_strtolower($type)) {
-            case 'alternative':
-                $compositor = new Alternative();
-                break;
-            case 'alternative-risch':
-                $compositor = new AlternativeRisch();
-                break;
-            case 'giovani-verdi':
-                $compositor = new GiovaniVerdi();
-                break;
-            case 'gruene':
-                $compositor = new Gruene(...$args);
-                break;
-            case 'gruene-vert-e-s':
-                $compositor = new GrueneVertes(...$args);
-                break;
-            case 'gruene-verts':
-                $compositor = new GrueneVerts(...$args);
-                break;
-            case 'jeunes-vert-e-s':
-                $compositor = new JeunesVertes();
-                break;
-            case 'junge-gruene':
-                $compositor = new JungeGruene();
-                break;
-            case 'verda':
-                $compositor = new Verda(...$args);
-                break;
-            case 'verdi':
-                $compositor = new Verdi(...$args);
-                break;
-            case 'vert-e-s':
-                $compositor = new Vertes(...$args);
-                break;
-            case 'verts':
-                $compositor = new Verts(...$args);
-                break;
-            default:
-                throw new LogoException("Missing logo compositor: $type");
-        }
+        $compositor = match (mb_strtolower($type)) {
+            'alternative' => new Alternative(),
+            'alternative-risch' => new AlternativeRisch(),
+            'basta' => new Basta(),
+            'giovani-verdi' => new GiovaniVerdi(),
+            'gruene' => new Gruene(...$args),
+            'gruene-vert-e-s' => new GrueneVertes(...$args),
+            'gruene-verts' => new GrueneVerts(...$args),
+            'jeunes-vert-e-s' => new JeunesVertes(),
+            'junge-gruene' => new JungeGruene(),
+            'verda' => new Verda(...$args),
+            'verdi' => new Verdi(...$args),
+            'vert-e-s' => new Vertes(...$args),
+            'verts' => new Verts(...$args),
+            default => throw new LogoException("Missing logo compositor: $type"),
+        };
 
         return new Logo($compositor, $color);
     }
