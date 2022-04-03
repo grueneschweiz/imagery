@@ -13,7 +13,7 @@ trait TestStorage
         $copy = [
             'base_logos',
             'fonts',
-            'vector_logo_templates_indesign'
+            'vector_logo_templates'
         ];
 
         $delete = [

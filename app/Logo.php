@@ -139,6 +139,16 @@ class Logo extends Model implements FileModel
         return $this->getRelPath(\App\Logo\Logo::LOGO_COLOR_DARK);
     }
 
+    /**
+     * @return string
+     * @throws LogoException
+     */
+    public function getRelTemplateFilePath(): string
+    {
+        $logo = LogoFactory::get($this->type, \App\Logo\Logo::LOGO_COLOR_DARK, [$this->name]);
+        return $logo->getLogoTemplateDirPath();
+    }
+
     public function getSlug(): string
     {
         $name = mb_strtolower($this->name);

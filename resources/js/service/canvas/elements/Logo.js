@@ -4,6 +4,7 @@ const LogoTypeRatios = {
     [LogoTypes.alternative]: 4,
     [LogoTypes['alternative-risch']]: 4,
     [LogoTypes['giovani-verdi']]: 2.75,
+    [LogoTypes.basta]: 4,
     [LogoTypes.gruene]: 4,
     [LogoTypes['gruene-vert-e-s']]: 4,
     [LogoTypes['gruene-verts']]: 4,

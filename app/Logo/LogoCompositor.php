@@ -44,4 +44,13 @@ interface LogoCompositor
      * @return string
      */
     public function getLogoIdentifier(int $width): string;
+
+    /**
+     * The name of the directory containing the logo template files.
+     *
+     * E.g.: "gruene", "jeunes-vert-e-s", etc.
+     *
+     * @return string
+     */
+    public function getTemplateDirName(): string;
 }

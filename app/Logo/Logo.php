@@ -137,4 +137,18 @@ class Logo
 
         return $path;
     }
+
+    /**
+     * Relative path to the directory containing the logo's vector templates.
+     *
+     * @return string
+     */
+    public function getLogoTemplateDirPath(): string
+    {
+        $templateDirName = $this->compositor->getTemplateDirName();
+
+        return config('app.logo_template_dir_path')
+            . DIRECTORY_SEPARATOR
+            . $templateDirName;
+    }
 }
