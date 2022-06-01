@@ -16,7 +16,7 @@ jobs:
         run: sudo chown -R 1000:1000 .
 
       - name: Install everything
-        run: bash install.sh
+        run: sudo -u \#1000 bash install.sh
 
       - name: Run PHPUnit
         run: docker exec imagery vendor/bin/phpunit
