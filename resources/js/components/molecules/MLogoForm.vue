@@ -93,7 +93,11 @@
                 },
                 types: [
                     {value: LogoTypes.alternative, text: 'Alternative Zug'},
+                    {value: LogoTypes['alternative-baar'], text: 'Alternative Bar'},
+                    {value: LogoTypes['alternative-cham'], text: 'Alternative Cham'},
                     {value: LogoTypes['alternative-risch'], text: 'Alternative Risch'},
+                    {value: LogoTypes['alternative-stadt-zug'], text: 'Alternative Stadt Zug'},
+                    {value: LogoTypes['alternative-unteraegeri'], text: 'Alternative Unteraegeri'},
                     {value: LogoTypes.basta, text: 'BastA!'},
                     {value: LogoTypes['giovani-verdi'], text: 'giovani verdi'},
                     {value: LogoTypes.gruene, text: 'GRÜNE'},

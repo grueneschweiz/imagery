@@ -12,6 +12,9 @@ jobs:
           PROPRIETARY_KEY: ${{ secrets.PROPRIETARY_KEY }}
         run: ./.github/scripts/decrypt_proprietary_files.sh
 
+      - name: Fix file permissions
+        run: sudo chmod 0777 .
+
       - name: Install everything
         run: bash install.sh
 

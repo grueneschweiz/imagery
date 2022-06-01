@@ -57,4 +57,12 @@ abstract class SimpleLogoCompositor implements LogoCompositor
     {
         return $this->getBaseLogoName()."-{$width}";
     }
+
+    /**
+     * @return string
+     */
+    public function getColorScheme(): string
+    {
+        return $this->colorScheme;
+    }
 }

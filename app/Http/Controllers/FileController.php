@@ -7,6 +7,7 @@ use App\Http\Controllers\Upload\ChunkUploadStrategy;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class FileController extends Controller
 {
@@ -31,7 +32,7 @@ class FileController extends Controller
      * @param  FileModel  $model
      * @param  array  $args
      *
-     * @return Response
+     * @return BinaryFileResponse
      */
     public function show(FileModel $model, ...$args)
     {
@@ -43,7 +44,7 @@ class FileController extends Controller
      *
      * @param  FileModel  $model
      *
-     * @return Response
+     * @return BinaryFileResponse
      */
     public function showThumbnail(FileModel $model)
     {
@@ -55,11 +56,11 @@ class FileController extends Controller
      *
      * @param  string  $relPath
      *
-     * @return Response
+     * @return Response|BinaryFileResponse
      */
     private function fileResponse(string $relPath)
     {
-        if ( ! Storage::exists($relPath)) {
+        if ( ! Storage::fileExists($relPath)) {
             return response('File not found', 404);
         }
 

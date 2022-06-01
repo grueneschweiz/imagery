@@ -40,6 +40,11 @@ class LogoTest extends TestCase
     {
         $types = [
             'alternative',
+            'alternative-baar',
+            'alternative-cham',
+            'alternative-risch',
+            'alternative-stadt-zug',
+            'alternative-unteraegeri',
             'gruene',
             'gruene-vert-e-s',
             'gruene-verts',

@@ -1,4 +1,4 @@
-FROM php:8.0-apache
+FROM php:8.1-apache
 
 # update the repository sources list
 # and install basic dependencies
@@ -19,12 +19,7 @@ RUN pecl install xdebug
 RUN docker-php-ext-enable xdebug
 
 # install imagick
-#RUN pecl install imagick
-# use github version for now until release from https://pecl.php.net/get/imagick is ready for PHP 8
-# see https://github.com/Imagick/imagick/issues/331#issuecomment-779190777
-RUN mkdir -p /usr/src/php/ext/imagick; \
-    curl -fsSL https://github.com/Imagick/imagick/archive/06116aa24b76edaf6b1693198f79e6c295eda8a9.tar.gz | tar xvz -C "/usr/src/php/ext/imagick" --strip 1; \
-    docker-php-ext-install imagick
+RUN pecl install imagick
 RUN docker-php-ext-enable imagick
 
 # install GD (for laravel tests)
@@ -65,3 +60,6 @@ ENV APACHE_DOCUMENT_ROOT ${APP_HOME}/public
 
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+# run as www-data
+USER www-data:www-data

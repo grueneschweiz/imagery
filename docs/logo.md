@@ -15,6 +15,10 @@
 * Add the logo type to the `types` property of `data()` in
   `js/components/molecules/MLogoForm.vue`
 
+## Common issues
+- SVGs that use a clip path don't work well with the current version of image 
+  magick. In case your image has a width <= 1 after trimming, try to remove
+  the clip path.
 
 ## Todo
 Refactor the logo handling, so adding a logo isn't such a pain anymore.

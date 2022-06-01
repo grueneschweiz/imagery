@@ -2,7 +2,11 @@ import {LogoTypes} from "../Constants";
 
 const LogoTypeRatios = {
     [LogoTypes.alternative]: 4,
+    [LogoTypes['alternative-baar']]: 4,
+    [LogoTypes['alternative-cham']]: 4,
     [LogoTypes['alternative-risch']]: 4,
+    [LogoTypes['alternative-stadt-zug']]: 4,
+    [LogoTypes['alternative-unteraegeri']]: 4,
     [LogoTypes['giovani-verdi']]: 2.75,
     [LogoTypes.basta]: 4,
     [LogoTypes.gruene]: 4,
