@@ -13,10 +13,10 @@ jobs:
         run: ./.github/scripts/decrypt_proprietary_files.sh
 
       - name: Fix file permissions
-        run: sudo chown -R 1000:1000 .
+        run: sudo chmod 0777 .
 
       - name: Install everything
-        run: sudo -u \#1000 bash install.sh
+        run: bash install.sh
 
       - name: Run PHPUnit
         run: docker exec imagery vendor/bin/phpunit
