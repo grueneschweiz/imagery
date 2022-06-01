@@ -20,8 +20,12 @@ class LogoFactory
         Logo::validateColorScheme($color);
 
         $compositor = match (mb_strtolower($type)) {
-            'alternative' => new Alternative(),
-            'alternative-risch' => new AlternativeRisch(),
+            'alternative' => new Alternative('alternative'),
+            'alternative-baar' => new Alternative('alternative-baar'),
+            'alternative-cham' => new Alternative('alternative-cham'),
+            'alternative-risch' => new Alternative('alternative-risch'),
+            'alternative-stadt-zug' => new Alternative('alternative-stadt-zug'),
+            'alternative-unteraegeri' => new Alternative('alternative-unteraegeri'),
             'basta' => new Basta(),
             'giovani-verdi' => new GiovaniVerdi(),
             'gruene' => new Gruene(...$args),

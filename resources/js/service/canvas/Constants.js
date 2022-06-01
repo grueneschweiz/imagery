@@ -48,7 +48,11 @@ export const BarTypes = {
 
 export const LogoTypes = {
     alternative: 'alternative',
+    'alternative-baar': 'alternative-baar',
+    'alternative-cham': 'alternative-cham',
     'alternative-risch': 'alternative-risch',
+    'alternative-stadt-zug': 'alternative-stadt-zug',
+    'alternative-unteraegeri': 'alternative-unteraegeri',
     basta: 'basta',
     'giovani-verdi': 'giovani-verdi',
     gruene: 'gruene',
