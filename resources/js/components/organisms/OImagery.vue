@@ -163,6 +163,7 @@
                 hasBorder: 'canvas/getHasBorder',
                 borderWidth: 'canvas/getBorderWidth',
                 bars: 'canvas/getBars',
+                hasBars: 'canvas/hasBars',
             }),
 
             canvasClasses() {
@@ -341,7 +342,10 @@
                 }
 
                 this.borderLayer.draw();
-                this.barLayer.draw();
+
+                if (this.hasBars) {
+                    this.barLayer.draw();
+                }
 
                 this.logoLayer.alignment = this.alignment;
                 this.logoLayer.barPos = this.barLayer.boundingRect;

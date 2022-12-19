@@ -197,6 +197,8 @@
             "layout": "Layout",
             "barsLeft": "Bars left",
             "barsRight": "Bars right",
+            "logoLeft": "Logo left",
+            "logoRight": "Logo right",
             "colorScheme": "Color scheme",
             "white": "White",
             "green": "Green",
