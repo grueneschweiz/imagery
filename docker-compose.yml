@@ -5,7 +5,9 @@ services:
     build:
       context: .docker
     expose:
-      - 80
+      - 80 # reach through node on port 3000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - .:/var/www/html
       - .docker/php.ini:/usr/local/etc/php/php.ini
