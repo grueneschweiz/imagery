@@ -197,6 +197,8 @@
             "layout": "Layout",
             "barsLeft": "Balken links",
             "barsRight": "Balken rechts",
+            "logoLeft": "Logo links",
+            "logoRight": "Logo rechts",
             "colorScheme": "Farbschema",
             "white": "Weiss",
             "green": "Grün",

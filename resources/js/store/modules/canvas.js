@@ -61,6 +61,7 @@ const getters = {
     getBars: state => state.bars,
     getHasTopShadow: state => state.hasTopShadow,
     getHasBottomShadow: state => state.hasBottomShadow,
+    hasBars: state => !!state.bars.filter(bar => bar.text.length).length,
 };
 
 const mutations = {

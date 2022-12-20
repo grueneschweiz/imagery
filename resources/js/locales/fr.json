@@ -197,6 +197,8 @@
             "layout": "Mettre en page",
             "barsLeft": "Barres à gauche",
             "barsRight": "Barres à droite",
+            "logoLeft": "Logo à gauche",
+            "logoRight": "Logo à droite",
             "colorScheme": "Thème",
             "white": "Blanc",
             "green": "Vert",

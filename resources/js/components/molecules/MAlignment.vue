@@ -14,14 +14,6 @@
     export default {
         name: 'MAlignment',
         components: {AButtonGroup},
-        data() {
-            return {
-                options: [
-                    {value: Alignments.left, text: this.$t('images.create.barsLeft')},
-                    {value: Alignments.right, text: this.$t('images.create.barsRight')},
-                ],
-            }
-        },
         computed: {
             alignment: {
                 get() {
@@ -29,6 +21,24 @@
                 },
                 set(value) {
                     this.$store.commit('canvas/setAlignment', value)
+                }
+            },
+
+            hasBars() {
+                return this.$store.getters['canvas/hasBars']
+            },
+
+            options() {
+                if (this.hasBars) {
+                    return [
+                        {value: Alignments.left, text: this.$t('images.create.barsLeft')},
+                        {value: Alignments.right, text: this.$t('images.create.barsRight')},
+                    ];
+                } else {
+                    return [
+                        {value: Alignments.right, text: this.$t('images.create.logoLeft')},
+                        {value: Alignments.left, text: this.$t('images.create.logoRight')},
+                    ];
                 }
             }
         }

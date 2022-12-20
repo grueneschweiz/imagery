@@ -21,7 +21,6 @@
         <div class="form-group">
             <label
                 class="mb-0"
-                for="font-size"
             >{{$t('images.create.bars')}}</label>
 
             <ABar

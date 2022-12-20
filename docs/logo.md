@@ -4,7 +4,7 @@
 * Generate a dark and a light SVG of the logo and store it in 
   `storage/app/base_logos/<logo-name>-<light|dark>.svg`
 * Store the logo template files for download (vector files) in
-  `storage/app/vevtor_logo_templates/<logo-name>`
+  `storage/app/vector_logo_templates/<logo-name>`
 * Create a logo class that implements `App\Logo\LogoCompositor` in `app/Logo`.
   Name the class after your logo.
 * Register the logo class in the `app/Logo/LogoFactory.php`
