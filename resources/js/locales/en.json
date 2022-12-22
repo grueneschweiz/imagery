@@ -216,6 +216,8 @@
             "sizes": {
                 "square": "Square",
                 "fbTimeline": "Facebook Timeline Image",
+                "fbCoverGreen": "Facebook Cover Image (Special)",
+                "fbCover": "Facebook Cover Image",
                 "fbEvent": "Facebook Event Image",
                 "fbWebsite": "Facebook Featured Website",
                 "video": "Video (Full HD)",

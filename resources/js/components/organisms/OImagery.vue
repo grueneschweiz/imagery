@@ -299,6 +299,7 @@
                 }
 
                 this.borderLayer.block = this.borderBlock;
+                this.barLayer.borderWidth = this.borderWidth;
                 this.draw();
             },
 
@@ -341,15 +342,19 @@
                     this.shadowLayer.draw();
                 }
 
-                this.borderLayer.draw();
+                if (this.styleSet === StyleSetTypes.green) {
+                    this.borderLayer.draw();
+                }
 
                 if (this.hasBars) {
                     this.barLayer.draw();
                 }
 
-                this.logoLayer.alignment = this.alignment;
-                this.logoLayer.barPos = this.barLayer.boundingRect;
-                this.logoLayer.draw();
+                if (this.styleSet !== StyleSetTypes.greenCentered) {
+                    this.logoLayer.alignment = this.alignment;
+                    this.logoLayer.barPos = this.barLayer.boundingRect;
+                    this.logoLayer.draw();
+                }
 
                 if (BackgroundTypes.image === this.backgroundType) {
                     this.copyrightLayer.alignment = this.alignment;
@@ -476,7 +481,7 @@
                 this.logoLayer = this.createLogoLayer(this.canvas);
                 this.updateBarLayer(this.barLayer);
                 this.updateLogoLayer(this.logoBlock);
-            }
+            },
         }
     }
 </script>

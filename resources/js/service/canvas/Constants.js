@@ -1,5 +1,6 @@
 export const StyleSetTypes = {
     green: 'green',
+    greenCentered: 'greenCentered',
     young: 'young'
 }
 
@@ -15,6 +16,19 @@ export const BackgroundTypes = {
     transparent: 'transparent',
     image: 'custom'
 };
+
+export const ImageSizes = {
+    10: 'square-1080x1080',
+    20: 'fbTimeline-1200x630',
+    fbCoverGreen: 'fbCoverGreen-851x315',
+    fbCoverYoung: 'fbCoverYoung-851x315',
+    30: 'fbEvent-1920x1005',
+    40: 'fbWebsite-1200x628',
+    50: 'video-1920x1080',
+    60: 'twFeed-1600x900',
+    70: 'instaStory-1080x1920',
+    custom: '999-custom',
+}
 
 export const BarSchemes = {
     white: {

@@ -30,6 +30,8 @@ class Border {
     draw() {
         this._context.clearRect(0, 0, this._canvas.width, this._canvas.height);
 
+        this._setBorderWidth();
+
         if (this._border) {
             this._drawBorder();
         }
@@ -38,8 +40,6 @@ class Border {
     }
 
     _drawBorder() {
-        this._setBorderWidth();
-
         this._context.fillStyle = borderColor;
         this._context.fillRect(0, 0, this._canvas.width, this._canvas.height);
 

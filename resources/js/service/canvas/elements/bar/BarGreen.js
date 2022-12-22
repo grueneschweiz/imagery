@@ -87,11 +87,7 @@ export default class BarGreen extends Bar {
     }
 
     _setBarOversize() {
-        if (Alignments.center === this._alignment) {
-            this._barOversize = this._textDims.padding;
-        } else {
-            this._barOversize = this._imageWidth * BarSizeFactor;
-        }
+        this._barOversize = this._imageWidth * BarSizeFactor;
     }
 
     _setTextDims() {

@@ -7,6 +7,9 @@ import BarBlockYoung from "../service/canvas/blocks/bar/BarBlockYoung";
 import BarBlockGreen from "../service/canvas/blocks/bar/BarBlockGreen";
 import LogoLayerYoung from "../service/canvas/layers/logo/LogoLayerYoung";
 import LogoLayerGreen from "../service/canvas/layers/logo/LogoLayerGreen";
+import BarBlockGreenCenter from "../service/canvas/blocks/bar/BarBlockGreenCenter";
+import BarLayerGreenCenter from "../service/canvas/layers/bar/BarLayerGreenCenter";
+import BarGreenCentered from "../service/canvas/elements/bar/BarGreenCentered";
 
 
 export default {
@@ -15,6 +18,8 @@ export default {
             switch (this._getStyleSet()) {
                 case StyleSetTypes.young:
                     return new BarYoung();
+                case StyleSetTypes.greenCentered:
+                    return new BarGreenCentered();
                 default:
                     return new BarGreen();
             }
@@ -24,6 +29,8 @@ export default {
             switch (this._getStyleSet()) {
                 case StyleSetTypes.young:
                     return new BarBlockYoung(bars);
+                case StyleSetTypes.greenCentered:
+                    return new BarBlockGreenCenter(bars);
                 default:
                     return new BarBlockGreen(bars);
             }
@@ -33,6 +40,8 @@ export default {
             switch (this._getStyleSet()) {
                 case StyleSetTypes.young:
                     return new BarLayerYoung(canvas);
+                case StyleSetTypes.greenCentered:
+                    return new BarLayerGreenCenter(canvas);
                 default:
                     return new BarLayerGreen(canvas);
             }

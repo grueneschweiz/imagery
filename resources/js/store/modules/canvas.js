@@ -3,7 +3,7 @@ import {
     BackgroundTypes,
     BarSchemes,
     BarTypes,
-    ColorSchemes,
+    ColorSchemes, ImageSizes,
     StyleSetTypes
 } from "../../service/canvas/Constants";
 
@@ -12,6 +12,7 @@ const state = {
     alignment: Alignments.left,
     imageHeight: 0,
     imageWidth: 0,
+    selectedImageSize: ImageSizes[10],
     colorSchema: ColorSchemes.white,
     logoId: null,
     backgroundType: BackgroundTypes.gradient,
@@ -51,6 +52,7 @@ const getters = {
     getAlignment: state => state.alignment,
     getImageHeight: state => state.imageHeight,
     getImageWidth: state => state.imageWidth,
+    getSelectedImageSize: state => state.selectedImageSize,
     getColorSchema: state => state.colorSchema,
     getLogoId: state => state.logoId,
     getBackgroundType: state => state.backgroundType,
@@ -69,6 +71,7 @@ const mutations = {
     setAlignment: (state, alignment) => state.alignment = alignment,
     setImageHeight: (state, height) => state.imageHeight = height,
     setImageWidth: (state, width) => state.imageWidth = width,
+    setSelectedImageSize: (state, size) => state.selectedImageSize = size,
     setColorSchema: (state, schema) => state.colorSchema = schema,
     setLogoId: (state, logoId) => state.logoId = logoId,
     setBackgroundType: (state, type) => state.backgroundType = type,
@@ -95,6 +98,9 @@ const actions = {
     },
     setImageWidth({commit}, width) {
         commit('setImageWidth', width)
+    },
+    setSelectedImageSize({commit}, size) {
+        commit('setSelectedImageSize', size)
     },
     setColorSchema({commit}, schema) {
         commit('setColorSchema', schema)

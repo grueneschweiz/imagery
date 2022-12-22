@@ -138,7 +138,8 @@
             },
 
             gradientBackgroundAvailable() {
-                return this.styleSet === StyleSetTypes.green;
+                return this.styleSet === StyleSetTypes.green
+                    || this.styleSet === StyleSetTypes.greenCentered;
             },
         },
 
@@ -289,7 +290,8 @@
                 if (StyleSetTypes.young === valueNew && BackgroundTypes.gradient === this.background) {
                     this.background = BackgroundTypes.placeholder
                 }
-                if (StyleSetTypes.green === valueNew && BackgroundTypes.placeholder === this.background) {
+                if ((StyleSetTypes.green === valueNew || StyleSetTypes.greenCentered === valueNew )
+                    && BackgroundTypes.placeholder === this.background) {
                     this.background = BackgroundTypes.gradient
                 }
             }
