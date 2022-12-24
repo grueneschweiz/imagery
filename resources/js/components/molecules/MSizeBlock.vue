@@ -5,7 +5,7 @@
                 <label
                     class="mt-2 mb-0"
                     for="canvas-format"
-                >{{ $t('images.create.format') }}</label>
+                >{{ $t('images.create.size') }}</label>
                 <div class="input select">
                     <ModelSelect
                         id="canvas-format"

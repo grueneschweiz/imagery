@@ -3,7 +3,7 @@ import {
     BackgroundTypes,
     BarSchemes,
     BarTypes,
-    ColorSchemes, ImageSizes,
+    ColorSchemes, Formats, ImageSizes,
     StyleSetTypes
 } from "../../service/canvas/Constants";
 
@@ -22,6 +22,7 @@ const state = {
     fontSize: 100,
     hasTopShadow: true,
     hasBottomShadow: true,
+    format: Formats.digital,
     bars: [
         {
             type: BarTypes.headline,
@@ -64,6 +65,7 @@ const getters = {
     getHasTopShadow: state => state.hasTopShadow,
     getHasBottomShadow: state => state.hasBottomShadow,
     hasBars: state => !!state.bars.filter(bar => bar.text.length).length,
+    getFormat: state => state.format,
 };
 
 const mutations = {
@@ -84,6 +86,7 @@ const mutations = {
     setBar: (state, payload) => state.bars.splice(payload.index, 1, payload.bar),
     setHasTopShadow: (state, shadow) => state.hasTopShadow = shadow,
     setHasBottomShadow: (state, shadow) => state.hasBottomShadow = shadow,
+    setFormat: (state, format) => state.format = format,
 };
 
 const actions = {
@@ -137,6 +140,9 @@ const actions = {
     },
     setHasBottomShadow({commit}, shadow) {
         commit('setHasBottomShadow', shadow)
+    },
+    setFormat({commit}, format) {
+        commit('setFormat', format)
     },
 };
 

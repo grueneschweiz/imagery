@@ -8,6 +8,8 @@
 
             <MStyleSetBlock/>
 
+            <MFormat/>
+
             <MSizeBlock/>
 
             <MBackgroundBlock
@@ -102,11 +104,13 @@
     import {mapGetters} from "vuex";
     import CanvasItemFactoryMixin from "../../mixins/CanvasItemFactoryMixin";
     import ShadowLayer from "../../service/canvas/layers/ShadowLayer";
+    import MFormat from "../molecules/MFormat.vue";
 
     export default {
         name: "OImagery",
         mixins: [CanvasItemFactoryMixin],
         components: {
+            MFormat,
             MCopyright,
             MAlignment,
             MSizeBlock,
