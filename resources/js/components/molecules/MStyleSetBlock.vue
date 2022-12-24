@@ -7,7 +7,7 @@
                 <input
                     v-model="styleSet"
                     :value="greenStyleSetButtonValue"
-                    name="background"
+                    name="styleSet"
                     type="radio"
                 >{{$t('images.create.styleSetGreen')}}
             </label>
@@ -16,7 +16,7 @@
                 <input
                     v-model="styleSet"
                     :value="styleSetTypes.young"
-                    name="background"
+                    name="styleSet"
                     type="radio"
                 >{{$t('images.create.styleSetYoung')}}
             </label>
