@@ -109,7 +109,11 @@
 
             userHasLogos() {
                 return this.logoChoices.length > 0;
-            }
+            },
+
+            logoSrc() {
+                return this.logoObjSelected[`src_${this.color}`]+`/${this.logo.logoWidth}`;
+            },
         },
 
         created() {
@@ -163,12 +167,16 @@
 
                 const img = new Image();
                 img.onload = () => {
+                    if (img.src !== this.logoSrc) {
+                        return;
+                    }
+
                     this.logoImage = img;
                     this.draw();
                     this.loadingLogoImage = false;
                 };
 
-                img.src = this.logoObjSelected[`src_${this.color}`]+`/${this.logo.logoWidth}`;
+                img.src = this.logoSrc;
             },
 
             populateLogosSelect() {
