@@ -3,16 +3,19 @@ import {
     BackgroundTypes,
     BarSchemes,
     BarTypes,
-    ColorSchemes, Formats, ImageSizes,
-    StyleSetTypes
+    ColorSchemes,
+    Formats,
+    StyleSetTypes,
+    Media
 } from "../../service/canvas/Constants";
+import {ImageSizes} from "../../service/canvas/ImageSizes";
 
 const state = {
     styleSet: StyleSetTypes.green,
     alignment: Alignments.left,
     imageHeight: 0,
     imageWidth: 0,
-    selectedImageSize: ImageSizes[10],
+    selectedImageSize: ImageSizes[0],
     colorSchema: ColorSchemes.white,
     logoId: null,
     backgroundType: BackgroundTypes.gradient,
@@ -23,6 +26,7 @@ const state = {
     hasTopShadow: true,
     hasBottomShadow: true,
     format: Formats.digital,
+    rotated: false,
     bars: [
         {
             type: BarTypes.headline,
@@ -66,6 +70,9 @@ const getters = {
     getHasBottomShadow: state => state.hasBottomShadow,
     hasBars: state => !!state.bars.filter(bar => bar.text.length).length,
     getFormat: state => state.format,
+    getResolution: state => state.selectedImageSize.resolution,
+    getMedia: state => state.format === Formats.digital ? Media.screen : Media.print,
+    getRotated: state => state.rotated,
 };
 
 const mutations = {
@@ -87,6 +94,7 @@ const mutations = {
     setHasTopShadow: (state, shadow) => state.hasTopShadow = shadow,
     setHasBottomShadow: (state, shadow) => state.hasBottomShadow = shadow,
     setFormat: (state, format) => state.format = format,
+    setRotated: (state, rotated) => state.rotated = rotated,
 };
 
 const actions = {
@@ -144,6 +152,9 @@ const actions = {
     setFormat({commit}, format) {
         commit('setFormat', format)
     },
+    setRotated({commit}, rotated) {
+        commit('setRotated', rotated)
+    }
 };
 
 export default {

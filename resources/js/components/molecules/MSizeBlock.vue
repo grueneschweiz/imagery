@@ -1,7 +1,9 @@
 <template>
     <div class="form-group">
         <div id="image-size" class="row no-gutters">
-            <div class="col-12 col-sm-6">
+            <div :class="{'col-sm-6': !rotatable, 'col-sm-5': rotatable}"
+                 class="col-12"
+            >
                 <label
                     class="mt-2 mb-0"
                     for="canvas-format"
@@ -10,43 +12,62 @@
                     <ModelSelect
                         id="canvas-format"
                         :options="sizes"
-                        :value="sizeSelected"
+                        :value="sizeIdSelected"
                         class="form-control"
                         required="true"
                         @input="setSize($event)"/>
                 </div>
             </div>
-            <div class="col-6 col-sm-3 pr-1 pr-sm-0 pl-sm-2">
-                <div class="input number">
-                    <label
-                        class="mt-2 mb-0"
-                        for="canvas-width-setter"
-                    >{{ $t('images.create.width') }}</label>
-                    <input id="canvas-width-setter"
-                           v-model.number="width"
-                           :disabled="!custom"
-                           :max="maxSize"
-                           :min="minSize"
-                           class="form-control"
-                           step="1"
-                           type="number">
-                </div>
-            </div>
-            <div class="col-6 col-sm-3 pl-1 pl-sm-2">
-                <div class="input number">
-                    <label
-                        class="mt-2 mb-0"
-                        for="canvas-height-setter"
-                    >{{ $t('images.create.height') }}</label>
-                    <input id="canvas-height-setter"
-                           v-model.number="height"
-                           :disabled="!custom"
-                           :max="maxSize"
-                           :min="minSize"
-                           class="form-control"
-                           step="1"
-                           type="number">
-                </div>
+            <template v-if="isMediaScreen">
+                <AImageSize
+                    v-model.number="width"
+                    :class="{'col-6': !rotatable, 'col-5': rotatable}"
+                    :disabled="!custom"
+                    :label="$t('images.create.widthPx')"
+                    :max-size="maxSize"
+                    :min-size="minSize"
+                    class="col-sm-3 pr-1 pr-sm-0 pl-sm-2"
+                />
+                <AImageSize
+                    v-model.number="height"
+                    :class="{'col-6': !rotatable, 'col-5': rotatable}"
+                    :disabled="!custom"
+                    :label="$t('images.create.heightPx')"
+                    :max-size="maxSize"
+                    :min-size="minSize"
+                    class="col-sm-3 pl-1 pl-sm-2"
+                />
+            </template>
+            <template v-else-if="isMediaPrint">
+                <AImageSize
+                    v-model.number="widthMM"
+                    :class="{'col-6': !rotatable, 'col-5': rotatable}"
+                    :disabled="!custom"
+                    :label="$t('images.create.widthMm')"
+                    :max-size="maxSizeMM"
+                    :min-size="minSizeMM"
+                    class="col-sm-3 pr-1 pr-sm-0 pl-sm-2"
+                />
+                <AImageSize
+                    v-model.number="heightMM"
+                    :class="{'col-6': !rotatable, 'col-5': rotatable}"
+                    :disabled="!custom"
+                    :label="$t('images.create.heightMm')"
+                    :max-size="maxSizeMM"
+                    :min-size="minSizeMM"
+                    class="col-sm-3 pl-1 pl-sm-2"
+                />
+            </template>
+            <div class="col-2 col-sm-1 pl-1 pl-sm-2">
+                <button
+                    v-if="rotatable"
+                    id="rotateBtn"
+                    :title="$t('images.create.switchOrientation')"
+                    class="btn btn-secondary btn-sm w-100"
+                    @click="rotate()"
+                >
+                    <i class="mdi mdi-rotate-right"></i>
+                </button>
             </div>
         </div>
         <div
@@ -65,132 +86,212 @@
 </template>
 
 <script>
-    import {ModelSelect} from 'vue-search-select'
-    import {StyleSetTypes, ImageSizes} from "../../service/canvas/Constants";
+import {ModelSelect} from 'vue-search-select'
+import {Inch2mm, Media, StyleSetTypes} from "../../service/canvas/Constants";
+import {ImageSizeIds, ImageSizes} from "../../service/canvas/ImageSizes";
+import {mapGetters} from "vuex";
+import AImageSize from "../atoms/AImageSize.vue";
 
-    const minSize = 100
-    const maxSize = 10000
+const minSize = 100
+const maxSize = 16384 // https://stackoverflow.com/a/11585939
 
-    export default {
-        name: "MSizeBlock",
-        components: {ModelSelect},
+export default {
+    name: "MSizeBlock",
+    components: {AImageSize, ModelSelect},
 
-        data() {
-            return {
-                width: 0,
-                height: 0,
-                custom: false,
-                minSize,
-                maxSize,
+    data() {
+        return {
+            width: 0,
+            height: 0,
+            custom: false,
+            minSize,
+            maxSize,
+        }
+    },
+
+    computed: {
+        ...mapGetters({
+            styleSet: "canvas/getStyleSet",
+            logoId: 'canvas/getLogoId',
+            format: 'canvas/getFormat',
+            resolution: 'canvas/getResolution',
+            sizeSelected: 'canvas/getSelectedImageSize',
+            media: 'canvas/getMedia',
+        }),
+
+        sizeIdSelected: {
+            get() {
+                return this.sizeSelected.id;
+            },
+            set(value) {
+                const size = ImageSizes.find(el => el.id === value);
+                this.$store.commit('canvas/setSelectedImageSize', size);
             }
         },
 
-        computed: {
-            styleSet() {
-                return this.$store.getters['canvas/getStyleSet'];
+        rotated: {
+            get() {
+                return this.$store.getters['canvas/getRotated'];
             },
+            set(value) {
+                this.$store.commit('canvas/setRotated', value);
+            }
+        },
 
-            sizeSelected: {
-                get() {
-                    return this.$store.getters['canvas/getSelectedImageSize'];
-                },
-                set(value) {
-                    this.$store.commit('canvas/setSelectedImageSize', value);
-                }
-            },
+        rotatable() {
+            return this.sizeSelected.rotatable;
+        },
 
-            logoId() {
-                return this.$store.getters['canvas/getLogoId'];
-            },
-
-            sizes() {
-                const all = [
-                    {value: ImageSizes[10], text: this.$t('images.create.sizes.square'), limitStyleSet: []},
-                    {value: ImageSizes[20], text: this.$t('images.create.sizes.fbTimeline'), limitStyleSet: []},
-                    {
-                        value: ImageSizes.fbCoverGreen,
-                        text: this.$t('images.create.sizes.fbCoverGreen'),
-                        limitStyleSet: [StyleSetTypes.green, StyleSetTypes.greenCentered]
-                    },
-                    {
-                        value: ImageSizes.fbCoverYoung,
-                        text: this.$t('images.create.sizes.fbCover'),
-                        limitStyleSet: [StyleSetTypes.young]
-                    },
-                    {
-                        value: ImageSizes[30],
-                        text: this.$t('images.create.sizes.fbEvent'),
-                        limitStyleSet: []
-                    },
-                    {value: ImageSizes[40], text: this.$t('images.create.sizes.fbWebsite'), limitStyleSet: []},
-                    {value: ImageSizes[50], text: this.$t('images.create.sizes.video'), limitStyleSet: []},
-                    {value: ImageSizes[60], text: this.$t('images.create.sizes.twFeed'), limitStyleSet: []},
-                    {value: ImageSizes[70], text: this.$t('images.create.sizes.instaStory'), limitStyleSet: []},
-                    {value: ImageSizes.custom, text: this.$t('images.create.sizes.custom'), limitStyleSet: []},
-                ];
-
-                return all.filter(
-                    size => size.limitStyleSet.length === 0
-                        || size.limitStyleSet.find(styleSet => styleSet === this.styleSet)
+        sizes() {
+            return ImageSizes
+                .filter(
+                    size => size.media === this.media
+                )
+                .filter(
+                    size => !size.excludeStyleSets.find(styleSet => styleSet === this.styleSet)
+                )
+                .map(
+                    size => ({value: size.id, text: this.$t(size.labelKey)})
                 );
+        },
+
+        widthMM: {
+            get() {
+                return this.px2mm(this.width);
+            },
+            set(value) {
+                this.width = this.mm2px(value);
             },
         },
 
-        created() {
-            this.setSize(this.sizes[0].value);
+        heightMM: {
+            get() {
+                return this.px2mm(this.height);
+            },
+            set(value) {
+                this.height = this.mm2px(value);
+            }
         },
 
-        methods: {
-            setSize(value) {
-                this.sizeSelected = value;
-
-                this.custom = ImageSizes.custom === value;
-
-                if (this.custom) {
-                    return;
-                }
-
-                const dims = value.split('-')[1].split('x');
-
-                this.width = parseInt(dims[0]);
-                this.height = parseInt(dims[1]);
-            },
-
-            sanitizeSize(value) {
-                const size = parseInt(value)
-                if (size >= minSize && size <= maxSize) {
-                    return size
-                }
-                if (size > maxSize) {
-                    return maxSize
-                }
-                return minSize
-            },
+        maxSizeMM() {
+            return this.px2mm(maxSize);
         },
 
-        watch: {
-            width() {
-                const width = this.sanitizeSize(this.width)
-                this.$store.commit('canvas/setImageWidth', width)
-            },
+        minSizeMM() {
+            return this.px2mm(minSize);
+        },
 
-            height() {
-                const height = this.sanitizeSize(this.height)
-                this.$store.commit('canvas/setImageHeight', height)
-            },
+        isMediaScreen() {
+            return this.sizeSelected.media === Media.screen;
+        },
 
-            styleSet(newVal) {
-                if (StyleSetTypes.young === newVal && this.sizeSelected === ImageSizes.fbCoverGreen) {
-                    this.sizeSelected = ImageSizes.fbCoverYoung;
-                }
+        isMediaPrint() {
+            return this.sizeSelected.media === Media.print;
+        },
+    },
 
-                if (StyleSetTypes.young !== newVal && this.sizeSelected === ImageSizes.fbCoverYoung) {
-                    this.sizeSelected = ImageSizes.fbCoverGreen;
-                }
-            },
-        }
+    created() {
+        this.setSize(this.sizeIdSelected);
+    },
+
+    methods: {
+        setSize(value) {
+            this.sizeIdSelected = value;
+
+            this.custom = ImageSizeIds.customScreen === value
+                || ImageSizeIds.customPrint === value;
+
+            if (this.custom) {
+                return;
+            }
+
+            if (!this.sizeSelected.rotatable) {
+                this.rotated = false;
+            }
+
+            const height = Math.round(this.sizeSelected.height);
+            const width = Math.round(this.sizeSelected.width);
+
+            if (this.rotated) {
+                // noinspection JSSuspiciousNameCombination
+                this.height = width;
+                // noinspection JSSuspiciousNameCombination
+                this.width = height;
+            } else {
+                this.height = height;
+                this.width = width;
+            }
+        },
+
+        sanitizeSize(value) {
+            const size = parseInt(value)
+            if (size >= minSize && size <= maxSize) {
+                return size
+            }
+            if (size > maxSize) {
+                return maxSize
+            }
+            return minSize
+        },
+
+        px2mm(value) {
+            return Math.round(value * (Inch2mm / this.resolution));
+        },
+
+        mm2px(value) {
+            return Math.round(value * (this.resolution / Inch2mm));
+        },
+
+        rotate() {
+            this.rotated = !this.rotated;
+
+            if (this.custom) {
+                // noinspection JSSuspiciousNameCombination
+                const height = this.width;
+                // noinspection JSSuspiciousNameCombination
+                this.width = this.height;
+                this.height = height;
+            } else {
+                this.setSize(this.sizeIdSelected);
+            }
+        },
+    },
+
+    watch: {
+        width() {
+            const width = this.sanitizeSize(this.width)
+            this.$store.commit('canvas/setImageWidth', width)
+        },
+
+        height() {
+            const height = this.sanitizeSize(this.height)
+            this.$store.commit('canvas/setImageHeight', height)
+        },
+
+        styleSet(newVal) {
+            if (StyleSetTypes.young === newVal && this.sizeIdSelected === ImageSizeIds.fbCoverGreen) {
+                this.setSize(ImageSizeIds.fbCoverYoung);
+            }
+
+            if (StyleSetTypes.young !== newVal && this.sizeIdSelected === ImageSizeIds.fbCoverYoung) {
+                this.setSize(ImageSizeIds.fbCoverGreen);
+            }
+        },
+
+        media(newVal) {
+            if (Media.print === newVal) {
+                this.setSize(ImageSizeIds.customPrint);
+            } else {
+                this.setSize(ImageSizeIds.customScreen)
+            }
+        },
     }
+}
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+#rotateBtn {
+    margin-top: 2.1rem;
+    height: 2.5rem;
+}
 </style>

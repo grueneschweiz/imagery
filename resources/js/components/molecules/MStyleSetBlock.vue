@@ -25,7 +25,8 @@
 </template>
 
 <script>
-    import {StyleSetTypes, LogoTypes, ImageSizes} from "../../service/canvas/Constants";
+    import {StyleSetTypes, LogoTypes} from "../../service/canvas/Constants";
+    import {ImageSizes} from "../../service/canvas/ImageSizes";
     import {mapGetters} from "vuex";
 
     export default {

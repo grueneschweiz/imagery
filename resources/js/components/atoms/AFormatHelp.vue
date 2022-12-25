@@ -9,10 +9,10 @@
         <ul>
             <li>{{ $t('images.create.fileFormat', {'format': fileFormat}) }}</li>
             <li>{{ $t('images.create.colorEncoding', {'encoding': colorEncoding}) }}</li>
-            <li v-if="format !== formats.digital">{{ $t('images.create.resolution', {'resolution': '300dpi'}) }}</li>
-            <li v-if="format === formats.printSelf">{{ $t('images.create.noBleed', {'bleed': '3mm'}) }}</li>
+            <li v-if="format !== formats.digital">{{ $t('images.create.resolution') }}</li>
+            <li v-if="format === formats.printSelf">{{ $t('images.create.noBleed') }}</li>
             <li v-if="format === formats.printProfessional">{{
-                    $t('images.create.bleedAndCropMarks', {'bleed': '3mm'})
+                    $t('images.create.bleedAndCropMarks', {bleed: `${bleed}mm`})
                 }}
             </li>
         </ul>
@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import {Formats} from "../../service/canvas/Constants";
+import {Formats, PrintingBleed} from "../../service/canvas/Constants";
 
 export default {
     name: "AFormatHelp",
@@ -41,7 +41,8 @@ export default {
 
     data() {
         return {
-            formats: Formats
+            formats: Formats,
+            bleed: PrintingBleed,
         }
     },
 
