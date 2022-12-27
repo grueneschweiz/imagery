@@ -35,6 +35,7 @@ $factory->define(Image::class, function (Faker $faker) {
         'keywords'   => $faker->words(5, true),
         'filename'   => $filename,
         'width'      => $imageWidth,
-        'height'     => $imageHeight
+        'height'     => $imageHeight,
+        'bleed'      => null,
     ];
 });

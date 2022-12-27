@@ -8,7 +8,9 @@ use App\Image;
 use App\Rules\EmptyIfRule;
 use App\Rules\FileExtensionRule;
 use App\Rules\ImageBackgroundRule;
+use App\Rules\ImageBleedRule;
 use App\Rules\ImageLogoRule;
+use App\Rules\ImageMediaRule;
 use App\Rules\ImageOriginalRule;
 use App\Rules\ImmutableRule;
 use App\Rules\UserLogoRule;
@@ -156,6 +158,7 @@ class ImageController extends Controller
             ],
             'width'       => ['sometimes', new ImmutableRule($image)],
             'height'      => ['sometimes', new ImmutableRule($image)],
+            'bleed'       => ['sometimes', new ImageBleedRule($image)],
             'created_at'  => ['sometimes', new ImmutableRule($image)],
             'updated_at'  => ['sometimes', new ImmutableRule($image)],
             'deleted_at'  => ['sometimes', new ImmutableRule($image)],
@@ -217,6 +220,7 @@ class ImageController extends Controller
             ],
             'width'       => ['sometimes', new ImmutableRule($image)],
             'height'      => ['sometimes', new ImmutableRule($image)],
+            'bleed'       => ['requiredIf:type,'.Image::TYPE_FINAL, new ImageBleedRule($image)],
             'created_at'  => ['sometimes', new ImmutableRule($image)],
             'updated_at'  => ['sometimes', new ImmutableRule($image)],
             'deleted_at'  => ['sometimes', new ImmutableRule($image)],

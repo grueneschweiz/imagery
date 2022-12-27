@@ -28,6 +28,7 @@ use Imagick;
  * @property string $filename
  * @property int $width
  * @property int $height
+ * @property int $bleed
  * @property string $src
  * @property string $thumb_src
  * @property string $file_type
@@ -77,6 +78,8 @@ class Image extends Model implements FileModel
     public const BG_GRADIENT = 'gradient';
     public const BG_TRANSPARENT = 'transparent';
     public const BG_CUSTOM = 'custom';
+
+    public const BLEED_MAX = 10; // mm
 
     /**
      * The attributes that should be hidden for arrays.
