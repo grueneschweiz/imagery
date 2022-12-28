@@ -3,14 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\ThumbnailException;
+use App\Http\Controllers\Upload\ChunkUploadStrategy;
 use App\Http\Controllers\Upload\RegularUploadStrategy;
 use App\Image;
-use App\Rules\EmptyIfRule;
 use App\Rules\FileExtensionRule;
 use App\Rules\ImageBackgroundRule;
 use App\Rules\ImageBleedRule;
 use App\Rules\ImageLogoRule;
-use App\Rules\ImageMediaRule;
 use App\Rules\ImageOriginalRule;
 use App\Rules\ImmutableRule;
 use App\Rules\UserLogoRule;
@@ -18,10 +17,13 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ImageController extends Controller
 {
+    use FileResponseTrait;
+
     private const ALLOWED_EXT = ['png', 'svg', 'jpg', 'jpeg'];
 
     /**
@@ -309,5 +311,64 @@ class ImageController extends Controller
         }
 
         return $query;
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  Request  $request
+     *
+     * @return void
+     */
+    public function storeChunk(Request $request)
+    {
+        $handler = new ChunkUploadStrategy(self::ALLOWED_EXT);
+        $handler->storeTmp($request);
+    }
+
+    /**
+     * Display the specified resource file.
+     *
+     * @param  Image  $image
+     *
+     * @return BinaryFileResponse
+     */
+    public function showThumbnail(Image $image)
+    {
+        return $this->fileResponse($image->getRelThumbPath());
+    }
+
+    /**
+     * Display the specified resource file.
+     *
+     * @param  Image  $image
+     *
+     * @return BinaryFileResponse
+     */
+    public function showFile(Request $request, Image $image)
+    {
+        Validator::make($request->query(), [
+            'format'        => ['sometimes', 'in:'.Image::OUTPUT_FORMAT_PNG.','.Image::OUTPUT_FORMAT_PDF],
+            'color_profile' => [
+                'requiredIf:format,'.Image::OUTPUT_FORMAT_PDF,
+                'in:'.Image::OUTPUT_COLOR_SRGB.','.Image::OUTPUT_COLOR_FOGRA51
+            ],
+            'resolution'    => [
+                'requiredIf:format,'.Image::OUTPUT_FORMAT_PDF,
+                'between:'.Image::OUTPUT_RESOLUTION_MIN.','.Image::OUTPUT_RESOLUTION_MAX
+            ],
+            'bleed'         => ['requiredIf:format,'.Image::OUTPUT_FORMAT_PDF, 'between:0,1']
+        ])->validate();
+
+        $args = [
+            'format'       => $request->query('format', Image::OUTPUT_FORMAT_PNG),
+            'colorProfile' => $request->query('color_profile', Image::OUTPUT_COLOR_SRGB),
+            'withBleed'    => (bool) $request->query('bleed', false),
+            'resolution'   => (int) $request->query('resolution', 300)
+        ];
+
+        // todo: generate image
+
+        return $this->fileResponse($image->getRelPath($args));
     }
 }

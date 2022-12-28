@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Validator;
 
 class LogoController extends Controller
 {
+    use FileResponseTrait;
+
     /**
      * Display a listing of the resource.
      *
@@ -234,5 +236,18 @@ class LogoController extends Controller
         }
 
         return response()->file(disk_path($relPath));
+    }
+
+    /**
+     * Get the image file of the given logo
+     *
+     * @param  Logo  $logo
+     * @param  string  $color
+     * @param  int  $width
+     * @return mixed
+     */
+    public function showFile(Logo $logo, string $color, int $width)
+    {
+        return $this->fileResponse($logo->getRelPath($color, $width));
     }
 }

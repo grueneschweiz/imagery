@@ -131,7 +131,7 @@ Route::prefix('api/1')->middleware('auth.federated')->group(function () {
     /**
      * Logo Files
      */
-    Route::get('/files/logos/{logo}/{color}/{width?}', 'FileController@show')
+    Route::get('/files/logos/{logo}/{color}/{width?}', 'LogoController@showFile')
         ->where('logo', '\d+')
         ->where('color', '(light)|(dark)')
         ->where('width', '\d+')
@@ -173,17 +173,17 @@ Route::prefix('api/1')->middleware('auth.federated')->group(function () {
     /**
      * Image Files
      */
-    Route::get('/files/images/{image}', 'FileController@show')
+    Route::get('/files/images/{image}', 'ImageController@showFile')
         ->where('image', '\d+')
         ->middleware('can:view,image')
         ->name('image');
 
-    Route::get('/files/images/{image}/thumbnail', 'FileController@showThumbnail')
+    Route::get('/files/images/{image}/thumbnail', 'ImageController@showThumbnail')
         ->where('image', '\d+')
         ->middleware('can:view,image')
         ->name('thumbnail');
 
-    Route::post('/files/images', 'FileController@storeChunk')
+    Route::post('/files/images', 'ImageController@storeChunk')
         ->middleware('can:create,App\Image');
 
     /**

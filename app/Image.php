@@ -62,7 +62,7 @@ use Imagick;
  * @method static \Illuminate\Database\Query\Builder|\App\Image withoutTrashed()
  * @mixin \Eloquent
  */
-class Image extends Model implements FileModel
+class Image extends Model
 {
     use SoftDeletes;
 
