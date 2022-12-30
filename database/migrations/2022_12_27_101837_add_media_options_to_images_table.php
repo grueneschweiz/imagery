@@ -14,7 +14,10 @@ return new class extends Migration
     public function up()
     {
         Schema::table('images', function (Blueprint $table) {
-            $table->integer('bleed')->after('height')->nullable();
+            $table->integer('bleed')
+                  ->comment('Pixels')
+                  ->after('height')
+                  ->nullable();
         });
 
         DB::update(
