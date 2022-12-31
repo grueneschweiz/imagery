@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Image;
+use App\Services\ImageEditor\ImageEditorPng;
 use Illuminate\Support\Facades\Auth;
 
 class ImageObserver
@@ -32,7 +33,10 @@ class ImageObserver
      */
     private function setImageDims(Image $image)
     {
-        list($width, $height) = getimagesize(disk_path($image->getRelPath()));
+        $editor = new ImageEditorPng($image);
+        $absPath = disk_path($editor->getRelPathOfUneditedImage());
+
+        list($width, $height) = getimagesize($absPath);
         $image->width  = $width;
         $image->height = $height;
     }

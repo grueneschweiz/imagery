@@ -5,10 +5,12 @@ namespace Tests\Feature\Http\Controllers;
 use App\Image;
 use App\Legal;
 use App\Logo;
+use App\Services\ImageEditor\ImageEditorPng;
+use App\Services\ImageEditor\ImageEditorThumbnail;
 use App\User;
+use Database\Seeders\RootSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use RootSeeder;
 use Tests\TestCase;
 
 class ImageTest extends TestCase
@@ -283,8 +285,8 @@ class ImageTest extends TestCase
         ]);
 
         $finalFilename = DB::table('images')->find($imageId)->filename;
-        $this->assertFileExists(disk_path(Image::getImageStorageDir().'/'.$finalFilename));
-        $this->assertFileExists(disk_path(Image::getThumbnailStorageDir().'/'.$finalFilename));
+        $this->assertFileExists(disk_path(ImageEditorPng::getStorageDir().'/'.$finalFilename));
+        $this->assertFileExists(disk_path(ImageEditorThumbnail::getStorageDir().'/'.$finalFilename));
     }
 
     public function testPostImage__final__422()
@@ -386,8 +388,8 @@ class ImageTest extends TestCase
         ]);
 
         $finalFilename = DB::table('images')->find($imageId)->filename;
-        $this->assertFileExists(disk_path(Image::getImageStorageDir().'/'.$finalFilename));
-        $this->assertFileExists(disk_path(Image::getThumbnailStorageDir().'/'.$finalFilename));
+        $this->assertFileExists(disk_path(ImageEditorPng::getStorageDir().'/'.$finalFilename));
+        $this->assertFileExists(disk_path(ImageEditorThumbnail::getStorageDir().'/'.$finalFilename));
     }
 
     public function testPutImage__raw__200()
@@ -426,7 +428,7 @@ class ImageTest extends TestCase
         $response->assertJsonFragment(['height' => 24]);
 
         $finalFilename = DB::table('images')->find($image->id)->filename;
-        $this->assertFileExists(disk_path(Image::getImageStorageDir().'/'.$finalFilename));
+        $this->assertFileExists(disk_path(ImageEditorPng::getStorageDir().'/'.$finalFilename));
     }
 
     public function testPutImage__rawOriginalId__422()

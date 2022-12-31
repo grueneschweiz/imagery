@@ -34,7 +34,7 @@ class ImageBleedRule implements Rule
 
         $value = (int) $value;
 
-        return $value >= 0 && $value <= Image::BLEED_MAX;
+        return $value >= 0;
     }
 
     /**
