@@ -24,7 +24,7 @@ class ImageEditorThumbnail extends ImageEditorPng
     protected function generate(): void
     {
         $im = $this->getUneditedWithoutBleed();
-        $outPath = disk_path($this->getRelPath());
+        $outPath = $this->getAbsPath();
 
         if (!(
             $im->thumbnailImage(static::THUMB_MAX_WIDTH, static::THUMB_MAX_HEIGHT, true)

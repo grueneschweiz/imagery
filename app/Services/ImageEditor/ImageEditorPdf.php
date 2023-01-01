@@ -71,7 +71,7 @@ class ImageEditorPdf extends ImageEditor
             $im = $this->getUneditedWithoutBleed();
         }
 
-        $outPath = disk_path($this->getRelPath());
+        $outPath = $this->getAbsPath();
 
         if (!(
             $im->stripImage()

@@ -14,6 +14,9 @@ abstract class ImageEditor
 
     protected const BASE_DIR_UNEDITED_IMAGES = 'full';
 
+    private string $relPath;
+    private string $absPath;
+
     public function __construct(
         protected readonly Image $image,
         protected string         $format,
@@ -38,9 +41,13 @@ abstract class ImageEditor
 
     public function getRelPath(): string
     {
-        return static::getStorageDir()
-               .DIRECTORY_SEPARATOR
-               .$this->getFilename();
+        if (!isset($this->relPath)) {
+            $this->relPath = static::getStorageDir()
+                             .DIRECTORY_SEPARATOR
+                             .$this->getFilename();
+        }
+
+        return $this->relPath;
     }
 
     public static function getStorageDir(): string
@@ -58,6 +65,15 @@ abstract class ImageEditor
     abstract protected function getFilename(): string;
 
     abstract protected function generate(): void;
+
+    public function getAbsPath(): string
+    {
+        if (!isset($this->absPath)) {
+            $this->absPath = disk_path($this->getRelPath());
+        }
+
+        return $this->absPath;
+    }
 
     /**
      * @throws \ImagickException

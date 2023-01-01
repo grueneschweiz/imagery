@@ -41,7 +41,7 @@ class ImageEditorPng extends ImageEditor
     protected function generate(): void
     {
         $im = $this->getUneditedWithoutBleed();
-        $outPath = disk_path($this->getRelPath());
+        $outPath = $this->getAbsPath();
 
         if (!(
             $im->stripImage()
