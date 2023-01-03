@@ -15,6 +15,16 @@ export const Formats = {
     printProfessional: 'printProfessional',
 }
 
+export const FileFormats = {
+    png: 'png',
+    pdf: 'pdf',
+}
+
+export const ColorEncodings = {
+    sRGB: 'sRGB',
+    FOGRA51: 'FOGRA51', // FOGRA51 === PSO Coated v3
+}
+
 export const Alignments = {
     left: -1,
     center: 0,

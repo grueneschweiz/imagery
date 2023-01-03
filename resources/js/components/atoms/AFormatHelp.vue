@@ -8,13 +8,15 @@
         <p>{{ desc }}</p>
         <ul>
             <li>{{ $t('images.create.fileFormat', {'format': fileFormat}) }}</li>
-            <li>{{ $t('images.create.colorEncoding', {'encoding': colorEncoding}) }}</li>
-            <li v-if="format !== formats.digital">{{ $t('images.create.resolution') }}</li>
-            <li v-if="format === formats.printSelf">{{ $t('images.create.noBleed') }}</li>
-            <li v-if="format === formats.printProfessional">{{
-                    $t('images.create.bleedAndCropMarks', {bleed: `${bleed}mm`})
-                }}
-            </li>
+            <li>{{ $t('images.create.colorProfile', {'profile': colorProfile}) }}</li>
+            <template v-if="format !== formats.digital">
+                <li>{{ $t('images.create.resolution') }}</li>
+                <li v-if="bleed">{{
+                        $t('images.create.bleedAndCropMarks', {bleed: `${bleed}mm`})
+                    }}
+                </li>
+                <li v-else>{{ $t('images.create.noBleed') }}</li>
+            </template>
         </ul>
 
         <button
@@ -27,7 +29,8 @@
 </template>
 
 <script>
-import {Formats, PrintingBleed} from "../../service/canvas/Constants";
+import {ColorEncodings, Formats} from "../../service/canvas/Constants";
+import {mapGetters} from "vuex";
 
 export default {
     name: "AFormatHelp",
@@ -42,14 +45,16 @@ export default {
     data() {
         return {
             formats: Formats,
-            bleed: PrintingBleed,
         }
     },
 
     computed: {
-        format() {
-            return this.$store.getters['canvas/getFormat'];
-        },
+        ...mapGetters({
+            format: 'canvas/getFormat',
+            fileFormat: 'canvas/getFileFormat',
+            colorEncoding: 'canvas/getColorEncoding',
+            bleed: 'canvas/getBleed',
+        }),
 
         heading() {
             switch (this.format) {
@@ -73,23 +78,12 @@ export default {
             }
         },
 
-        fileFormat() {
-            switch (this.format) {
-                case Formats.digital:
-                    return 'PNG';
-                case Formats.printSelf:
-                case Formats.printProfessional:
-                    return 'PDF';
-            }
-        },
-
-        colorEncoding() {
-            switch (this.format) {
-                case Formats.digital:
+        colorProfile() {
+            switch (this.colorEncoding) {
+                case ColorEncodings.sRGB:
                     return 'sRGB';
-                case Formats.printSelf:
-                case Formats.printProfessional:
-                    return 'CMYK';
+                case ColorEncodings.FOGRA51:
+                    return 'CMYK (PSO coated v3 / FOGRA51)';
             }
         },
     },
