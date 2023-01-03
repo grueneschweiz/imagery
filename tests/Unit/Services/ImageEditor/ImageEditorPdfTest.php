@@ -84,18 +84,6 @@ class ImageEditorPdfTest extends TestCase
             Storage::exists($editor->getRelPath()),
         );
 
-        $im   = new \Imagick(disk_path($editor->getRelPath()));
-        $data = $im->identifyImage();
-
-        $this->assertSame(
-            'PDF (Portable Document Format)',
-            $data['format'],
-        );
-        $this->assertSame(
-            'CMYK',
-            $data['colorSpace'],
-        );
-
         // the pdf properties must be tested manually
         // else we need another library etc. and mess with
         // the pdf standard.

@@ -7,18 +7,25 @@ use App\Image;
 
 class PDFFormat
 {
-    public const CROP_MARK_LEN_MM = 5;
+    // TCPDF uses factor 4 to define the whitespace between the center
+    // of the crop mark and the beginning of the stroke. We do therefore
+    // bind the crop mark length to the bleed value, so the crop marks
+    // start at the edge of the bleed box.
+    public const CROP_MARK_LEN_FACTOR = 4;
     private const INCH_2_MM = 25.4; // 1inch = 25.4mm
 
     private float $bleedMm;
     private float $cropMarkLenMm;
-    private float $imageWidthMm;
-    private float $imageHeightMm;
+    private float $imageWidthWithBleedMm;
+    private float $imageHeightWithBleedMm;
+    private float $imageWidthTrimmedMm;
+    private float $imageHeightTrimmedMm;
+
 
     public function __construct(
         private readonly Image $image,
-        private readonly bool $withBleed,
-        private readonly int $resolution,
+        private readonly bool  $withBleed,
+        private readonly int   $resolution,
     ) {
         $this->setBleedMm();
         $this->setImageDimsMm();
@@ -27,7 +34,7 @@ class PDFFormat
 
     private function setBleedMm(): void
     {
-        if (! $this->withBleed) {
+        if (!$this->withBleed) {
             $this->bleedMm = 0;
             return;
         }
@@ -42,13 +49,23 @@ class PDFFormat
 
     private function setImageDimsMm(): void
     {
-        $this->imageWidthMm  = $this->px2mm($this->image->width);
-        $this->imageHeightMm = $this->px2mm($this->image->height);
+        $this->imageWidthWithBleedMm  = $this->px2mm($this->image->width);
+        $this->imageHeightWithBleedMm = $this->px2mm($this->image->height);
+
+        if ($this->withBleed) {
+            $this->imageWidthTrimmedMm  = $this->imageWidthWithBleedMm - (2 * $this->bleedMm);
+            $this->imageHeightTrimmedMm = $this->imageHeightWithBleedMm - (2 * $this->bleedMm);
+        } else {
+            $this->imageWidthTrimmedMm  = $this->imageWidthWithBleedMm;
+            $this->imageHeightTrimmedMm = $this->imageHeightWithBleedMm;
+        }
     }
 
-    private function setCropMarkLenMm()
+    private function setCropMarkLenMm(): void
     {
-        $this->cropMarkLenMm = $this->withBleed ? self::CROP_MARK_LEN_MM : 0;
+        $this->cropMarkLenMm = $this->withBleed
+            ? self::CROP_MARK_LEN_FACTOR * $this->bleedMm
+            : 0;
     }
 
     public function getOrientation(): string
@@ -63,8 +80,8 @@ class PDFFormat
         return [
             'MediaBox' => $this->getMediaBox(),
             'BleedBox' => $this->getBleedBox(),
-            'TrimBox' => $trimBox,
-            'CropBox' => $trimBox,
+            'TrimBox'  => $trimBox,
+            'CropBox'  => $trimBox,
         ];
     }
 
@@ -73,8 +90,8 @@ class PDFFormat
         return [
             'llx' => $this->cropMarkLenMm + $this->bleedMm,
             'lly' => $this->cropMarkLenMm + $this->bleedMm,
-            'urx' => $this->imageWidthMm,
-            'ury' => $this->imageHeightMm,
+            'urx' => $this->imageWidthTrimmedMm + $this->cropMarkLenMm + $this->bleedMm,
+            'ury' => $this->imageHeightTrimmedMm + $this->cropMarkLenMm + $this->bleedMm,
         ];
     }
 
@@ -88,8 +105,8 @@ class PDFFormat
         return [
             'llx' => 0,
             'lly' => 0,
-            'urx' => $this->imageWidthMm + $this->bleedMm * 2 + $this->cropMarkLenMm * 2,
-            'ury' => $this->imageHeightMm + $this->bleedMm * 2 + $this->cropMarkLenMm * 2,
+            'urx' => $this->imageWidthWithBleedMm + $this->cropMarkLenMm * 2,
+            'ury' => $this->imageHeightWithBleedMm + $this->cropMarkLenMm * 2,
         ];
     }
 
@@ -98,8 +115,50 @@ class PDFFormat
         return [
             'llx' => $this->cropMarkLenMm,
             'lly' => $this->cropMarkLenMm,
-            'urx' => $this->imageWidthMm + $this->bleedMm * 2,
-            'ury' => $this->imageHeightMm + $this->bleedMm * 2,
+            'urx' => $this->imageWidthWithBleedMm + $this->cropMarkLenMm,
+            'ury' => $this->imageHeightWithBleedMm + $this->cropMarkLenMm,
+        ];
+    }
+
+    public function getImagePosArray(): array
+    {
+        $bleedBox = $this->getBleedBox();
+
+        return [
+            'x' => $bleedBox['llx'],
+            'y' => $bleedBox['lly'],
+            'w' => $bleedBox['urx'] - $bleedBox['llx'],
+            'h' => $bleedBox['ury'] - $bleedBox['lly'],
+        ];
+    }
+
+    public function getCropMarkPosArray(): array
+    {
+        return [
+            'TL' => [
+                'x' => $this->cropMarkLenMm + $this->bleedMm,
+                'y' => $this->cropMarkLenMm + $this->bleedMm,
+                'w' => $this->cropMarkLenMm,
+                'h' => $this->cropMarkLenMm,
+            ],
+            'TR' => [
+                'x' => $this->cropMarkLenMm + $this->bleedMm + $this->imageWidthTrimmedMm,
+                'y' => $this->cropMarkLenMm + $this->bleedMm,
+                'w' => $this->cropMarkLenMm,
+                'h' => $this->cropMarkLenMm,
+            ],
+            'BL' => [
+                'x' => $this->cropMarkLenMm + $this->bleedMm,
+                'y' => $this->cropMarkLenMm + $this->bleedMm + $this->imageHeightTrimmedMm,
+                'w' => $this->cropMarkLenMm,
+                'h' => $this->cropMarkLenMm,
+            ],
+            'BR' => [
+                'x' => $this->cropMarkLenMm + $this->bleedMm + $this->imageWidthTrimmedMm,
+                'y' => $this->cropMarkLenMm + $this->bleedMm + $this->imageHeightTrimmedMm,
+                'w' => $this->cropMarkLenMm,
+                'h' => $this->cropMarkLenMm,
+            ],
         ];
     }
 }

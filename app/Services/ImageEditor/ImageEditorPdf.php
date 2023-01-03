@@ -78,18 +78,18 @@ class ImageEditorPdf extends ImageEditor
             throw new ImageEditorException('Image generation failed.');
         }
 
-        // prepare pdf file
+        // setup dimensions
         $format      = app(PDFFormat::class, [
             'image'      => $this->image,
             'withBleed'  => $this->withBleed,
             'resolution' => $this->resolution,
         ]);
-        $formatArray = $format->getFormatArray();
 
+        // prepare pdf file
         $pdf = app(MyTCPDF::class, [
             'orientation' => $format->getOrientation(),
             'unit' => 'mm',
-            'format' => $formatArray,
+            'format' => $format->getFormatArray(),
         ]);
 
         // set document information
@@ -112,14 +112,17 @@ class ImageEditorPdf extends ImageEditor
         $pdf->AddPage();
         $pdf->Image(
             '@'.$im->getImageBlob(), // '@' indicates data stream instead of filename
-            x: $formatArray['TrimBox']['llx'],
-            y: $formatArray['TrimBox']['lly'],
-            w: $formatArray['TrimBox']['urx'] - $formatArray['TrimBox']['llx'],
-            h: $formatArray['TrimBox']['ury'] - $formatArray['TrimBox']['lly'],
+            ...$format->getImagePosArray(),
         );
 
         // add crop marks
-        // todo
+        if ($this->withBleed) {
+            $pos = $format->getCropMarkPosArray();
+            $pdf->cropMark(...$pos['TL'], type: 'TL');
+            $pdf->cropMark(...$pos['TR'], type: 'TR');
+            $pdf->cropMark(...$pos['BL'], type: 'BL');
+            $pdf->cropMark(...$pos['BR'], type: 'BR');
+        }
 
         // save pdf file
         $pdf->Output($this->getAbsPath(), 'F');
