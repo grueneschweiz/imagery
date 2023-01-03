@@ -61,27 +61,65 @@ class ImageEditorPdf extends ImageEditor
      */
     protected function generate(): void
     {
-        if ($this->withBleed) {
-            if (0 === $this->image->bleed) {
-                throw new ImageEditorException('Can not get image with bleed since original image was saved without.');
-            }
-
-            $im = $this->getUneditedImage();
-        } else {
-            $im = $this->getUneditedWithoutBleed();
+        if ($this->withBleed && 0 === $this->image->bleed) {
+            throw new ImageEditorException('Can not generate image with bleed since original image was saved without.');
         }
 
-        $outPath = $this->getAbsPath();
+        // load image
+        $im = $this->withBleed ? $this->getUneditedImage() : $this->getUneditedWithoutBleed();
 
+        // prepare image
         if (!(
             $im->stripImage()
             && $this->transformToCmyk($im)
             && $im->setImageResolution($this->resolution, $this->resolution)
-            && $im->writeImage($outPath)
-            && $im->destroy()
+            && $im->setFormat('jpeg')
         )) {
             throw new ImageEditorException('Image generation failed.');
         }
+
+        // prepare pdf file
+        $format      = app(PDFFormat::class, [
+            'image'      => $this->image,
+            'withBleed'  => $this->withBleed,
+            'resolution' => $this->resolution,
+        ]);
+        $formatArray = $format->getFormatArray();
+
+        $pdf = new \TCPDF($format->getOrientation(), 'mm', $formatArray);
+
+        // set document information
+        $user   = $this->image->user;
+        $author = $user ? $user->first_name.' '.$user->last_name : config('app.name');
+
+        $pdf->setCreator(config('app.url'));
+        $pdf->setAuthor($author);
+        $pdf->setTitle($this->image->logo?->name || config('app.name'));
+        $pdf->setSubject($this->image->keywords);
+
+        // configure pdf
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->setMargins(0, 0, 0);
+        $pdf->setAbsXY(0, 0);
+        $pdf->setAutoPageBreak(false);
+
+        // add image
+        $pdf->AddPage();
+        $pdf->Image(
+            '@'.$im->getImageBlob(), // '@' indicates data stream instead of filename
+            x: $formatArray['TrimBox']['llx'],
+            y: $formatArray['TrimBox']['lly'],
+            w: $formatArray['TrimBox']['urx'] - $formatArray['TrimBox']['llx'],
+            h: $formatArray['TrimBox']['ury'] - $formatArray['TrimBox']['lly'],
+        );
+
+        // add crop marks
+        // todo
+
+        // save pdf file
+        $pdf->Output($this->getAbsPath(), 'F');
+        $im->destroy();
     }
 
     /**
