@@ -86,7 +86,11 @@ class ImageEditorPdf extends ImageEditor
         ]);
         $formatArray = $format->getFormatArray();
 
-        $pdf = new \TCPDF($format->getOrientation(), 'mm', $formatArray);
+        $pdf = app(MyTCPDF::class, [
+            'orientation' => $format->getOrientation(),
+            'unit' => 'mm',
+            'format' => $formatArray,
+        ]);
 
         // set document information
         $user   = $this->image->user;
