@@ -172,8 +172,9 @@
 
             canvasClasses() {
                 return {
-                    'bar-dragging': this.dragObj,
-                    'bar-touching': this.barLayer && this.barLayer.touching,
+                    'dragging': this.dragObj && this.dragObj.draggable,
+                    'image-touching': this.hasImageBackground && this.backgroundLayer.touching && this.backgroundLayer.draggable,
+                    'bar-touching': this.barLayer && this.barLayer.touching && this.barLayer.draggable,
                     'transparent': this.backgroundType === BackgroundTypes.transparent,
                     'image': this.backgroundType === BackgroundTypes.image,
                 }
@@ -522,7 +523,8 @@
         }
 
         &__canvas {
-            &.transparent {
+            &.transparent,
+            &.image {
                 // https://stackoverflow.com/a/35362074
                 background-image: linear-gradient(45deg, #d7d7d7 25%, transparent 25%),
                 linear-gradient(-45deg, #d7d7d7 25%, transparent 25%),
@@ -532,15 +534,12 @@
                 background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
             }
 
-            &.image {
+            &.bar-touching,
+            &.image-touching {
                 cursor: grab;
             }
 
-            &.bar-touching {
-                cursor: grab;
-            }
-
-            &.bar-dragging {
+            &.dragging {
                 cursor: grabbing !important;
             }
         }

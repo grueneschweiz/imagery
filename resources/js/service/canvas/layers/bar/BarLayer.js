@@ -1,35 +1,20 @@
 import Layer from "../Layer";
+import DraggableLayer from "../DraggableLayer";
 
 const shadowColorMouseOver = 'rgba(0,0,0,0.5)';
 const shadowMouseOverSize = 0.01;
 
-export default class BarLayer extends Layer {
+export default class BarLayer extends DraggableLayer {
     constructor(canvas) {
         super(canvas);
 
         this._borderWidth = null;
         this._textPadding = 0;
         this._y = this._canvas.height;
-
-        this._touching = false;
-        this._dragging = true;
-        this._mousePos = {
-            x: 0,
-            y: 0,
-        };
     }
 
     set alignment(alignment) {
         this._alignment = alignment;
-    }
-
-    set mousePos(mousePos) {
-        this._mousePos = mousePos;
-        this._touching = this._isHover();
-    }
-
-    set dragging(value) {
-        this._dragging = value;
     }
 
     set borderWidth(value) {
@@ -38,10 +23,6 @@ export default class BarLayer extends Layer {
 
     set textPadding(value) {
         this._textPadding = value;
-    }
-
-    get touching() {
-        return this._touching;
     }
 
     get boundingRect() {
@@ -153,21 +134,17 @@ export default class BarLayer extends Layer {
 
     _getXstart() {
         throw new Error("Method '_getXstart()' must be implemented.")
-        return 0
     }
 
     _getXend() {
         throw new Error("Method '_getXend()' must be implemented.")
-        return 0
     }
 
     _getYstart() {
         throw new Error("Method '_getYstart()' must be implemented.")
-        return 0
     }
 
     _getYend() {
         throw new Error("Method '_getYend()' must be implemented.")
-        return 0
     }
 }

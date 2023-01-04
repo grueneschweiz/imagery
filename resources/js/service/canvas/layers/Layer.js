@@ -27,4 +27,8 @@ export default class Layer {
             this._context.imageSmoothingEnabled = true;
         }
     }
+
+    _drawBlock() {
+        throw new Error("Method '_drawBlock()' must be implemented.")
+    }
 }

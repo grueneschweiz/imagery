@@ -1,6 +1,6 @@
-import Layer from "./Layer";
+import DraggableLayer from "./DraggableLayer";
 
-export default class BackgroundLayer extends Layer {
+export default class BackgroundLayer extends DraggableLayer {
     constructor(canvas) {
         super(canvas);
 
@@ -9,11 +9,6 @@ export default class BackgroundLayer extends Layer {
 
         this._lastWidth = 0;
         this._lastHeight = 0;
-
-        this._mousePos = {
-            x: 0,
-            y: 0,
-        };
     }
 
     set block(block) {
@@ -25,8 +20,11 @@ export default class BackgroundLayer extends Layer {
         this._block = block;
     }
 
-    set mousePos(mousePos) {
-        this._mousePos = mousePos;
+    get draggable() {
+        const oversizeX = this._block.width > this._canvas.width;
+        const oversizeY = this._block.height > this._canvas.height;
+
+        return oversizeX || oversizeY;
     }
 
     drag(pos) {
@@ -105,5 +103,21 @@ export default class BackgroundLayer extends Layer {
         if (axis < upper) return upper;
 
         return axis;
+    }
+
+    _isHover() {
+        const mouseX = this._mousePos.x;
+        const mouseY = this._mousePos.y;
+
+        const posXstart = this._x;
+        const posXend = this._x + this._block.width;
+
+        const posYstart = this._y;
+        const posYend = this._y + this._block.height;
+
+        const xTouch = mouseX >= posXstart && mouseX <= posXend;
+        const yTouch = mouseY >= posYstart && mouseY <= posYend;
+
+        return xTouch && yTouch;
     }
 }
