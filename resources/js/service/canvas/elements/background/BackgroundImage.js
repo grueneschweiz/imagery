@@ -59,10 +59,12 @@ export default class extends Background {
         let width, height;
 
         if (wRatio < hRatio) {
-            width = this._containerWidth + this._zoom * dW;
+            const w = dW ? this._containerWidth : this._image.width;
+            width = w + this._zoom * dW;
             height = width / aspectRatioImage;
         } else {
-            height = this._containerHeight + this._zoom * dH;
+            const h = dH ? this._containerHeight : this._image.height;
+            height = h + this._zoom * dH;
             width = height * aspectRatioImage;
         }
 

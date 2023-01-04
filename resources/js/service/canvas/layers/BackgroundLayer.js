@@ -79,22 +79,31 @@ export default class BackgroundLayer extends Layer {
     }
 
     _moveIntoCanvas() {
-        const dstW = this._canvas.width;
-        const dstH = this._canvas.height;
+        this._x = this._getPositionBoundary(
+            this._x,
+            this._canvas.width,
+            this._block.width
+        );
 
-        const srcW = this._block.width;
-        const srcH = this._block.height;
+        this._y = this._getPositionBoundary(
+            this._y,
+            this._canvas.height,
+            this._block.height
+        );
+    }
 
-        const lowerX = 0;
-        const upperX = dstW - srcW;
+    _getPositionBoundary(axis, canvasSize, blockSize) {
+        if (blockSize < canvasSize) {
+            // center if the block is smaller than the canvas
+            return (canvasSize - blockSize) / 2;
+        }
 
-        const lowerY = 0;
-        const upperY = dstH - srcH;
+        const lower = 0;
+        const upper = canvasSize - blockSize;
 
-        if (this._x > lowerX) this._x = lowerX;
-        if (this._x < upperX) this._x = upperX;
+        if (axis > lower) return lower;
+        if (axis < upper) return upper;
 
-        if (this._y > lowerY) this._y = lowerY;
-        if (this._y < upperY) this._y = upperY;
+        return axis;
     }
 }
