@@ -198,11 +198,12 @@
 
         mounted() {
             this.draw()
-            this.loadFonts().then(this.draw)
+            this.loadFonts()
+                .then(() => this.draw(true))
         },
 
         methods: {
-            draw() {
+            draw(forceRepaint = false) {
                 if (! this.bar) {
                     return;
                 }
@@ -215,7 +216,7 @@
                 this.drawObj.imageWidth = this.imageWidth;
                 this.drawObj.isFirstSubline = this.isFirstSubline;
 
-                this.bar.canvas = this.drawObj.draw()
+                this.bar.canvas = this.drawObj.draw(forceRepaint)
 
                 this.bar.padding = this.drawObj.padding;
 

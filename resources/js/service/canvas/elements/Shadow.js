@@ -1,12 +1,13 @@
+import DrawBase from "../DrawBase";
+
 const sizeFactor = 0.2
 const fadeStart = 0
 
 const color = 'rgba(0, 0, 0, 0.33)'
 
-export class Shadow {
+export class Shadow extends DrawBase {
     constructor() {
-        this._canvas = document.createElement('canvas')
-        this._context = this._canvas.getContext('2d')
+        super();
 
         this._top = false
         this._bottom = false
@@ -14,22 +15,22 @@ export class Shadow {
     }
 
     set top(enabled) {
-        this._top = enabled
+        this._setProperty('_top', enabled);
     }
 
     set bottom(enabled) {
-        this._bottom = enabled
+        this._setProperty('_bottom', enabled);
     }
 
     set width(width) {
-        this._canvas.width = width
+        this._setProperty('_imageWidth', width);
     }
 
     set height(height) {
-        this._canvas.height = height
+        this._setProperty('_imageHeight', height);
     }
 
-    draw() {
+    _draw() {
         this._context.clearRect(0, 0, this._canvas.width, this._canvas.height)
 
         this._setShadowHeight()
@@ -41,8 +42,6 @@ export class Shadow {
         if (this._bottom) {
             this._drawBottom()
         }
-
-        return this._canvas
     }
 
     _setShadowHeight() {

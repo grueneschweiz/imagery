@@ -1,4 +1,5 @@
 import {LogoTypes} from "../Constants";
+import DrawBase from "../DrawBase";
 
 const LogoTypeRatios = {
     [LogoTypes.alternative]: 4,
@@ -20,10 +21,9 @@ const LogoTypeRatios = {
     [LogoTypes.verts]: 4,
 };
 
-class Logo {
+class Logo extends DrawBase {
     constructor() {
-        this._canvas = document.createElement('canvas');
-        this._context = this._canvas.getContext('2d');
+        super();
 
         this._logo = null;
         this._type = null;
@@ -33,15 +33,15 @@ class Logo {
     }
 
     set logo(logo) {
-        this._logo = logo;
+        this._setProperty('_logo', logo);
     }
 
     set imageWidth(width) {
-        this._imageWidth = width;
+        this._setProperty('_imageWidth', width);
     }
 
     set imageHeight(height) {
-        this._imageHeight = height;
+        this._setProperty('_imageHeight', height);
     }
 
     get height() {
@@ -49,7 +49,7 @@ class Logo {
     }
 
     set type(type) {
-        this._type = type;
+        this._setProperty('_type', type);
     }
 
     get logoWidth() {
@@ -70,14 +70,12 @@ class Logo {
         return Math.round(logoWidth);
     }
 
-    draw() {
+    _draw() {
         this._context.clearRect(0, 0, this._canvas.width, this._canvas.height);
 
         if (this._logo) {
             this._drawLogo();
         }
-
-        return this._canvas;
     }
 
     _drawLogo() {

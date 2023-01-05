@@ -1,17 +1,17 @@
-export default class Layer {
+import DrawBase from "../DrawBase";
+
+export default class Layer extends DrawBase {
     constructor(canvas) {
-        this._canvas = canvas;
+        super(canvas);
 
         this._block = null;
-        this._context = null; // deferred loading because we have to create this
-                              // object before the canvas in the dom is ready
     }
 
     set block(block) {
-        this._block = block;
+        this._setProperty('_block', block);
     }
 
-    draw() {
+    _draw() {
         this._setContext();
 
         if (!this._block) {

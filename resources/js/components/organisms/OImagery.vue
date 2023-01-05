@@ -106,6 +106,8 @@
     import ShadowLayer from "../../service/canvas/layers/ShadowLayer";
     import MFormat from "../molecules/MFormat.vue";
 
+    let requestedAnimationFrame;
+
     export default {
         name: "OImagery",
         mixins: [CanvasItemFactoryMixin],
@@ -341,31 +343,37 @@
             },
 
             draw() {
-                this.backgroundLayer.draw();
-
-                if (this.styleSet === StyleSetTypes.young) {
-                    this.shadowLayer.draw();
+                if (requestedAnimationFrame) {
+                    window.cancelAnimationFrame(requestedAnimationFrame);
                 }
 
-                if (this.styleSet === StyleSetTypes.green) {
-                    this.borderLayer.draw();
-                }
+                requestedAnimationFrame = window.requestAnimationFrame(() => {
+                    this.backgroundLayer.draw(true);
 
-                if (this.hasBars) {
-                    this.barLayer.draw();
-                }
+                    if (this.styleSet === StyleSetTypes.young) {
+                        this.shadowLayer.draw(true);
+                    }
 
-                if (this.styleSet !== StyleSetTypes.greenCentered) {
-                    this.logoLayer.alignment = this.alignment;
-                    this.logoLayer.barPos = this.barLayer.boundingRect;
-                    this.logoLayer.draw();
-                }
+                    if (this.styleSet === StyleSetTypes.green) {
+                        this.borderLayer.draw(true);
+                    }
 
-                if (BackgroundTypes.image === this.backgroundType) {
-                    this.copyrightLayer.alignment = this.alignment;
-                    this.copyrightLayer.border = this.hasBorder;
-                    this.copyrightLayer.draw();
-                }
+                    if (this.hasBars) {
+                        this.barLayer.draw(true);
+                    }
+
+                    if (this.styleSet !== StyleSetTypes.greenCentered) {
+                        this.logoLayer.alignment = this.alignment;
+                        this.logoLayer.barPos = this.barLayer.boundingRect;
+                        this.logoLayer.draw(true);
+                    }
+
+                    if (BackgroundTypes.image === this.backgroundType) {
+                        this.copyrightLayer.alignment = this.alignment;
+                        this.copyrightLayer.border = this.hasBorder;
+                        this.copyrightLayer.draw(true);
+                    }
+                });
             },
 
             setCanvasZoneLeft: debounce(function () {
@@ -444,7 +452,11 @@
 
                 this.propagateMousePos(pos);
 
-                this.draw();
+                if (this.dragObj // dragging
+                    || this.barLayer.isDirty() // touching state changed
+                ) {
+                    this.draw();
+                }
             },
             relImagePos(absX, absY) {
                 return {

@@ -129,9 +129,10 @@
                     return;
                 }
 
+                const repaint = this.logo.isDirty();
                 this.block.logo = this.drawLogo();
 
-                this.$emit('drawn', this.block.draw());
+                this.$emit('drawn', this.block.draw(repaint));
             },
 
             drawLogo() {

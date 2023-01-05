@@ -17,7 +17,7 @@ export default class BackgroundLayer extends DraggableLayer {
             this._lastHeight = block.height;
         }
 
-        this._block = block;
+        this._setProperty('_block', block);
     }
 
     get draggable() {

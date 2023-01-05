@@ -13,12 +13,12 @@ export default class DraggableLayer extends Layer {
     }
 
     set mousePos(mousePos) {
-        this._mousePos = mousePos;
-        this._touching = this._isHover();
+        this._mousePos = mousePos; // do not use setProperty as it must not trigger a repaint
+        this._setProperty('_touching', this._isHover());
     }
 
     set dragging(value) {
-        this._dragging = value;
+        this._setProperty('_dragging', value);
     }
 
     get touching() {

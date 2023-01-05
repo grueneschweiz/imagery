@@ -1,4 +1,4 @@
-import {Alignments} from "./../Constants";
+import {Alignments} from "../Constants";
 import Layer from "./Layer";
 import BorderHelper from "../BorderHelper";
 
@@ -16,11 +16,11 @@ export default class CopyrightLayer extends Layer {
     }
 
     set border(bool) {
-        this._border = bool;
+        this._setProperty('_border', bool);
     }
 
     set alignment(alignment) {
-        this._alignment = alignment;
+        this._setProperty('_alignment', alignment);
     }
 
     _drawBlock() {

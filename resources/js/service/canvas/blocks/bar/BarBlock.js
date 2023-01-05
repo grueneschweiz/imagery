@@ -1,15 +1,15 @@
 import {Alignments} from "../../Constants";
+import DrawBase from "../../DrawBase";
 
-export default class BarBlock {
+export default class BarBlock extends DrawBase {
     constructor(bars) {
-        this._canvas = document.createElement('canvas');
-        this._context = this._canvas.getContext('2d');
-
+        super();
         this._bars = bars;
+        this._alignment = Alignments.left;
     }
 
     set alignment(alignment) {
-        this._alignment = alignment;
+        this._setProperty('_alignment', alignment);
     }
 
     get width() {
@@ -24,13 +24,11 @@ export default class BarBlock {
         return 1
     }
 
-    draw() {
+    _draw() {
         this._setWidth();
         this._setHeight();
         this._clear();
         this._drawBars();
-
-        return this._canvas;
     }
 
     _setWidth() {

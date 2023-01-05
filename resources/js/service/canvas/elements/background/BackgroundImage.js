@@ -1,6 +1,6 @@
 import Background from "./Background";
 
-export default class extends Background {
+export default class BackgroundImage extends Background {
     constructor() {
         super();
 
@@ -13,19 +13,19 @@ export default class extends Background {
     }
 
     set width(width) {
-        this._containerWidth = width;
+        this._setProperty('_containerWidth', width);
     }
 
     set height(height) {
-        this._containerHeight = height;
+        this._setProperty('_containerHeight', height);
     }
 
     set image(image) {
-        this._image = image;
+        this._setProperty('_image', image);
     }
 
     set zoom(zoom) {
-        this._zoom = zoom;
+        this._setProperty('_zoom', zoom);
     }
 
     _drawBackground() {

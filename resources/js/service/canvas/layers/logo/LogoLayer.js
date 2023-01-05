@@ -19,11 +19,11 @@ export default class LogoLayer extends Layer {
     }
 
     set barPos(pos) {
-        this._barPos = pos;
+        this._setProperty('_barPos', pos);
     }
 
     set alignment(alignment) {
-        this._alignment = alignment;
+        this._setProperty('_alignment', alignment);
     }
 
     _drawBlock() {

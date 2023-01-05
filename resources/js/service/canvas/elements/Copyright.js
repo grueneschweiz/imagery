@@ -1,4 +1,5 @@
 import BorderHelper from "../BorderHelper";
+import DrawBase from "../DrawBase";
 
 const font = 'Arial';
 
@@ -26,10 +27,9 @@ const opticalCenterFactor = 0.05;
  */
 const paddingFactor = (1.2 - fontSizeFactor) / 2;
 
-class Copyright {
+class Copyright extends DrawBase {
     constructor() {
-        this._canvas = document.createElement('canvas');
-        this._context = this._canvas.getContext('2d');
+        super();
 
         this._text = '';
         this._color = '#000000';
@@ -46,29 +46,28 @@ class Copyright {
     }
 
     set text(value) {
-        this._text = value.toLocaleUpperCase().trim();
+        value = value.toLocaleUpperCase().trim();
+        this._setProperty('_text', value);
     }
 
     set color(value) {
-        this._color = value;
+        this._setProperty('_color', value);
     }
 
     set width(width) {
-        this._imageWidth = width;
+        this._setProperty('_imageWidth', width);
     }
 
     set height(height) {
-        this._imageHeight = height;
+        this._setProperty('_imageHeight', height);
     }
 
-    draw() {
+    _draw() {
         this._context.clearRect(0, 0, this._canvas.width, this._canvas.height);
 
         if (this._text) {
             this._drawText();
         }
-
-        return this._canvas;
     }
 
     _drawText() {

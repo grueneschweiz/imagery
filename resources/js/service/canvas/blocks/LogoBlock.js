@@ -1,24 +1,22 @@
-class LogoBlock {
+import DrawBase from "../DrawBase";
+
+class LogoBlock extends DrawBase {
     constructor() {
-        this._canvas = document.createElement('canvas');
-        this._context = this._canvas.getContext('2d');
+        super();
 
         this._logo = null;
     }
 
     set logo(logo) {
-        this._logo = logo;
+        this._setProperty('_logo', logo);
     }
 
-    draw() {
+    _draw() {
         this._context.clearRect(0, 0, this._canvas.width, this._canvas.height);
 
         if (this._hasLogo()) {
             this._drawLogo();
         }
-
-
-        return this._canvas;
     }
 
     _hasLogo() {
@@ -32,7 +30,7 @@ class LogoBlock {
     }
 
     _setSize() {
-        this._canvas.width  =this._logo.width;
+        this._canvas.width  = this._logo.width;
         this._canvas.height = this._logo.height;
     }
 }

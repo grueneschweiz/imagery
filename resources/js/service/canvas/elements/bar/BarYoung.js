@@ -39,32 +39,39 @@ export default class BarYoung extends Bar {
     }
 
     set type(type) {
+        let font;
+
         switch (type) {
             case BarTypes.headline:
-                this._font = fontFamily.headline
+                font = fontFamily.headline
                 break;
             case BarTypes.subline:
-                this._font = fontFamily.subline
+                font = fontFamily.subline
                 break;
             default:
                 throw new Error(`BarType ${type} is not implemented.`)
         }
+
+        this._setProperty('_font', font);
     }
 
     set baseFontSize(fontSize) {
+        let size;
+
         if (this._font === fontFamily.subline) {
-            this._fontSize = fontSize * sublineHeadlineSizeRatio
-            return
+            size = fontSize * sublineHeadlineSizeRatio
+        } else {
+            size = fontSize
         }
 
-        this._fontSize = fontSize
+        this._setProperty('_fontSize', size);
     }
 
     set isFirstSubline(val) {
-        this._hasMargin = val
+        this._setProperty('_hasMargin', val);
     }
 
-    draw() {
+    _draw() {
         this._setFont();
         this._setTextDims();
         this._setCanvasWidth();
@@ -73,8 +80,6 @@ export default class BarYoung extends Bar {
 
         this._drawBackground();
         this._drawFont();
-
-        return this._canvas;
     }
 
     _setFont() {

@@ -1,33 +1,33 @@
 import BorderHelper from "../BorderHelper";
+import DrawBase from "../DrawBase";
 
 const borderColor = '#ffffff';
 
-class Border {
+class Border extends DrawBase {
     constructor() {
-        this._canvas = document.createElement('canvas');
-        this._context = this._canvas.getContext('2d');
+        super();
 
         this._border = true;
         this._borderWidth = 0;
     }
 
     set border(enabled) {
-        this._border = enabled;
+        this._setProperty('_border', enabled);
     }
 
     set width(width) {
-        this._canvas.width = width;
+        this._setProperty('_canvas.width', width);
     }
 
     set height(height) {
-        this._canvas.height = height;
+        this._setProperty('_canvas.height', height);
     }
 
     get borderWidth() {
         return this._borderWidth;
     }
 
-    draw() {
+    _draw() {
         this._context.clearRect(0, 0, this._canvas.width, this._canvas.height);
 
         this._setBorderWidth();
@@ -35,8 +35,6 @@ class Border {
         if (this._border) {
             this._drawBorder();
         }
-
-        return this._canvas;
     }
 
     _drawBorder() {

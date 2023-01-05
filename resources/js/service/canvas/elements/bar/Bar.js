@@ -1,9 +1,9 @@
-import {Alignments, BarSchemes as Schemes, BarTypes as Types} from "./../../Constants"
+import {Alignments, BarSchemes as Schemes} from "./../../Constants"
+import DrawBase from "../../DrawBase";
 
-export default class Bar {
+export default class Bar extends DrawBase {
     constructor() {
-        this._canvas = document.createElement('canvas')
-        this._context = this._canvas.getContext('2d')
+        super();
 
         this._text = ''
         this._fontSize = 16
@@ -20,35 +20,34 @@ export default class Bar {
     }
 
     set text(text) {
-        this._text = text.trim()
+        this._setProperty('_text', text.trim());
     }
 
     set baseFontSize(fontSize) {
-        this._fontSize = fontSize
+        this._setProperty('_fontSize', fontSize);
     }
 
     set alignment(alignment) {
-        this._alignment = alignment
+        this._setProperty('_alignment', alignment);
     }
 
     set schema(schema) {
-        this._schema = schema
+        this._setProperty('_schema', schema);
     }
 
     set type(type) {
-        throw new Error("Method 'draw()' must be implemented.")
+        throw new Error("Setter 'type(type)' must be implemented.")
     }
 
     set imageWidth(width) {
-        this._imageWidth = width
+        this._setProperty('_imageWidth', width);
     }
 
     get padding() {
         return this._textDims.padding
     }
 
-    draw() {
-        throw new Error("Method 'draw()' must be implemented.")
-        return this._canvas
+    _draw() {
+        throw new Error("Method '_draw()' must be implemented.")
     }
 }

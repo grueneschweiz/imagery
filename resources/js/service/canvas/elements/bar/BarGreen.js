@@ -43,32 +43,39 @@ export default class BarGreen extends Bar {
     }
 
     set text(text) {
-        this._text = text.toLocaleUpperCase().trim();
+        super.text = text.toLocaleUpperCase();
     }
 
     set type(type) {
+        let font;
+
         switch (type) {
             case Types.headline:
-                this._font = fontFamily.headline
+                font = fontFamily.headline
                 break;
             case Types.subline:
-                this._font = fontFamily.subline
+                font = fontFamily.subline
                 break;
             default:
                 throw new Error(`BarType ${type} is not implemented.`)
         }
+
+        this._setProperty('_font', font);
     }
 
     set baseFontSize(fontSize) {
+        let size;
+
         if (this._font === fontFamily.subline) {
-            this._fontSize = fontSize * sublineHeadlineSizeRatio
-            return
+            size = fontSize * sublineHeadlineSizeRatio
+        } else {
+            size = fontSize
         }
 
-        this._fontSize = fontSize
+        this._setProperty('_fontSize', size);
     }
 
-    draw() {
+    _draw() {
         this._setFont();
         this._setTextDims();
         this._setBarOversize();
@@ -78,8 +85,6 @@ export default class BarGreen extends Bar {
 
         this._drawBackground();
         this._drawFont();
-
-        return this._canvas;
     }
 
     _setFont() {

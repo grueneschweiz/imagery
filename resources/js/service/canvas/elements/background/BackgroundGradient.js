@@ -4,7 +4,7 @@ import Background from "./Background";
 const gradientColorDark = '#66971c';
 const gradientColorLight = '#b0c300';
 
-export default class extends Background {
+export default class BackgroundGradient extends Background {
     _drawBackground() {
         const width = this._canvas.width;
         const height = this._canvas.height;

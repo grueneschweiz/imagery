@@ -1,5 +1,5 @@
-import Layer from "../Layer";
 import DraggableLayer from "../DraggableLayer";
+import {Alignments} from "../../Constants";
 
 const shadowColorMouseOver = 'rgba(0,0,0,0.5)';
 const shadowMouseOverSize = 0.01;
@@ -11,18 +11,19 @@ export default class BarLayer extends DraggableLayer {
         this._borderWidth = null;
         this._textPadding = 0;
         this._y = this._canvas.height;
+        this._alignment = Alignments.left;
     }
 
     set alignment(alignment) {
-        this._alignment = alignment;
+        this._setProperty('_alignment', alignment);
     }
 
     set borderWidth(value) {
-        this._borderWidth = value;
+        this._setProperty('_borderWidth', value);
     }
 
     set textPadding(value) {
-        this._textPadding = value;
+        this._setProperty('_textPadding', value);
     }
 
     get boundingRect() {
@@ -46,22 +47,20 @@ export default class BarLayer extends DraggableLayer {
         const bottomLimit = this._getBottomLimit();
 
         if (y < topLimit) {
-            this._y = topLimit;
+            this._setProperty('_y', topLimit);
         } else if (y > bottomLimit) {
-            this._y = bottomLimit;
+            this._setProperty('_y', bottomLimit);
         } else {
-            this._y = y;
+            this._setProperty('_y', y);
         }
     }
 
     _getTopLimit() {
         throw new Error("Method '_getTopLimit()' must be implemented.")
-        return 0
     }
 
     _getBottomLimit() {
         throw new Error("Method '_getBottomLimit()' must be implemented.")
-        return 0
     }
 
     _drawBlock() {
@@ -96,7 +95,6 @@ export default class BarLayer extends DraggableLayer {
 
     _getBlockXpos() {
         throw new Error("Method '_getBlockXpos()' must be implemented.")
-        return 0
     }
 
     _getBlockYpos() {

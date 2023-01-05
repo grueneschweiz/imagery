@@ -58,6 +58,8 @@
     const defaultMinFontSizeFactor = 0.1
     const defaultMaxFontSizeFactor = 0.9
 
+    let requestedAnimationFrame;
+
     export default {
         name: "MBarBlock",
         components: {ABar},
@@ -142,20 +144,26 @@
             },
 
             draw() {
-                this.setupBlock()
-
-                if (!this.block) {
-                    return
+                if (requestedAnimationFrame) {
+                    cancelAnimationFrame(requestedAnimationFrame)
                 }
 
-                this.block.alignment = this.alignment;
+                requestedAnimationFrame = requestAnimationFrame(() => {
+                    this.setupBlock()
 
-                this.block.draw(); // called twice. first call is needed to determine size for content based font adjustment
-                const fitsInImage = this.adjustFontSize();
+                    if (!this.block) {
+                        return
+                    }
 
-                if (fitsInImage) {
-                    this.$emit('drawn', this.block.draw());
-                }
+                    this.block.alignment = this.alignment;
+
+                    this.block.draw(); // called twice. first call is needed to determine size for content based font adjustment
+                    const fitsInImage = this.adjustFontSize();
+
+                    if (fitsInImage) {
+                        this.$emit('drawn', this.block.draw());
+                    }
+                })
             },
 
             adjustFontSize() {
