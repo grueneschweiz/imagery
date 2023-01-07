@@ -1,5 +1,5 @@
 import {Alignments} from "../../Constants";
-import DrawBase from "../../DrawBase";
+import DrawBase from "../../misc/DrawBase";
 
 export default class BarBlock extends DrawBase {
     constructor(bars) {

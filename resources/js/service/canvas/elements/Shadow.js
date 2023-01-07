@@ -1,4 +1,4 @@
-import DrawBase from "../DrawBase";
+import DrawBase from "../misc/DrawBase";
 
 const sizeFactor = 0.2
 const fadeStart = 0

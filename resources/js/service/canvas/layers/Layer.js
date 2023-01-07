@@ -1,4 +1,4 @@
-import DrawBase from "../DrawBase";
+import DrawBase from "../misc/DrawBase";
 
 export default class Layer extends DrawBase {
     constructor(canvas) {

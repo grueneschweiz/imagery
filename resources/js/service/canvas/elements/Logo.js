@@ -1,5 +1,5 @@
 import {LogoTypes} from "../Constants";
-import DrawBase from "../DrawBase";
+import DrawBase from "../misc/DrawBase";
 
 const LogoTypeRatios = {
     [LogoTypes.alternative]: 4,

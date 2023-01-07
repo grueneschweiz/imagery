@@ -1,5 +1,5 @@
-import BorderHelper from "../BorderHelper";
-import DrawBase from "../DrawBase";
+import BorderHelper from "../misc/BorderHelper";
+import DrawBase from "../misc/DrawBase";
 
 const borderColor = '#ffffff';
 

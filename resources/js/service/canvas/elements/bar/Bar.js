@@ -1,5 +1,5 @@
 import {Alignments, BarSchemes as Schemes} from "./../../Constants"
-import DrawBase from "../../DrawBase";
+import DrawBase from "../../misc/DrawBase";
 
 export default class Bar extends DrawBase {
     constructor() {

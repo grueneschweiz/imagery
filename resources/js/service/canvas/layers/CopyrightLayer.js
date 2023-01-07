@@ -1,6 +1,6 @@
 import {Alignments} from "../Constants";
 import Layer from "./Layer";
-import BorderHelper from "../BorderHelper";
+import BorderHelper from "../misc/BorderHelper";
 
 const orthogonal = -Math.PI / 2;
 
