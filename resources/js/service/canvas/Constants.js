@@ -73,6 +73,11 @@ export const BarSchemes = {
     },
 };
 
+export const CopyrightColors = {
+    withBorder: '#666666',
+    noBorder: '#ffffff',
+};
+
 export const ColorSchemes = {
     white: 'white',
     green: 'green',
@@ -102,6 +107,26 @@ export const LogoTypes = {
     verdi: 'verdi',
     'vert-e-s': 'vert-e-s',
     verts: 'verts',
+};
+
+export const LogoTypeRatios = {
+    [LogoTypes.alternative]: 4,
+    [LogoTypes['alternative-baar']]: 4,
+    [LogoTypes['alternative-cham']]: 4,
+    [LogoTypes['alternative-risch']]: 4,
+    [LogoTypes['alternative-stadt-zug']]: 4,
+    [LogoTypes['alternative-unteraegeri']]: 4,
+    [LogoTypes['giovani-verdi']]: 3.45,
+    [LogoTypes.basta]: 4,
+    [LogoTypes.gruene]: 4,
+    [LogoTypes['gruene-vert-e-s']]: 4,
+    [LogoTypes['gruene-verts']]: 4,
+    [LogoTypes['jeunes-vert-e-s']]: 3,
+    [LogoTypes['junge-gruene']]: 3.2,
+    [LogoTypes.verda]: 4,
+    [LogoTypes.verdi]: 4,
+    [LogoTypes['vert-e-s']]: 4,
+    [LogoTypes.verts]: 4,
 };
 
 /**

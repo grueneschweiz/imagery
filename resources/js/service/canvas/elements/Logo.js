@@ -1,25 +1,5 @@
-import {LogoTypes} from "../Constants";
 import DrawBase from "../misc/DrawBase";
-
-const LogoTypeRatios = {
-    [LogoTypes.alternative]: 4,
-    [LogoTypes['alternative-baar']]: 4,
-    [LogoTypes['alternative-cham']]: 4,
-    [LogoTypes['alternative-risch']]: 4,
-    [LogoTypes['alternative-stadt-zug']]: 4,
-    [LogoTypes['alternative-unteraegeri']]: 4,
-    [LogoTypes['giovani-verdi']]: 3.45,
-    [LogoTypes.basta]: 4,
-    [LogoTypes.gruene]: 4,
-    [LogoTypes['gruene-vert-e-s']]: 4,
-    [LogoTypes['gruene-verts']]: 4,
-    [LogoTypes['jeunes-vert-e-s']]: 3,
-    [LogoTypes['junge-gruene']]: 3.2,
-    [LogoTypes.verda]: 4,
-    [LogoTypes.verdi]: 4,
-    [LogoTypes['vert-e-s']]: 4,
-    [LogoTypes.verts]: 4,
-};
+import {LogoTypeRatios} from "../Constants";
 
 class Logo extends DrawBase {
     constructor() {
