@@ -16,14 +16,6 @@ export default class BarBlock extends DrawBase {
         return this._canvas.width;
     }
 
-    get minFontSizeFactor() {
-        return 0.1
-    }
-
-    get maxFontSizeFactor() {
-        return 1
-    }
-
     _draw() {
         this._setWidth();
         this._setHeight();

@@ -1,8 +1,6 @@
 import {Alignments} from "../../Constants";
 import BarBlockGreen from "./BarBlockGreen";
 
-const maxFontSizeFactor = 0.9
-
 export default class BarBlockGreenCenter extends BarBlockGreen {
     constructor(bars) {
         super(bars)
@@ -10,9 +8,5 @@ export default class BarBlockGreenCenter extends BarBlockGreen {
     }
 
     set alignment(alignment) {
-    }
-
-    get maxFontSizeFactor() {
-        return maxFontSizeFactor
     }
 }

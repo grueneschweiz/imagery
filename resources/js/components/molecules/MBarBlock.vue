@@ -49,7 +49,7 @@
     import {
         BarSchemes,
         BarTypes,
-        ColorSchemes,
+        ColorSchemes, MaxFontSizeFactors, MinFontSizeFactors,
         StyleSetTypes
     } from "../../service/canvas/Constants";
     import ABar from "../atoms/ABar";
@@ -105,9 +105,15 @@
                 }
             },
 
-            fontSizeMin() {
-                const minFontSizeFactor = this.block?.minFontSizeFactor || defaultMinFontSizeFactor
+            minFontSizeFactor() {
+                return MinFontSizeFactors[this.styleSet] || defaultMinFontSizeFactor;
+            },
 
+            maxFontSizeFactor() {
+                return MaxFontSizeFactors[this.styleSet] || defaultMaxFontSizeFactor;
+            },
+
+            fontSizeMin() {
                 // base the minimal font size on a normalized side length of
                 // the image.
                 // to get a normalized side length, square the image width,
@@ -117,7 +123,7 @@
                 // meaning full on a instagram story)
                 const cube = this.imageHeight * this.imageWidth ** 2;
                 const sideNormalized = Math.pow(cube, 1 / 3);
-                const min = sideNormalized * minFontSizeFactor;
+                const min = sideNormalized * this.minFontSizeFactor;
                 return Math.ceil(min);
             },
 
@@ -167,9 +173,8 @@
             },
 
             adjustFontSize() {
-                const maxFontSizeFactor = this.block?.maxFontSizeFactor || defaultMaxFontSizeFactor
                 const min = this.fontSizeMin;
-                const maxWidth = this.imageWidth * maxFontSizeFactor;
+                const maxWidth = this.imageWidth * this.maxFontSizeFactor;
                 const imageToBlockRatio = maxWidth / this.block.width;
                 let max = this.fontSize * imageToBlockRatio;
                 max = Math.floor(max); // the range slider wants integers

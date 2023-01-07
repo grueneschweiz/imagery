@@ -4,6 +4,18 @@ export const StyleSetTypes = {
     young: 'young'
 }
 
+export const MinFontSizeFactors = {
+    [StyleSetTypes.green]: 0.0625, // the correct 175% would be 0.0925
+    [StyleSetTypes.greenCentered]: 0.0625, // the correct 175% would be 0.0925
+    [StyleSetTypes.young]: 0.0575,
+}
+
+export const MaxFontSizeFactors = {
+    [StyleSetTypes.green]: 1.08,
+    [StyleSetTypes.greenCentered]: 1.08,
+    [StyleSetTypes.young]: 0.9,
+}
+
 export const Media = {
     screen: 'screen',
     print: 'print',
