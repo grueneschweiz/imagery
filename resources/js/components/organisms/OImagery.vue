@@ -147,12 +147,13 @@
                 borderBlock: null,
                 logoBlock: null,
                 copyrightBlock: null,
+                shadowBlock: null,
                 borderLayer: null,
                 barLayer: null,
                 backgroundLayer: null,
                 logoLayer: null,
                 copyrightLayer: null,
-                shadowBlock: null,
+                shadowLayer: null,
 
                 dragObj: null,
             }
