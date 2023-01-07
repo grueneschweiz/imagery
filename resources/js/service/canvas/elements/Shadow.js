@@ -23,11 +23,11 @@ export class Shadow extends DrawBase {
     }
 
     set width(width) {
-        this._setProperty('_imageWidth', width);
+        this._setProperty('_canvas.width', width);
     }
 
     set height(height) {
-        this._setProperty('_imageHeight', height);
+        this._setProperty('_canvas.height', height);
     }
 
     _draw() {
