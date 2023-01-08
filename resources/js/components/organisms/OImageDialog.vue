@@ -88,6 +88,7 @@ import {BackgroundTypes, Media} from "../../service/canvas/Constants";
             ...mapGetters({
                 logoId: 'canvas/getLogoId',
                 rawImage: 'canvas/getBackgroundImage',
+                rawImageMimeType: 'canvas/getBackgroundImageMimeType',
                 backgroundType: 'canvas/getBackgroundType',
                 bleed: 'canvas/getBleed',
                 colorEncoding: 'canvas/getColorEncoding',
@@ -134,7 +135,7 @@ import {BackgroundTypes, Media} from "../../service/canvas/Constants";
             },
 
             rawImageExportType() {
-                return 'image/jpeg' === this.rawImage.mimeType ? 'image/jpeg' : 'image/png';
+                return 'image/jpeg' === this.rawImageMimeType ? 'image/jpeg' : 'image/png';
             },
 
             rawImageExtension() {
@@ -142,7 +143,7 @@ import {BackgroundTypes, Media} from "../../service/canvas/Constants";
             },
 
             rawImageDataUrl() {
-                return this.rawImage.image.toDataURL(this.rawImageExportType);
+                return this.rawImage.toDataURL(this.rawImageExportType);
             },
 
             uploadStatus() {

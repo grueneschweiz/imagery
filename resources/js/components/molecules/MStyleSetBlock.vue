@@ -44,6 +44,7 @@
               usableLogos: 'logosUsable/getAll',
               currentLogoId: 'canvas/getLogoId',
               selectedImageSize: 'canvas/getSelectedImageSize',
+              logoType: 'canvas/getLogoType',
             }),
 
             styleSet: {
@@ -53,20 +54,6 @@
                 set(value) {
                     this.$store.commit('canvas/setStyleSet', value);
                 },
-            },
-
-            logoType() {
-                if (! this.currentLogoId) {
-                    return null
-                }
-
-                const logo = this.getLogoById(this.currentLogoId)
-
-                if (! logo) {
-                    return null;
-                }
-
-                return logo.type
             },
 
             usableLogoTypes() {

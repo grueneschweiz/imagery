@@ -33,6 +33,10 @@ class Logo extends DrawBase {
     }
 
     get logoWidth() {
+        if (!this._imageWidth || !this._imageHeight || !this._type) {
+            return null;
+        }
+
         let imgEdgeLen;
 
         // for portrait images the width is authoritative for landscape images

@@ -11,9 +11,15 @@ export const MinFontSizeFactors = {
 }
 
 export const MaxFontSizeFactors = {
-    [StyleSetTypes.green]: 1.08,
-    [StyleSetTypes.greenCentered]: 1.08,
+    [StyleSetTypes.green]: 0.99,
+    [StyleSetTypes.greenCentered]: 0.99,
     [StyleSetTypes.young]: 0.9,
+}
+
+export const MinToMaxFontSizeFactors = {
+    [StyleSetTypes.green]: 4,
+    [StyleSetTypes.greenCentered]: 4,
+    [StyleSetTypes.young]: 4,
 }
 
 export const Media = {

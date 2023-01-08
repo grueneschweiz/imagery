@@ -4,8 +4,8 @@ import LogoLayer from "./LogoLayer";
 const marginFactor = 0.04;
 
 export default class LogoLayerYoung extends LogoLayer {
-    constructor(canvas) {
-        super(canvas)
+    constructor(canvas, context) {
+        super(canvas, context)
 
         this.alignment = Alignments.left
     }

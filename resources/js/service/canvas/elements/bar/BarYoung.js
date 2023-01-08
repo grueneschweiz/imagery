@@ -71,6 +71,20 @@ export default class BarYoung extends Bar {
         this._setProperty('_hasMargin', val);
     }
 
+    calculateWidth(fontSize) {
+        const originalFontSize = this._fontSize;
+
+        this.baseFontSize = fontSize;
+        this._setFont();
+        this._setTextDims();
+
+        const width = this._calculateCanvasWidth();
+
+        this._fontSize = originalFontSize;
+
+        return width;
+    }
+
     _draw() {
         this._setFont();
         this._setTextDims();
@@ -93,10 +107,14 @@ export default class BarYoung extends Bar {
     }
 
     _setCanvasWidth() {
+        this._canvas.width = this._calculateCanvasWidth();
+    }
+
+    _calculateCanvasWidth() {
         const textWidth = this._textDims.width;
         const padding = this._textDims.padding;
 
-        this._canvas.width = textWidth + 2 * padding;
+        return textWidth + 2 * padding;
     }
 
     _setCanvasHeight() {

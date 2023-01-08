@@ -46,11 +46,9 @@
 <script>
     import SnackbarMixin from "../../mixins/SnackbarMixin";
     import {ModelSelect} from 'vue-search-select'
-    import {Logo} from "../../service/canvas/elements/Logo";
     import ResourceLoadMixin from "../../mixins/ResourceLoadMixin";
     import {mapGetters} from "vuex";
     import PrepareSelectMixin from "../../mixins/PrepareSelectMixin";
-    import {LogoBlock} from "../../service/canvas/blocks/LogoBlock";
     import {ColorSchemes, StyleSetTypes} from "../../service/canvas/Constants";
     import ADefaultLogo from "../atoms/ADefaultLogo";
 
@@ -61,10 +59,7 @@
 
         data() {
             return {
-                logo: new Logo(),
-                block: new LogoBlock(),
                 logoObjSelected: null,
-                logoImage: null,
                 logoChoices: [],
                 loadingLogoImage: false,
                 logoDefaultSaving: false,
@@ -80,6 +75,7 @@
                 imageWidth: 'canvas/getImageWidth',
                 colorSchema: 'canvas/getColorSchema',
                 styleSet: 'canvas/getStyleSet',
+                logoWidth: 'canvas/getLogoWidth',
             }),
 
             logoIdSelected: {
@@ -88,6 +84,24 @@
                 },
                 set(val) {
                     return this.$store.dispatch('canvas/setLogoId', val)
+                }
+            },
+
+            logoImage: {
+                get() {
+                    return this.$store.getters['canvas/getLogoImage']
+                },
+                set(val) {
+                    return this.$store.dispatch('canvas/setLogoImage', val)
+                }
+            },
+
+            logoType: {
+                get() {
+                    return this.$store.getters['canvas/getLogoType']
+                },
+                set(val) {
+                    return this.$store.dispatch('canvas/setLogoType', val)
                 }
             },
 
@@ -112,7 +126,11 @@
             },
 
             logoSrc() {
-                return this.logoObjSelected[`src_${this.color}`]+`/${this.logo.logoWidth}`;
+                if (!this.logoObjSelected || !this.logoWidth) {
+                    return null;
+                }
+
+                return this.logoObjSelected[`src_${this.color}`]+`/${this.logoWidth}`;
             },
         },
 
@@ -123,24 +141,6 @@
         },
 
         methods: {
-            draw() {
-                if (!this.logoObjSelected) {
-                    this.$emit('drawn', null);
-                    return;
-                }
-
-                const repaint = this.logo.isDirty();
-                this.block.logo = this.drawLogo();
-
-                this.$emit('drawn', this.block.draw(repaint));
-            },
-
-            drawLogo() {
-                this.logo.logo = this.logoImage;
-
-                return this.logo.draw()
-            },
-
             setLogo(logo) {
                 this.logoIdSelected = logo;
 
@@ -148,23 +148,25 @@
                     return this.removeLogo();
                 }
 
+                this.logoObjSelected = this.getLogoById(this.logoIdSelected);
+                this.logoType = this.logoObjSelected.type;
+
                 this.loadLogo();
             },
 
             removeLogo() {
                 this.logoImage = null;
+                this.logoType = null;
                 this.logoObjSelected = null;
                 this.loadingLogoImage = false;
-                this.draw();
             },
 
             loadLogo() {
-                this.loadingLogoImage = true;
-                this.logoObjSelected = this.getLogoById(this.logoIdSelected);
+                if (!this.logoSrc) {
+                    return;
+                }
 
-                this.logo.type = this.logoObjSelected.type;
-                this.logo.imageWidth = this.imageWidth;
-                this.logo.imageHeight = this.imageHeight;
+                this.loadingLogoImage = true;
 
                 const img = new Image();
                 img.onload = () => {
@@ -173,7 +175,6 @@
                     }
 
                     this.logoImage = img;
-                    this.draw();
                     this.loadingLogoImage = false;
                 };
 
@@ -190,10 +191,7 @@
         },
 
         watch: {
-            imageWidth() {
-                this.setLogo(this.logoIdSelected);
-            },
-            imageHeight() {
+            logoWidth() {
                 this.setLogo(this.logoIdSelected);
             },
             color() {

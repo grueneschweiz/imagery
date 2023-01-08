@@ -1,20 +1,11 @@
 <template>
     <div class="o-imagery" ref="container">
         <div class="o-imagery__controls-1">
-
-            <MLogoBlock
-                @drawn="updateLogoLayer($event)"
-            />
-
+            <MLogoBlock/>
             <MStyleSetBlock/>
-
             <MFormat/>
-
             <MSizeBlock/>
-
-            <MBackgroundBlock
-                @drawn="updateBackgroundLayer($event)"
-            />
+            <MBackgroundBlock/>
         </div>
 
         <div class="o-imagery__preview">
@@ -26,6 +17,7 @@
                     @mousedown.stop="mouseDragStart($event)"
                     @mousemove.stop="mouseMove($event)"
                     @mouseout.stop="mouseLeave($event)"
+                    @mouseenter.stop="mouseEnter($event)"
                     @mouseup.stop="mouseDragStop($event)"
                     @touchcancel.stop="touchDragStop($event)"
                     @touchend.stop="touchDragStop($event)"
@@ -42,13 +34,9 @@
         </div>
 
         <div class="o-imagery__controls-2">
-            <MBarBlock
-                @drawn="updateBarLayer($event)"
-                class="mt-2"
-            />
+            <MBarBlock class="mt-2"/>
 
             <MCopyright
-                @drawn="updateCopyrightLayer($event)"
                 v-if="hasImageBackground"
             />
 
@@ -56,18 +44,13 @@
                 v-if="styleSet === styleSetTypes.green"
             />
 
-            <MColorScheme
-                v-if="backgroundType !== backgroundTypes.gradient"
-            />
+            <MColorScheme/>
 
             <MShadowBlock
                 v-if="styleSet === styleSetTypes.young"
-                @drawn="updateShadowLayer($event)"
             />
 
-            <MBorderBlock
-                @drawn="updateBorderLayer($event)"
-            />
+            <MBorderBlock/>
 
             <div class="d-sm-flex align-items-center mb-3">
                 <button
@@ -86,31 +69,26 @@
 </template>
 
 <script>
-    import {BackgroundTypes, ColorSchemes, StyleSetTypes} from "../../service/canvas/Constants";
-    import MBarBlock from "../molecules/MBarBlock";
-    import BackgroundLayer from "../../service/canvas/layers/BackgroundLayer";
-    import MBackgroundBlock from "../molecules/MBackgroundBlock";
-    import MBorderBlock from "../molecules/MBorderBlock";
-    import BorderLayer from "../../service/canvas/layers/BorderLayer";
-    import MLogoBlock from "../molecules/MLogoBlock";
-    import MStyleSetBlock from "../molecules/MStyleSetBlock";
-    import MSizeBlock from "../molecules/MSizeBlock";
-    import MAlignment from "../molecules/MAlignment";
-    import MColorScheme from "../molecules/MColorScheme";
-    import MShadowBlock from "../molecules/MShadowBlock";
-    import debounce from 'lodash/debounce';
-    import MCopyright from "../molecules/MCopyright";
-    import CopyrightLayer from "../../service/canvas/layers/CopyrightLayer";
-    import {mapGetters} from "vuex";
-    import CanvasItemFactoryMixin from "../../mixins/CanvasItemFactoryMixin";
-    import ShadowLayer from "../../service/canvas/layers/ShadowLayer";
-    import MFormat from "../molecules/MFormat.vue";
+import {BackgroundTypes, StyleSetTypes} from "../../service/canvas/Constants";
+import MBarBlock from "../molecules/MBarBlock";
+import MBackgroundBlock from "../molecules/MBackgroundBlock";
+import MBorderBlock from "../molecules/MBorderBlock";
+import MLogoBlock from "../molecules/MLogoBlock";
+import MStyleSetBlock from "../molecules/MStyleSetBlock";
+import MSizeBlock from "../molecules/MSizeBlock";
+import MAlignment from "../molecules/MAlignment";
+import MColorScheme from "../molecules/MColorScheme";
+import MShadowBlock from "../molecules/MShadowBlock";
+import debounce from 'lodash/debounce';
+import MCopyright from "../molecules/MCopyright";
+import {mapGetters} from "vuex";
+import MFormat from "../molecules/MFormat.vue";
+import ImageEngine from "../../service/canvas/ImageEngine";
 
-    let requestedAnimationFrame;
+let requestedAnimationFrame;
 
     export default {
         name: "OImagery",
-        mixins: [CanvasItemFactoryMixin],
         components: {
             MFormat,
             MCopyright,
@@ -128,7 +106,7 @@
         data() {
             return {
                 canvas: null,
-                fontSize: 50,
+                context: null,
                 backgroundTypes: BackgroundTypes,
                 styleSetTypes: StyleSetTypes,
 
@@ -142,18 +120,13 @@
                     height: 0,
                 },
 
-                barBlock: null,
-                backgroundBlock: null,
-                borderBlock: null,
-                logoBlock: null,
-                copyrightBlock: null,
-                shadowBlock: null,
-                borderLayer: null,
-                barLayer: null,
-                backgroundLayer: null,
-                logoLayer: null,
-                copyrightLayer: null,
-                shadowLayer: null,
+                mousePos: {
+                    x: -1,
+                    y: -1
+                },
+                dragging: false,
+
+                engine: new ImageEngine(),
 
                 dragObj: null,
             }
@@ -161,23 +134,31 @@
 
         computed: {
             ...mapGetters({
-                alignment: 'canvas/getAlignment',
+                logoImage: 'canvas/getLogoImage',
+                logoType: 'canvas/getLogoType',
                 styleSet: 'canvas/getStyleSet',
+                format: 'canvas/getFormat',
                 height: 'canvas/getImageHeight',
                 width: 'canvas/getImageWidth',
                 backgroundType: 'canvas/getBackgroundType',
                 backgroundImage: 'canvas/getBackgroundImage',
-                hasBorder: 'canvas/getHasBorder',
-                borderWidth: 'canvas/getBorderWidth',
+                backgroundZoom: 'canvas/getBackgroundZoom',
+                backgroundWatermarkText: 'canvas/getBackgroundWatermarkText',
                 bars: 'canvas/getBars',
-                hasBars: 'canvas/hasBars',
+                fontSizePercent: 'canvas/getFontSizePercent',
+                hasTopShadow: 'canvas/getHasTopShadow',
+                hasBottomShadow: 'canvas/getHasBottomShadow',
+                hasBorder: 'canvas/getHasBorder',
+                copyrightText: 'canvas/getCopyrightText',
+                alignment: 'canvas/getAlignment',
+                fontsLoaded: 'canvas/getFontsLoaded',
             }),
 
             canvasClasses() {
                 return {
-                    'dragging': this.dragObj && this.dragObj.draggable,
-                    'image-touching': this.hasImageBackground && this.backgroundLayer.touching && this.backgroundLayer.draggable,
-                    'bar-touching': this.barLayer && this.barLayer.touching && this.barLayer.draggable,
+                    'dragging': this.dragging,
+                    'image-touching': this.engine.getBackgroundDraggable() && this.engine.getBackgroundTouching(),
+                    'bar-touching': this.engine.getBarDraggable() && this.engine.getBarTouching(),
                     'transparent': this.backgroundType === BackgroundTypes.transparent,
                     'image': this.backgroundType === BackgroundTypes.image,
                 }
@@ -210,171 +191,94 @@
             hasImageBackground() {
                 return this.backgroundType === BackgroundTypes.image && this.backgroundImage;
             },
-
-            textPadding() {
-                if (!this.bars.length) {
-                    return 0
-                }
-
-                return this.bars[0].padding
-            },
         },
 
         created() {
             window.addEventListener('resize', this.setViewDims);
             window.addEventListener('resize', this.setCanvasZoneLeft);
-            window.addEventListener('resize', this.setCanvasPos);
-            window.addEventListener('scroll', this.setCanvasPos);
         },
 
         mounted() {
             this.canvas = this.$refs.canvas;
 
-            this.initializeCanvasPos();
             this.setCanvasZoneLeft();
 
             this.$nextTick(() => {
                 this.canvas.width = this.width;
                 this.canvas.height = this.height;
+                this.context = this.canvas.getContext('2d');
 
-                this.backgroundLayer = new BackgroundLayer(this.canvas);
-                this.borderLayer = new BorderLayer(this.canvas);
-                this.barLayer = this.createBarLayer(this.canvas);
-                this.logoLayer = this.createLogoLayer(this.canvas);
-                this.copyrightLayer = new CopyrightLayer(this.canvas);
-                this.shadowLayer = new ShadowLayer(this.canvas);
-
-                this.updateBackgroundLayer(this.backgroundBlock);
-                this.updateShadowLayer(this.shadowBlock);
-                this.updateBorderLayer(this.borderBlock);
-                this.updateBarLayer(this.barBlock);
-                this.updateLogoLayer(this.logoBlock);
-                this.updateCopyrightLayer(this.copyrightBlock);
+                this.setInitialEngineProps();
+                this.updateLogoWidth();
+                this.draw();
             });
         },
 
         destroyed() {
             window.removeEventListener('resize', this.setViewDims);
             window.removeEventListener('resize', this.setCanvasZoneLeft);
-            window.removeEventListener('resize', this.setCanvasPos);
-            window.removeEventListener('scroll', this.setCanvasPos);
         },
 
         methods: {
-            initializeCanvasPos() {
-                // on startup, this is zero. since there is no hook
-                // to catch the fully rendered event, we have to retry
-                // until the browser has positioned the canvas.
-                window.requestAnimationFrame(() => {
-                    this.setCanvasPos();
-                    if (this.canvasPos.y === 0) {
-                        this.initializeCanvasPos();
-                    }
-                });
+            setInitialEngineProps() {
+                const engine = this.engine;
+
+                engine.logoImage = this.logoImage;
+                engine.logoType = this.logoType;
+                engine.styleSet = this.styleSet;
+                engine.format = this.format;
+                engine.visibleWidth = this.width;
+                engine.visibleHeight = this.height;
+                engine.backgroundType = this.backgroundType;
+                engine.backgroundImage = this.backgroundImage;
+                engine.backgroundZoom = this.backgroundZoom;
+                engine.backgroundWatermarkText = this.backgroundWatermarkText;
+                engine.bars = this.bars;
+                engine.fontSizePercent = this.fontSizePercent;
+                engine.topShadow = this.hasTopShadow;
+                engine.bottomShadow = this.hasBottomShadow;
+                engine.hasBorder = this.hasBorder;
+                this.setCopyrightText();
+                engine.alignment = this.alignment;
+                engine.mousePos = this.mousePos;
+                engine.dragging = this.dragging;
             },
 
-            updateBarLayer(barBlock) {
-                this.barBlock = barBlock;
+            updateLogoWidth() {
+                this.$store.commit('canvas/setLogoWidth', this.engine.getLogoWidth())
+            },
 
-                if (!this.barLayer) {
+            setCopyrightText() {
+                if (this.copyrightText) {
+                    this.engine.copyrightText = this.$t('images.create.imageCopyInfo', {photographer: this.copyrightText});
+                } else {
+                    this.engine.copyrightText = '';
+                }
+            },
+
+            draw(forceRepaint = false) {
+                if (!forceRepaint && !this.engine.needsRepaint()) {
                     return;
                 }
 
-                this.barLayer.alignment = this.alignment;
-                this.barLayer.block = this.barBlock;
-                this.barLayer.borderWidth = this.borderWidth;
-                this.barLayer.textPadding = this.textPadding;
-
-                this.draw();
-            },
-
-            updateBackgroundLayer(backgroundBlock) {
-                this.backgroundBlock = backgroundBlock;
-
-                if (!this.backgroundLayer) {
-                    return;
-                }
-
-                this.backgroundLayer.block = this.backgroundBlock;
-                this.draw();
-            },
-
-            updateBorderLayer(borderBlock) {
-                this.borderBlock = borderBlock;
-
-                if (!this.borderLayer) {
-                    return;
-                }
-
-                this.borderLayer.block = this.borderBlock;
-                this.barLayer.borderWidth = this.borderWidth;
-                this.draw();
-            },
-
-            updateShadowLayer(shadowBlock) {
-                this.shadowBlock = shadowBlock;
-
-                if (!this.shadowBlock || ! this.shadowLayer) {
-                    return;
-                }
-
-                this.shadowLayer.block = this.shadowBlock;
-                this.draw();
-            },
-
-            updateLogoLayer(logoBlock) {
-                if (!this.logoLayer) {
-                    return;
-                }
-
-                this.logoBlock = logoBlock;
-                this.logoLayer.block = this.logoBlock;
-                this.draw();
-            },
-
-            updateCopyrightLayer(copyrightBlock) {
-                this.copyrightBlock = copyrightBlock;
-
-                if (!this.copyrightLayer) {
-                    return;
-                }
-
-                this.copyrightLayer.block = this.copyrightBlock;
-                this.draw();
-            },
-
-            draw() {
                 if (requestedAnimationFrame) {
                     window.cancelAnimationFrame(requestedAnimationFrame);
                 }
 
-                requestedAnimationFrame = window.requestAnimationFrame(() => {
-                    this.backgroundLayer.draw(true);
+                const drawFn = () => {
+                    this.context.clearRect(0, 0, this.width, this.height);
+                    this.context.drawImage(this.engine.draw(forceRepaint), 0, 0);
 
-                    if (this.styleSet === StyleSetTypes.young) {
-                        this.shadowLayer.draw(true);
-                    }
+                    this.$store.dispatch('canvas/setTextFitsImage', this.engine.getTextFitsImage());
+                };
 
-                    if (this.styleSet === StyleSetTypes.green) {
-                        this.borderLayer.draw(true);
-                    }
-
-                    if (this.hasBars) {
-                        this.barLayer.draw(true);
-                    }
-
-                    if (this.styleSet !== StyleSetTypes.greenCentered) {
-                        this.logoLayer.alignment = this.alignment;
-                        this.logoLayer.barPos = this.barLayer.boundingRect;
-                        this.logoLayer.draw(true);
-                    }
-
-                    if (BackgroundTypes.image === this.backgroundType) {
-                        this.copyrightLayer.alignment = this.alignment;
-                        this.copyrightLayer.border = this.hasBorder;
-                        this.copyrightLayer.draw(true);
-                    }
-                });
+                if (forceRepaint) {
+                    // draw immediately to avoid draw event canceling.
+                    // this is needed when the font is loaded.
+                    drawFn();
+                } else {
+                    requestedAnimationFrame = window.requestAnimationFrame(drawFn);
+                }
             },
 
             setCanvasZoneLeft: debounce(function () {
@@ -383,15 +287,13 @@
                     : 0;
             }, 100),
 
-            setCanvasPos: debounce(function () {
-                this.$nextTick(() => {
-                    const pos = this.canvas.getBoundingClientRect();
-                    this.canvasPos.x = pos.x + window.scrollX;
-                    this.canvasPos.y = pos.y + window.scrollY;
-                    this.canvasPos.width = pos.width;
-                    this.canvasPos.height = pos.height;
-                });
-            }, 100, {leading: true, trailing: true}),
+            setCanvasPos() {
+                const pos = this.canvas.getBoundingClientRect();
+                this.canvasPos.x = pos.x + window.scrollX;
+                this.canvasPos.y = pos.y + window.scrollY;
+                this.canvasPos.width = pos.width;
+                this.canvasPos.height = pos.height;
+            },
 
             setViewDims: debounce(function () {
                 this.viewHeight = document.documentElement.clientHeight;
@@ -408,13 +310,18 @@
                 this.dragStop();
                 this.move(event);
             },
-            mouseLeave() {
+            mouseLeave(event) {
                 this.dragStop();
+                this.move(event);
+            },
+            mouseEnter(){
+                this.setCanvasPos();
             },
             touchDragStart(event) {
+                this.setCanvasPos();
+
                 const touch = event.touches[0];
-                const pos = this.relImagePos(touch.pageX, touch.pageY);
-                this.propagateMousePos(pos);
+                this.mousePos = this.relImagePos(touch.pageX, touch.pageY);
 
                 this.dragStart();
             },
@@ -426,48 +333,19 @@
             },
 
             dragStart() {
-                if (this.barLayer.touching) {
-                    this.dragObj = this.barLayer;
-                    this.dragObj.dragging = true;
-                } else if (this.backgroundType === BackgroundTypes.image) {
-                    this.dragObj = this.backgroundLayer;
-                    this.dragObj.dragging = true;
-                }
+                this.dragging = true;
             },
             dragStop() {
-                if (this.dragObj) {
-                    this.dragObj.dragging = false;
-                    this.dragObj = null;
-                }
-
-                this.propagateMousePos({x: -1, y: -1});
-
-                this.draw();
+                this.dragging = false;
             },
             move(event) {
-                const pos = this.relImagePos(event.pageX, event.pageY);
-
-                if (this.dragObj) {
-                    this.dragObj.drag(pos);
-                }
-
-                this.propagateMousePos(pos);
-
-                if (this.dragObj // dragging
-                    || this.barLayer.isDirty() // touching state changed
-                ) {
-                    this.draw();
-                }
+                this.mousePos = this.relImagePos(event.pageX, event.pageY);
             },
             relImagePos(absX, absY) {
                 return {
                     x: (absX - this.canvasPos.x) * this.width / this.canvasPos.width,
                     y: (absY - this.canvasPos.y) * this.height / this.canvasPos.height,
                 };
-            },
-            propagateMousePos(pos) {
-                this.backgroundLayer.mousePos = pos;
-                this.barLayer.mousePos = pos;
             },
 
             save() {
@@ -478,27 +356,89 @@
         },
 
         watch: {
-            backgroundType(value) {
-                const schema = BackgroundTypes.gradient === value
-                    ? ColorSchemes.white
-                    : ColorSchemes.green
-                this.$store.dispatch('canvas/setColorSchema', schema)
-
-                this.setCanvasPos();
+            logoImage(value) {
+                this.engine.logoImage = value;
+                this.draw();
             },
-            width(value) {
-                this.canvas.width = value;
-                this.setCanvasPos();
+            logoType(value) {
+                this.engine.logoType = value;
+                this.updateLogoWidth();
+                this.draw();
+            },
+            styleSet(value) {
+                this.engine.styleSet = value;
+                this.draw();
+            },
+            format(value) {
+                this.engine.format = value;
+                this.draw();
             },
             height(value) {
                 this.canvas.height = value;
-                this.setCanvasPos();
+                this.engine.visibleHeight = value;
+                this.updateLogoWidth();
+                this.draw();
             },
-            styleSet() {
-                this.barLayer = this.createBarLayer(this.canvas);
-                this.logoLayer = this.createLogoLayer(this.canvas);
-                this.updateBarLayer(this.barLayer);
-                this.updateLogoLayer(this.logoBlock);
+            width(value) {
+                this.canvas.width = value;
+                this.engine.visibleWidth = value;
+                this.updateLogoWidth();
+                this.draw();
+            },
+            backgroundType(value) {
+                this.engine.backgroundType = value;
+                this.draw();
+            },
+            backgroundImage(value) {
+                this.engine.backgroundImage = value;
+                this.draw();
+            },
+            backgroundZoom(value) {
+                this.engine.backgroundZoom = value;
+                this.draw();
+            },
+            backgroundWatermarkText(value) {
+                this.engine.backgroundWatermarkText = value;
+                this.draw();
+            },
+            bars(value) {
+                this.engine.bars = value;
+                this.draw(true);
+            },
+            fontSizePercent(value) {
+                this.engine.fontSizePercent = value;
+                this.draw();
+            },
+            hasTopShadow(value) {
+                this.engine.topShadow = value;
+                this.draw();
+            },
+            hasBottomShadow(value) {
+                this.engine.bottomShadow = value;
+                this.draw();
+            },
+            hasBorder(value) {
+                this.engine.hasBorder = value;
+                this.draw();
+            },
+            copyrightText() {
+                this.setCopyrightText();
+                this.draw();
+            },
+            alignment(value) {
+                this.engine.alignment = value;
+                this.draw();
+            },
+            fontsLoaded() {
+                this.draw(true);
+            },
+            mousePos() {
+                this.engine.mousePos = this.mousePos;
+                this.draw();
+            },
+            dragging() {
+                this.engine.dragging = this.dragging;
+                this.draw();
             },
         }
     }
@@ -514,6 +454,7 @@
             background-color: $gray-600;
             padding: 0.25em 0.5em 0.125em;
             color: $white;
+            user-select: none;
 
             @include media-breakpoint-up(lg) {
                 position: fixed;

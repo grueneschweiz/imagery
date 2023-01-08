@@ -1,13 +1,13 @@
 import isEqual from 'lodash/isEqual';
 
 export default class DrawBase {
-    constructor(canvas = null) {
+    constructor(canvas = null, context = null) {
         if (canvas) {
             this._canvas = canvas;
 
             // deferred loading because we may have to create this
             // object before the canvas in the dom is ready
-            this._context = null;
+            this._context = context;
         } else {
             this._canvas = document.createElement('canvas');
             this._context = this._canvas.getContext('2d');

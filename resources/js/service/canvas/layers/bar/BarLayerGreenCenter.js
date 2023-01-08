@@ -2,8 +2,8 @@ import {Alignments} from "../../Constants";
 import BarLayerGreen from "./BarLayerGreen";
 
 export default class BarLayerGreenCenter extends BarLayerGreen {
-    constructor(canvas) {
-        super(canvas);
+    constructor(canvas, context) {
+        super(canvas, context);
 
         this._alignment = Alignments.center;
     }

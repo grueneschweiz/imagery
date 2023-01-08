@@ -1,8 +1,8 @@
 import DrawBase from "../misc/DrawBase";
 
 export default class Layer extends DrawBase {
-    constructor(canvas) {
-        super(canvas);
+    constructor(canvas, context) {
+        super(canvas, context);
 
         this._block = null;
     }

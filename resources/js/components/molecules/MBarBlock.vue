@@ -6,15 +6,14 @@
                 for="font-size"
             >{{$t('images.create.fontSize')}}</label>
             <input
-                :disabled="tooMuchText"
-                :max="fontSizeMax"
-                :min="fontSizeMin"
-                @input="draw"
+                v-model.number="fontSizePercent"
+                :disabled="!textFitsImage"
+                :max="100"
                 class="form-control-range"
                 id="font-size"
                 step="1"
                 type="range"
-                v-model.number="fontSize"
+                :min="1"
             >
         </div>
 
@@ -37,7 +36,7 @@
             >{{$t('images.create.sublineAdd')}}
             </button>
 
-            <div class="alert alert-warning" role="alert" v-if="tooMuchText">
+            <div v-if="!textFitsImage" class="alert alert-warning" role="alert">
                 {{$t('images.create.tooMuchText')}}
             </div>
         </div>
@@ -49,27 +48,18 @@
     import {
         BarSchemes,
         BarTypes,
-        ColorSchemes, MaxFontSizeFactors, MinFontSizeFactors,
+        ColorSchemes,
         StyleSetTypes
     } from "../../service/canvas/Constants";
     import ABar from "../atoms/ABar";
-    import CanvasItemFactoryMixin from "../../mixins/CanvasItemFactoryMixin";
-
-    const defaultMinFontSizeFactor = 0.1
-    const defaultMaxFontSizeFactor = 0.9
-
-    let requestedAnimationFrame;
 
     export default {
         name: "MBarBlock",
         components: {ABar},
-        mixins: [CanvasItemFactoryMixin],
 
         data() {
             return {
-                fontSizeMax: 100,
-                tooMuchText: false,
-                block: null,
+                fontSizePercentBeforeReset: 0,
             }
         },
 
@@ -77,19 +67,18 @@
             ...mapGetters({
                 styleSet: 'canvas/getStyleSet',
                 alignment: 'canvas/getAlignment',
-                imageHeight: 'canvas/getImageHeight',
-                imageWidth: 'canvas/getImageWidth',
                 colorSchema: 'canvas/getColorSchema',
                 bars: 'canvas/getBars',
+                textFitsImage: 'canvas/getTextFitsImage',
             }),
 
-            fontSize: {
+            fontSizePercent: {
                 get() {
-                    return this.$store.getters['canvas/getFontSize']
+                    return this.$store.getters['canvas/getFontSizePercent']
                 },
                 set(val) {
                     if (val > 0) {
-                        this.$store.dispatch('canvas/setFontSize', val)
+                        this.$store.dispatch('canvas/setFontSizePercent', val)
                     }
                 }
             },
@@ -105,109 +94,32 @@
                 }
             },
 
-            minFontSizeFactor() {
-                return MinFontSizeFactors[this.styleSet] || defaultMinFontSizeFactor;
-            },
-
-            maxFontSizeFactor() {
-                return MaxFontSizeFactors[this.styleSet] || defaultMaxFontSizeFactor;
-            },
-
-            fontSizeMin() {
-                // base the minimal font size on a normalized side length of
-                // the image.
-                // to get a normalized side length, square the image width,
-                // and multiply it with the height, then take the third root.
-                // this way we only violate the corporate design rules on slim
-                // portrait images (without violation, we can't write anything
-                // meaning full on a instagram story)
-                const cube = this.imageHeight * this.imageWidth ** 2;
-                const sideNormalized = Math.pow(cube, 1 / 3);
-                const min = sideNormalized * this.minFontSizeFactor;
-                return Math.ceil(min);
-            },
-
             showAddSublineBtn() {
                 return this.bars
                     .filter(bar => bar.type === BarTypes.subline)
                     .length === 0
-            }
+            },
+
+            sublineSchema() {
+                if (this.styleSet === StyleSetTypes.young) {
+                    return BarSchemes.transparent
+                }
+
+                return ColorSchemes.greengreen === this.colorSchema
+                    ? BarSchemes.green
+                    : BarSchemes.white
+            },
         },
 
         mounted() {
             this.maybeRemoveSubline()
-            this.draw()
         },
 
         methods: {
-            setupBlock() {
-                const canvases = this.bars.map(bar => bar.canvas)
-                if (canvases.length) {
-                    this.block = this.createBarBlock(canvases)
-                } else {
-                    this.block = null
-                }
-            },
-
-            draw() {
-                if (requestedAnimationFrame) {
-                    cancelAnimationFrame(requestedAnimationFrame)
-                }
-
-                requestedAnimationFrame = requestAnimationFrame(() => {
-                    this.setupBlock()
-
-                    if (!this.block) {
-                        return
-                    }
-
-                    this.block.alignment = this.alignment;
-
-                    this.block.draw(); // called twice. first call is needed to determine size for content based font adjustment
-                    const fitsInImage = this.adjustFontSize();
-
-                    if (fitsInImage) {
-                        this.$emit('drawn', this.block.draw());
-                    }
-                })
-            },
-
-            adjustFontSize() {
-                const min = this.fontSizeMin;
-                const maxWidth = this.imageWidth * this.maxFontSizeFactor;
-                const imageToBlockRatio = maxWidth / this.block.width;
-                let max = this.fontSize * imageToBlockRatio;
-                max = Math.floor(max); // the range slider wants integers
-
-                if (this.fontSize < min) {
-                    this.fontSize = min;
-                    return false;
-                }
-
-                if (max < min) {
-                    this.fontSize = min;
-                    this.fontSizeMax = min;
-                    this.tooMuchText = true;
-                    return false;
-                } else {
-                    this.tooMuchText = false;
-                }
-
-                if (this.block.width > maxWidth) {
-                    this.fontSizeMax = max;
-                    this.fontSize = max;
-                    return false;
-                }
-
-                this.fontSizeMax = max;
-
-                return true;
-            },
-
             addSubline() {
                 const subline = {
                     type: BarTypes.subline,
-                    schema: BarSchemes.white,
+                    schema: this.sublineSchema,
                     text: 'Subline',
                     canvas: null,
                     padding: 0,
@@ -229,21 +141,43 @@
                     })
                 }
             },
+
+            maybeRemoveHeadline() {
+                // remove third headline for style set young
+                if (this.styleSet === StyleSetTypes.young) {
+                    // remove first primary headline if there are two
+                    const primaryHeadlines = this.bars.filter(
+                        bar => bar.type === BarTypes.headline
+                            && (bar.schema === BarSchemes.white || bar.schema === BarSchemes.green)
+                    );
+                    if (primaryHeadlines.length > 1) {
+                        this.$store.commit('canvas/removeBar', {index: 0})
+                    }
+
+                    // remove first secondary headline if there are two
+                    const secondaryHeadlines = this.bars.filter(
+                        bar => bar.type === BarTypes.headline
+                            && (bar.schema === BarSchemes.magenta)
+                    );
+                    if (secondaryHeadlines.length > 1) {
+                        this.$store.commit('canvas/removeBar', {index: 1})
+                    }
+                }
+            }
         },
 
         watch: {
-            imageWidth() {
-                this.draw();
-            },
-            imageHeight() {
-                this.draw();
-            },
-            bars() {
-                this.draw()
-            },
             styleSet() {
                 this.maybeRemoveSubline()
-                this.draw()
+                this.maybeRemoveHeadline()
+            },
+            textFitsImage(val) {
+                if (!val) {
+                    this.fontSizePercentBeforeReset = this.fontSizePercent
+                    this.fontSizePercent = 1
+                } else {
+                    this.fontSizePercent = this.fontSizePercentBeforeReset
+                }
             },
         }
     }

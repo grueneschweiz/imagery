@@ -10,8 +10,8 @@ import BarLayer from "./BarLayer";
 const borderMarginFactor = 3;
 
 export default class BarLayerYoung extends BarLayer {
-    constructor(canvas) {
-        super(canvas);
+    constructor(canvas, context) {
+        super(canvas, context);
 
         this._alignment = Alignments.center;
     }

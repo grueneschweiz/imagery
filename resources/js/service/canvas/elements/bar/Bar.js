@@ -47,6 +47,10 @@ export default class Bar extends DrawBase {
         return this._textDims.padding
     }
 
+    calculateWidth(fontSize) {
+        throw new Error("Method 'calculateWidth()' must be implemented.")
+    }
+
     _draw() {
         throw new Error("Method '_draw()' must be implemented.")
     }

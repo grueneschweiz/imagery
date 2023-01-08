@@ -5,8 +5,8 @@ const shadowColorMouseOver = 'rgba(0,0,0,0.5)';
 const shadowMouseOverSize = 0.01;
 
 export default class BarLayer extends DraggableLayer {
-    constructor(canvas) {
-        super(canvas);
+    constructor(canvas, context) {
+        super(canvas, context);
 
         this._borderWidth = null;
         this._textPadding = 0;
@@ -39,7 +39,7 @@ export default class BarLayer extends DraggableLayer {
         };
     }
 
-    drag(pos) {
+    _drag(pos) {
         const deltaY = pos.y - this._mousePos.y;
         const y = this._y + deltaY;
 
@@ -118,8 +118,8 @@ export default class BarLayer extends DraggableLayer {
         const mouseX = this._mousePos.x;
         const mouseY = this._mousePos.y;
 
-        const posXstart = this._getXstart();
-        const posXend = this._getXend();
+        const posXstart = Math.max(0, this._getXstart());
+        const posXend = Math.min(this._canvas.width - 1, this._getXend());
 
         const posYstart = this._getYstart();
         const posYend = this._getYend();

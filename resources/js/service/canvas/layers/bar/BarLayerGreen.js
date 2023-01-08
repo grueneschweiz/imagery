@@ -25,8 +25,8 @@ const borderMarginFactorRadius = 2;
 const textPaddingFactor = 2;
 
 export default class BarLayerGreen extends BarLayer {
-    constructor(canvas) {
-        super(canvas);
+    constructor(canvas, context) {
+        super(canvas, context);
     }
 
     _getTopLimit() {

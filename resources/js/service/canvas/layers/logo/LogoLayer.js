@@ -2,8 +2,8 @@ import {Alignments} from "../../Constants";
 import Layer from "../Layer";
 
 export default class LogoLayer extends Layer {
-    constructor(canvas) {
-        super(canvas);
+    constructor(canvas, context) {
+        super(canvas, context);
 
         this._alignment = Alignments.left;
         this._barPos = {

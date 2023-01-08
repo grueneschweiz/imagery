@@ -75,6 +75,21 @@ export default class BarGreen extends Bar {
         this._setProperty('_fontSize', size);
     }
 
+    calculateWidth(fontSize) {
+        const originalFontSize = this._fontSize;
+
+        this.baseFontSize = fontSize;
+        this._setFont();
+        this._setTextDims();
+        this._setBarOversize();
+
+        const width = this._calculateCanvasWidth();
+
+        this._fontSize = originalFontSize;
+
+        return width;
+    }
+
     _draw() {
         this._setFont();
         this._setTextDims();
@@ -102,10 +117,14 @@ export default class BarGreen extends Bar {
     }
 
     _setCanvasWidth() {
-        const textWidth = this._textDims.width;
+        this._canvas.width = this._calculateCanvasWidth();
+    }
+
+    _calculateCanvasWidth() {
+        const textWidth = this._context.measureText(this._text).width;
         const padding = this._textDims.padding;
 
-        this._canvas.width = this._barOversize + textWidth + padding;
+        return this._barOversize + textWidth + padding;
     }
 
     _setCanvasHeight() {

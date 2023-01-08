@@ -1,8 +1,8 @@
 import Layer from "./Layer";
 
 export default class DraggableLayer extends Layer {
-    constructor(canvas) {
-        super(canvas);
+    constructor(canvas, context) {
+        super(canvas, context);
 
         this._touching = false;
         this._dragging = true;
@@ -13,6 +13,14 @@ export default class DraggableLayer extends Layer {
     }
 
     set mousePos(mousePos) {
+        if (!mousePos) {
+            return;
+        }
+
+        if (this._dragging) {
+            this._drag(mousePos);
+        }
+
         this._mousePos = mousePos; // do not use setProperty as it must not trigger a repaint
         this._setProperty('_touching', this._isHover());
     }
@@ -31,5 +39,9 @@ export default class DraggableLayer extends Layer {
 
     _isHover() {
         throw new Error("Method '_isHover()' must be implemented.")
+    }
+
+    _drag(pos) {
+        throw new Error("Method '_drag()' must be implemented.")
     }
 }

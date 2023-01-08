@@ -34,18 +34,11 @@
         StyleSetTypes
     } from "../../service/canvas/Constants";
     import FontFaceObserver from "fontfaceobserver";
-    import CanvasItemFactoryMixin from "../../mixins/CanvasItemFactoryMixin";
     import {mapGetters} from "vuex";
 
     export default {
         name: "ABar",
-        mixins: [SnackbarMixin, CanvasItemFactoryMixin],
-
-        data() {
-            return {
-                drawObj: this.createBar(),
-            }
-        },
+        mixins: [SnackbarMixin],
 
         props: {
             index: {
@@ -57,9 +50,6 @@
         computed: {
             ...mapGetters({
                 styleSet: 'canvas/getStyleSet',
-                alignment: 'canvas/getAlignment',
-                imageWidth: 'canvas/getImageWidth',
-                baseFontSize: 'canvas/getFontSize',
                 bars: 'canvas/getBars',
                 colorSchema: 'canvas/getColorSchema'
             }),
@@ -73,14 +63,17 @@
                     return this.bar.text
                 },
                 set(val) {
-                    this.$set(this.bar, 'text', val)
-                    this.draw()
+                    this.$set(
+                        this.bars,
+                        this.index,
+                        {...this.bar, text: val}
+                    )
                 }
             },
 
             barSchema() {
                 if (BarSchemes.magenta === this.bar.schema) {
-                    return this.bar.schema
+                    return BarSchemes.magenta
                 }
 
                 if (this.isHeadline) {
@@ -190,42 +183,14 @@
             isSubline() {
                 return this.bar.type === BarTypes.subline
             },
-
-            isFirstSubline() {
-                return this.index === this.bars.findIndex(bar => bar.type === BarTypes.subline)
-            }
         },
 
         mounted() {
-            this.draw()
             this.loadFonts()
-                .then(() => this.draw(true))
+                .then(() => this.$store.dispatch('canvas/setFontsLoaded', true));
         },
 
         methods: {
-            draw(forceRepaint = false) {
-                if (! this.bar) {
-                    return;
-                }
-
-                this.drawObj.text = this.bar.text;
-                this.drawObj.alignment = this.alignment;
-                this.drawObj.type = this.bar.type;
-                this.drawObj.schema = this.barSchema;
-                this.drawObj.baseFontSize = this.baseFontSize;
-                this.drawObj.imageWidth = this.imageWidth;
-                this.drawObj.isFirstSubline = this.isFirstSubline;
-
-                this.bar.canvas = this.drawObj.draw(forceRepaint)
-
-                this.bar.padding = this.drawObj.padding;
-
-                this.$store.dispatch(
-                    'canvas/setBar',
-                    {index: this.index, bar: {...this.bar}}
-                )
-            },
-
             loadFonts() {
                 const timeout = 10000;
                 const sanukFat = new FontFaceObserver('SanukFat');
@@ -266,34 +231,22 @@
                 )
             },
 
-            maybeRemoveBar() {
-                if ( this.isStyleYoung
-                    && this.isHeadline
-                    && this.deletable
-                ) {
-                    this.remove()
-                }
-            }
+            updateBarSchema() {
+                this.$set(
+                    this.bars,
+                    this.index,
+                    {...this.bar, schema: this.barSchema}
+                )
+            },
         },
 
         watch: {
-            alignment() {
-                this.draw()
-            },
-            baseFontSize() {
-                this.draw()
-            },
-            imageWidth() {
-                this.draw()
+            colorSchema() {
+                this.updateBarSchema()
             },
             styleSet() {
-                this.maybeRemoveBar()
-                this.drawObj = this.createBar()
-                this.draw()
+                this.updateBarSchema()
             },
-            colorSchema() {
-                this.draw()
-            }
         }
     }
 </script>

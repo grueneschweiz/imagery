@@ -6,7 +6,11 @@ import {
     ColorSchemes,
     Formats,
     StyleSetTypes,
-    Media, ColorEncodings, FileFormats, PrintingBleed, Inch2mm
+    Media,
+    ColorEncodings,
+    FileFormats,
+    PrintingBleed,
+    Inch2mm
 } from "../../service/canvas/Constants";
 import {ImageSizes} from "../../service/canvas/ImageSizes";
 
@@ -18,15 +22,23 @@ const state = {
     selectedImageSize: ImageSizes[0],
     colorSchema: ColorSchemes.white,
     logoId: null,
+    logoWidth: 0,
+    logoImage: null,
+    logoType: null,
     backgroundType: BackgroundTypes.gradient,
     backgroundImage: null,
+    backgroundImageMimeType: null,
+    backgroundZoom: 0,
+    backgroundWatermarkText: null,
     hasBorder: true,
-    borderWidth: 0,
-    fontSize: 100,
+    fontSizePercent: 50,
+    textFitsImage: true,
     hasTopShadow: true,
     hasBottomShadow: true,
     format: Formats.digital,
     rotated: false,
+    fontsLoaded: false,
+    copyrightText: '',
     bars: [
         {
             type: BarTypes.headline,
@@ -60,15 +72,20 @@ const getters = {
     getSelectedImageSize: state => state.selectedImageSize,
     getColorSchema: state => state.colorSchema,
     getLogoId: state => state.logoId,
+    getLogoWidth: state => state.logoWidth,
+    getLogoImage: state => state.logoImage,
+    getLogoType: state => state.logoType,
     getBackgroundType: state => state.backgroundType,
     getBackgroundImage: state => state.backgroundImage,
+    getBackgroundImageMimeType: state => state.backgroundImageMimeType,
+    getBackgroundZoom: state => state.backgroundZoom,
+    getBackgroundWatermarkText: state => state.backgroundWatermarkText,
     getHasBorder: state => state.hasBorder,
-    getBorderWidth: state => state.borderWidth,
-    getFontSize: state => state.fontSize,
+    getFontSizePercent: state => state.fontSizePercent,
+    getTextFitsImage: state => state.textFitsImage,
     getBars: state => state.bars,
     getHasTopShadow: state => state.hasTopShadow,
     getHasBottomShadow: state => state.hasBottomShadow,
-    hasBars: state => !!state.bars.filter(bar => bar.text.length).length,
     getFormat: state => state.format,
     getResolution: state => state.selectedImageSize.resolution,
     getMedia: state => state.format === Formats.digital ? Media.screen : Media.print,
@@ -76,6 +93,8 @@ const getters = {
     getColorEncoding: state => state.format === Formats.digital ? ColorEncodings.sRGB : ColorEncodings.FOGRA51,
     getFileFormat: state => state.format === Formats.digital ? FileFormats.png : FileFormats.pdf,
     getRotated: state => state.rotated,
+    getFontsLoaded: state => state.fontsLoaded,
+    getCopyrightText: state => state.copyrightText,
 };
 
 const mutations = {
@@ -86,11 +105,17 @@ const mutations = {
     setSelectedImageSize: (state, size) => state.selectedImageSize = size,
     setColorSchema: (state, schema) => state.colorSchema = schema,
     setLogoId: (state, logoId) => state.logoId = logoId,
+    setLogoWidth: (state, width) => state.logoWidth = width,
+    setLogoImage: (state, image) => state.logoImage = image,
+    setLogoType: (state, type) => state.logoType = type,
     setBackgroundType: (state, type) => state.backgroundType = type,
     setBackgroundImage: (state, image) => state.backgroundImage = image,
+    setBackgroundImageMimeType: (state, mimeType) => state.backgroundImageMimeType = mimeType,
+    setBackgroundZoom: (state, zoom) => state.backgroundZoom = zoom,
+    setBackgroundWatermarkText: (state, text) => state.backgroundWatermarkText = text,
     setHasBorder: (state, border) => state.hasBorder = border,
-    setBorderWidth: (state, width) => state.borderWidth = width,
-    setFontSize: (state, size) => state.fontSize = size,
+    setFontSizePercent: (state, size) => state.fontSizePercent = size,
+    setTextFitsImage: (state, fits) => state.textFitsImage = fits,
     addBar: (state, payload) => state.bars.splice(payload.index, 0, payload.bar),
     removeBar: (state, payload) => state.bars.splice(payload.index, 1),
     setBar: (state, payload) => state.bars.splice(payload.index, 1, payload.bar),
@@ -98,6 +123,8 @@ const mutations = {
     setHasBottomShadow: (state, shadow) => state.hasBottomShadow = shadow,
     setFormat: (state, format) => state.format = format,
     setRotated: (state, rotated) => state.rotated = rotated,
+    setFontsLoaded: (state, loaded) => state.fontsLoaded = loaded,
+    setCopyrightText: (state, text) => state.copyrightText = text,
 };
 
 const actions = {
@@ -122,20 +149,38 @@ const actions = {
     setLogoId({commit}, logoId) {
         commit('setLogoId', logoId)
     },
+    setLogoWidth({commit}, width) {
+        commit('setLogoWidth', width)
+    },
+    setLogoImage({commit}, image) {
+        commit('setLogoImage', image)
+    },
+    setLogoType({commit}, type) {
+        commit('setLogoType', type)
+    },
     setBackgroundType({commit}, type) {
         commit('setBackgroundType', type)
     },
     setBackgroundImage({commit}, image) {
         commit('setBackgroundImage', image)
     },
+    setBackgroundImageMimeType({commit}, mimeType) {
+        commit('setBackgroundImageMimeType', mimeType)
+    },
+    setBackgroundZoom({commit}, zoom) {
+        commit('setBackgroundZoom', zoom)
+    },
+    setBackgroundWatermarkText({commit}, text) {
+        commit('setBackgroundWatermarkText', text)
+    },
     setHasBorder({commit}, border) {
         commit('setHasBorder', border)
     },
-    setBorderWidth({commit}, width) {
-        commit('setBorderWidth', width)
+    setFontSizePercent({commit}, size) {
+        commit('setFontSizePercent', size)
     },
-    setFontSize({commit}, size) {
-        commit('setFontSize', size)
+    setTextFitsImage({commit}, fits) {
+        commit('setTextFitsImage', fits)
     },
     addBar({commit}, payload) {
         commit('addBar', payload)
@@ -157,7 +202,13 @@ const actions = {
     },
     setRotated({commit}, rotated) {
         commit('setRotated', rotated)
-    }
+    },
+    setFontsLoaded({commit}, loaded) {
+        commit('setFontsLoaded', loaded)
+    },
+    setCopyrightText({commit}, text) {
+        commit('setCopyrightText', text)
+    },
 };
 
 export default {

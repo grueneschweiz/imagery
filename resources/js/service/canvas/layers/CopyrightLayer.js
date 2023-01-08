@@ -5,8 +5,8 @@ import BorderHelper from "../misc/BorderHelper";
 const orthogonal = -Math.PI / 2;
 
 export default class CopyrightLayer extends Layer {
-    constructor(canvas) {
-        super(canvas);
+    constructor(canvas, context) {
+        super(canvas, context);
 
         this._alignment = Alignments.left;
         this._border = true;
