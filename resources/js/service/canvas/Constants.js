@@ -63,6 +63,9 @@ export const Inch2mm = 25.4; // 1inch = 25.4mm
 export const MarkColor = '#00f7ff';
 export const MarkWidth = 2;
 
+export const BorderWidthFactor = 0.0175;
+export const BorderRadiusFactor = 1;
+
 export const BarSchemes = {
     white: {
         background: '#ffffff',

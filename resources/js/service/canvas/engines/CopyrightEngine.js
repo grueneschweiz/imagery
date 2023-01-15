@@ -5,14 +5,15 @@ import SubEngine from "./SubEngine";
 
 export default class CopyrightEngine extends SubEngine {
     _hasBorder;
+    _borderWidth;
     _copyrightText;
 
-    _borderWidth;
 
     constructor(events, canvas, drawingContext) {
         super(events, canvas, drawingContext);
 
         this._events.on('_hasBorder', value => this._setProperty('_hasBorder', value));
+        this._events.on('_borderWidth', value => this._setProperty('_borderWidth', value));
         this._events.on('_copyrightText', value => this._setProperty('_copyrightText', value));
 
         this._element = new Copyright();
@@ -32,6 +33,7 @@ export default class CopyrightEngine extends SubEngine {
         this._element.width = this._visibleWidth;
         this._element.height = this._visibleHeight;
         this._element.text = this._copyrightText;
+        this._element.borderWidth = this._borderWidth;
         this._element.color = this._hasBorder
             ? CopyrightColors.withBorder
             : CopyrightColors.noBorder;

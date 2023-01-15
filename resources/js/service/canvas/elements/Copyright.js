@@ -1,4 +1,3 @@
-import BorderHelper from "../misc/BorderHelper";
 import DrawBase from "../misc/DrawBase";
 
 const font = 'Arial';
@@ -36,6 +35,7 @@ class Copyright extends DrawBase {
 
         this._imageWidth = 0;
         this._imageHeight = 0;
+        this._borderWidth = 0;
 
         this._textDims = {
             width: null,
@@ -60,6 +60,10 @@ class Copyright extends DrawBase {
 
     set height(height) {
         this._setProperty('_imageHeight', height);
+    }
+
+    set borderWidth(width) {
+        this._setProperty('_borderWidth', width);
     }
 
     _draw() {
@@ -87,8 +91,7 @@ class Copyright extends DrawBase {
     }
 
     _setFontSize() {
-        const borderWidth = BorderHelper.width(this._imageWidth, this._imageHeight);
-        this._fontSize = borderWidth * fontSizeFactor;
+        this._fontSize = this._borderWidth * fontSizeFactor;
     }
 
     _setTextDims() {

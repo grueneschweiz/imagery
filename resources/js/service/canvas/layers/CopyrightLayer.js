@@ -1,6 +1,5 @@
 import {Alignments} from "../Constants";
 import Layer from "./Layer";
-import BorderHelper from "../misc/BorderHelper";
 
 const orthogonal = -Math.PI / 2;
 
@@ -10,6 +9,7 @@ export default class CopyrightLayer extends Layer {
 
         this._alignment = Alignments.left;
         this._border = true;
+        this._borderWidth = 0;
 
         this._x = 0;
         this._y = 0;
@@ -21,6 +21,10 @@ export default class CopyrightLayer extends Layer {
 
     set alignment(alignment) {
         this._setProperty('_alignment', alignment);
+    }
+
+    set borderWidth(width) {
+        this._setProperty('_borderWidth', width);
     }
 
     _drawBlock() {
@@ -45,18 +49,17 @@ export default class CopyrightLayer extends Layer {
     }
 
     _determinePos() {
-        const borderWidth = BorderHelper.width(this._canvas.width, this._canvas.height);
         let borderX, borderY;
 
         if (this._border) {
-            borderX = BorderHelper.radius(borderWidth);
+            borderX = this._borderWidth;
             borderY = 0;
         } else {
             borderX = 0;
-            borderY = borderWidth;
+            borderY = this._borderWidth;
         }
 
-        this._x = borderWidth + borderX;
+        this._x = this._borderWidth + borderX;
 
         if (this._alignment === Alignments.right) {
             this._y = borderY;

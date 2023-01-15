@@ -1,5 +1,5 @@
-import BorderHelper from "../misc/BorderHelper";
 import DrawBase from "../misc/DrawBase";
+import {BorderRadiusFactor, BorderWidthFactor} from "../Constants";
 
 const borderColor = '#ffffff';
 
@@ -48,7 +48,7 @@ class Border extends DrawBase {
     _setClippingArea() {
         const ctx = this._context;
         const bWidth = this._borderWidth;
-        const radius = BorderHelper.radius(bWidth);
+        const radius = bWidth * BorderRadiusFactor;
         const width = this._canvas.width - 2 * bWidth;
         const height = this._canvas.height - 2 * bWidth;
 
@@ -66,7 +66,8 @@ class Border extends DrawBase {
     }
 
     _setBorderWidth() {
-        this._borderWidth = BorderHelper.width(this._canvas.width, this._canvas.height);
+        const area = this._canvas.width * this._canvas.height;
+        this._borderWidth = Math.sqrt(area) * BorderWidthFactor;
     }
 }
 
