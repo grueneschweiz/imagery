@@ -12,20 +12,11 @@ export default class Layer extends DrawBase {
     }
 
     _draw() {
-        this._setContext();
-
         if (!this._block) {
             return;
         }
 
         this._drawBlock();
-    }
-
-    _setContext() {
-        if (!this._context) {
-            this._context = this._canvas.getContext('2d');
-            this._context.imageSmoothingEnabled = true;
-        }
     }
 
     _drawBlock() {
