@@ -1,4 +1,11 @@
-import {Alignments, BarSchemes as Schemes, BarSizeFactor, BarTypes as Types} from "./../../Constants";
+import {
+    Alignments,
+    BarSchemes as Schemes,
+    BarSizeFactor,
+    BarTypes as Types,
+    MarkColor,
+    MarkWidth
+} from "./../../Constants";
 import Bar from "./Bar";
 
 
@@ -90,7 +97,7 @@ export default class BarGreen extends Bar {
         return width;
     }
 
-    _draw() {
+    _drawConcrete() {
         this._setFont();
         this._setTextDims();
         this._setBarOversize();
@@ -100,6 +107,23 @@ export default class BarGreen extends Bar {
 
         this._drawBackground();
         this._drawFont();
+    }
+
+    _drawSelectedMark() {
+        const previewLen = Math.max(this._previewDims.width, this._previewDims.height);
+        const imageLen = Math.max(this._imageWidth, this._imageHeight);
+
+        const lenRatio = imageLen / previewLen;
+        const lineWidth = MarkWidth * lenRatio;
+
+        this._context.lineWidth = lineWidth;
+        this._context.strokeStyle = MarkColor;
+        this._context.strokeRect(
+            lineWidth / 2,
+            lineWidth / 2,
+            this._canvas.width - lineWidth,
+            this._getBarHeight() - lineWidth
+        );
     }
 
     _setFont() {

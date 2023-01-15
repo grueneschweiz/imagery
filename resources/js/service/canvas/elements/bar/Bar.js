@@ -12,10 +12,17 @@ export default class Bar extends DrawBase {
         this._font = ''
 
         this._imageWidth = 0
+        this._imageHeight = 0
         this._textDims = {
             width: null,
             height: null,
             padding: null,
+        }
+
+        this._markSelected = false
+        this._previewDims = {
+            width: 0,
+            height: 0,
         }
     }
 
@@ -43,6 +50,18 @@ export default class Bar extends DrawBase {
         this._setProperty('_imageWidth', width);
     }
 
+    set imageHeight(height) {
+        this._setProperty('_imageHeight', height);
+    }
+
+    set markSelected(mark) {
+        this._setProperty('_markSelected', mark);
+    }
+
+    set previewDims(dims) {
+        this._setProperty('_previewDims', dims)
+    }
+
     get padding() {
         return this._textDims.padding
     }
@@ -52,6 +71,18 @@ export default class Bar extends DrawBase {
     }
 
     _draw() {
+        this._drawConcrete();
+
+        if (this._markSelected) {
+            this._drawSelectedMark();
+        }
+    }
+
+    _drawConcrete() {
         throw new Error("Method '_draw()' must be implemented.")
+    }
+
+    _drawSelectedMark() {
+        throw new Error("Method '_drawSelectedMark()' must be implemented.")
     }
 }

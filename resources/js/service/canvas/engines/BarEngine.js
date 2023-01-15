@@ -17,6 +17,7 @@ export default class BarEngine extends DraggableSubEngine {
     _styleSet;
     _bars;
     _fontSizePercent;
+    _previewDims;
 
     _currentStyleSet;
     _textPadding;
@@ -33,6 +34,7 @@ export default class BarEngine extends DraggableSubEngine {
         this._events.on('_bars', value => this._setProperty('_bars', value));
         this._events.on('_fontSizePercent', value => this._setProperty('_fontSizePercent', value));
         this._events.on('_barDragging', value => this._setProperty('_dragging', value));
+        this._events.on('_previewDims', value => this._setProperty('_previewDims', value));
     }
 
     draw(forceRepaint = false) {
@@ -125,6 +127,9 @@ export default class BarEngine extends DraggableSubEngine {
             element.alignment = this._alignment;
             element.schema = this._bars[index].schema;
             element.imageWidth = this._visibleWidth;
+            element.imageHeight = this._visibleHeight;
+            element.markSelected = this.getTouching();
+            element.previewDims = this._previewDims;
 
             if (this._styleSet === StyleSetTypes.young) {
                 element.isFirstSubline = index === this._bars.findIndex(bar => bar.type === BarTypes.subline);

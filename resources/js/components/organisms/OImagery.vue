@@ -165,6 +165,10 @@ let requestedAnimationFrame;
             },
 
             canvasStyleSize() {
+                return `height: ${this.previewDims.height}px; width: ${this.previewDims.width}px;`;
+            },
+
+            previewDims() {
                 const paddingX = 30;
                 const paddingY = 160;
                 const vh = this.viewHeight;
@@ -185,7 +189,10 @@ let requestedAnimationFrame;
                 const height = imgHeight / ratio;
                 const width = imgWidth / ratio;
 
-                return `height: ${height}px; width: ${width}px;`;
+                return {
+                    height,
+                    width,
+                }
             },
 
             hasImageBackground() {
@@ -440,6 +447,9 @@ let requestedAnimationFrame;
                 this.engine.dragging = this.dragging;
                 this.draw();
             },
+            previewDims(value) {
+                this.engine.previewDims = value;
+            }
         }
     }
 </script>

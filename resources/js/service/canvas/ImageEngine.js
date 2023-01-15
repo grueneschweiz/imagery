@@ -116,31 +116,6 @@ export default class ImageEngine {
      * @private
      */
     _hasBars;
-    constructor() {
-        this._events = new EngineEvents();
-
-        this._canvas = document.createElement('canvas');
-        this._context = this._canvas.getContext('2d');
-        this._context.imageSmoothingEnabled = true;
-
-        this._events.on('_canvasWidth', w => this._canvas.width = w);
-        this._events.on('_canvasHeight', h => this._canvas.height = h);
-
-        this._events.on('_borderWidth', w => this._borderWidth = w);
-        this._events.on('_barPos', p => this._barPos = p);
-        this._events.on('_dragging', d => this._setDragging(d));
-        this._events.on('dirty', () => this._dirty = true);
-
-        this._logoEngine = new LogoEngine(this._events, this._canvas, this._context);
-        this._backgroundEngine = new BackgroundEngine(this._events, this._canvas, this._context);
-        this._barEngine = new BarEngine(this._events, this._canvas, this._context);
-        this._shadowEngine = new ShadowEngine(this._events, this._canvas, this._context);
-        this._borderEngine = new BorderEngine(this._events, this._canvas, this._context);
-        this._copyrightEngine = new CopyrightEngine(this._events, this._canvas, this._context);
-
-        // set default values
-        this._setProperty('_bleed', 0);
-    }
     /**
      * @type {boolean}
      * @private
@@ -183,6 +158,31 @@ export default class ImageEngine {
      * @private
      */
     _dragging;
+    constructor() {
+        this._events = new EngineEvents();
+
+        this._canvas = document.createElement('canvas');
+        this._context = this._canvas.getContext('2d');
+        this._context.imageSmoothingEnabled = true;
+
+        this._events.on('_canvasWidth', w => this._canvas.width = w);
+        this._events.on('_canvasHeight', h => this._canvas.height = h);
+
+        this._events.on('_borderWidth', w => this._borderWidth = w);
+        this._events.on('_barPos', p => this._barPos = p);
+        this._events.on('_dragging', d => this._setDragging(d));
+        this._events.on('dirty', () => this._dirty = true);
+
+        this._logoEngine = new LogoEngine(this._events, this._canvas, this._context);
+        this._backgroundEngine = new BackgroundEngine(this._events, this._canvas, this._context);
+        this._barEngine = new BarEngine(this._events, this._canvas, this._context);
+        this._shadowEngine = new ShadowEngine(this._events, this._canvas, this._context);
+        this._borderEngine = new BorderEngine(this._events, this._canvas, this._context);
+        this._copyrightEngine = new CopyrightEngine(this._events, this._canvas, this._context);
+
+        // set default values
+        this._setProperty('_bleed', 0);
+    }
 
     /**
      * @type {LogoEngine}
@@ -251,6 +251,14 @@ export default class ImageEngine {
      * @private
      */
     _fontSizePercent;
+
+    /**
+     * Preview dimensions
+     *
+     * @type {{width: number, height: number}}
+     * @private
+     */
+    _previewDims;
 
     set logoImage(image) {
         this._setProperty('_logoImage', image);
@@ -331,6 +339,10 @@ export default class ImageEngine {
         this._setProperty('_dragging', dragging);
     }
 
+    set previewDims(dims) {
+        this._setProperty('_previewDims', dims);
+    }
+
     draw(forceRepaint = false) {
         if (!this._dirty && !forceRepaint) {
             return this._canvas;
@@ -343,7 +355,7 @@ export default class ImageEngine {
         }
 
         if (this._styleSet === StyleSetTypes.green) {
-           this._borderEngine.draw(forceRepaint);
+            this._borderEngine.draw(forceRepaint);
         }
 
         if (this._hasBars) {

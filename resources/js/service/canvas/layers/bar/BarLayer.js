@@ -1,9 +1,6 @@
 import DraggableLayer from "../DraggableLayer";
 import {Alignments} from "../../Constants";
 
-const shadowColorMouseOver = 'rgba(0,0,0,0.5)';
-const shadowMouseOverSize = 0.01;
-
 export default class BarLayer extends DraggableLayer {
     constructor(canvas, context) {
         super(canvas, context);
@@ -68,11 +65,7 @@ export default class BarLayer extends DraggableLayer {
             return;
         }
 
-        this._setTouchEffect()
-
         this._drawBlockConcrete()
-
-        this._context.filter = 'none'
     }
 
     _drawBlockConcrete() {
@@ -81,16 +74,6 @@ export default class BarLayer extends DraggableLayer {
 
     _hasBlock() {
         return this._block && 0 < this._block.width && 0 < this._block.height;
-    }
-
-    _setTouchEffect() {
-        if (this._touching) {
-            const shadowSize = Math.sqrt(this._canvas.width * this._canvas.height) * shadowMouseOverSize;
-
-            this._context.filter = `drop-shadow(0 0 ${shadowSize}px ${shadowColorMouseOver})`;
-        } else {
-            this._context.filter = 'none';
-        }
     }
 
     _getBlockXpos() {
@@ -144,5 +127,13 @@ export default class BarLayer extends DraggableLayer {
 
     _getYend() {
         throw new Error("Method '_getYend()' must be implemented.")
+    }
+
+    _getBlockWidth() {
+        return this._block?.width || 0;
+    }
+
+    _getBlockHeight() {
+        return this._block?.height || 0;
     }
 }

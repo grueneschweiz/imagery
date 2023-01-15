@@ -25,7 +25,7 @@ export default class BarLayerYoung extends BarLayer {
 
     _getBottomLimit() {
         const margin = borderMarginFactor * this._borderWidth
-        return this._canvas.height - margin - this._block.height
+        return this._canvas.height - margin - this._getBlockHeight()
     }
 
     _drawBlockConcrete() {
@@ -36,7 +36,7 @@ export default class BarLayerYoung extends BarLayer {
     }
 
     _getBlockXpos() {
-        return (this._canvas.width - this._block.width) / 2
+        return (this._canvas.width - this._getBlockWidth()) / 2
     }
 
     _getXstart() {
@@ -44,7 +44,7 @@ export default class BarLayerYoung extends BarLayer {
     }
 
     _getXend() {
-        return this._getBlockXpos() + this._block.width
+        return this._getBlockXpos() + this._getBlockWidth()
     }
 
     _getYstart() {
@@ -52,6 +52,6 @@ export default class BarLayerYoung extends BarLayer {
     }
 
     _getYend() {
-        return this._getYstart() + this._block.height;
+        return this._getYstart() + this._getBlockHeight();
     }
 }

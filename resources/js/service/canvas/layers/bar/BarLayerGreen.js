@@ -40,7 +40,7 @@ export default class BarLayerGreen extends BarLayer {
         const margin = this._alignment === Alignments.left
             ? borderMarginFactorRadius * this._borderWidth
             : borderMarginFactor * this._borderWidth
-        return this._canvas.height - margin - this._block.height
+        return this._canvas.height - margin - this._getBlockHeight()
     }
 
     _drawBlockConcrete() {
@@ -60,10 +60,10 @@ export default class BarLayerGreen extends BarLayer {
                 return -this._getBlockOversize()
             case Alignments.right:
                 return this._canvas.width
-                    - this._block.width
+                    - this._getBlockWidth()
                     + this._getBlockOversize()
             default:
-                return (this._canvas.width - this._block.width) / 2
+                return (this._canvas.width - this._getBlockWidth()) / 2
         }
     }
 
@@ -86,11 +86,11 @@ export default class BarLayerGreen extends BarLayer {
     }
 
     _getRotatedVisibleHeight() {
-        return this._block.height + this._getVisibleHorizontalRotationTriangleHeight();
+        return this._getBlockHeight() + this._getVisibleHorizontalRotationTriangleHeight();
     }
 
     _getRotatedFullWidth() {
-        return this._block.width + Math.sin(-RotationAngle) * this._block.height;
+        return this._getBlockWidth() + Math.sin(-RotationAngle) * this._getBlockHeight();
     }
 
     _getBlockOversize() {
@@ -100,7 +100,7 @@ export default class BarLayerGreen extends BarLayer {
             return this._canvas.width * BarSizeFactor - paddingX;
         }
 
-        const rotationCorr = Math.sin(RotationAngle) * this._block.height;
+        const rotationCorr = Math.sin(RotationAngle) * this._getBlockHeight();
         return this._canvas.width * BarSizeFactor + rotationCorr - paddingX;
     }
 
@@ -109,10 +109,10 @@ export default class BarLayerGreen extends BarLayer {
     }
 
     _getFullHorizontalRotationTriangleHeight() {
-        return Math.sin(-RotationAngle) * this._block.width;
+        return Math.sin(-RotationAngle) * this._getBlockWidth();
     }
 
     _getVisibleBlockWidth() {
-        return this._block.width - this._getBlockOversize();
+        return this._getBlockWidth() - this._getBlockOversize();
     }
 }
