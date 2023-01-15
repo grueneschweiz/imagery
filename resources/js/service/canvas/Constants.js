@@ -60,8 +60,9 @@ export const PrintingBleed = 3; // mm
 
 export const Inch2mm = 25.4; // 1inch = 25.4mm
 
-export const MarkColor = '#00f7ff';
-export const MarkWidth = 2;
+export const MarkColor = '#d9b500';
+export const MarkColorActive = '#ffd500';
+export const MarkWidth = 1.5;
 
 export const BorderWidthFactor = 0.0175;
 export const BorderRadiusFactor = 1;

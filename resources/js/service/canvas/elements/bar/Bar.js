@@ -1,4 +1,4 @@
-import {Alignments, BarSchemes as Schemes} from "./../../Constants"
+import {Alignments, BarSchemes as Schemes, MarkColor, MarkColorActive, MarkWidth} from "./../../Constants"
 import DrawBase from "../../misc/DrawBase";
 
 export default class Bar extends DrawBase {
@@ -20,6 +20,7 @@ export default class Bar extends DrawBase {
         }
 
         this._markSelected = false
+        this._markActive = false
         this._previewDims = {
             width: 0,
             height: 0,
@@ -58,6 +59,10 @@ export default class Bar extends DrawBase {
         this._setProperty('_markSelected', mark);
     }
 
+    set markActive(mark) {
+        this._setProperty('_markActive', mark);
+    }
+
     set previewDims(dims) {
         this._setProperty('_previewDims', dims)
     }
@@ -84,5 +89,21 @@ export default class Bar extends DrawBase {
 
     _drawSelectedMark() {
         throw new Error("Method '_drawSelectedMark()' must be implemented.")
+    }
+
+    _getMarkColor() {
+        if (this._markActive) {
+            return MarkColorActive;
+        }
+
+        return MarkColor;
+    }
+
+    _getMarkLineWidth() {
+        const previewLen = Math.max(this._previewDims.width, this._previewDims.height);
+        const imageLen = Math.max(this._imageWidth, this._imageHeight);
+
+        const lenRatio = imageLen / previewLen;
+        return MarkWidth * lenRatio;
     }
 }

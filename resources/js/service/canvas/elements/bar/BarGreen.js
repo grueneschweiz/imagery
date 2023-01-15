@@ -3,8 +3,6 @@ import {
     BarSchemes as Schemes,
     BarSizeFactor,
     BarTypes as Types,
-    MarkColor,
-    MarkWidth
 } from "./../../Constants";
 import Bar from "./Bar";
 
@@ -110,14 +108,10 @@ export default class BarGreen extends Bar {
     }
 
     _drawSelectedMark() {
-        const previewLen = Math.max(this._previewDims.width, this._previewDims.height);
-        const imageLen = Math.max(this._imageWidth, this._imageHeight);
-
-        const lenRatio = imageLen / previewLen;
-        const lineWidth = MarkWidth * lenRatio;
+        const lineWidth = this._getMarkLineWidth();
 
         this._context.lineWidth = lineWidth;
-        this._context.strokeStyle = MarkColor;
+        this._context.strokeStyle = this._getMarkColor();
         this._context.strokeRect(
             lineWidth / 2,
             lineWidth / 2,

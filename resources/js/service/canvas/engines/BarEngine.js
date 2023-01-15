@@ -129,6 +129,7 @@ export default class BarEngine extends DraggableSubEngine {
             element.imageWidth = this._visibleWidth;
             element.imageHeight = this._visibleHeight;
             element.markSelected = this.getTouching();
+            element.markActive = this._dragging;
             element.previewDims = this._previewDims;
 
             if (this._styleSet === StyleSetTypes.young) {
