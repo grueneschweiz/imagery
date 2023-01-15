@@ -57,7 +57,7 @@
         >
 
         <div
-            class="alert alert-warning"
+            class="alert alert-warning mt-1"
             role="alert"
             v-if="backgroundType === backgroundTypes.image && imageTooSmall">
             {{$t('images.create.imageTooSmall')}}

@@ -36,7 +36,7 @@
             >{{$t('images.create.sublineAdd')}}
             </button>
 
-            <div v-if="!textFitsImage" class="alert alert-warning" role="alert">
+            <div v-if="!textFitsImage" class="alert alert-warning mt-1" role="alert">
                 {{$t('images.create.tooMuchText')}}
             </div>
         </div>
