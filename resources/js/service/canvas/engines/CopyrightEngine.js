@@ -7,6 +7,7 @@ export default class CopyrightEngine extends SubEngine {
     _hasBorder;
     _borderWidth;
     _copyrightText;
+    _alignment;
 
 
     constructor(events, canvas, drawingContext) {
@@ -15,6 +16,7 @@ export default class CopyrightEngine extends SubEngine {
         this._events.on('_hasBorder', value => this._setProperty('_hasBorder', value));
         this._events.on('_borderWidth', value => this._setProperty('_borderWidth', value));
         this._events.on('_copyrightText', value => this._setProperty('_copyrightText', value));
+        this._events.on('_alignment', value => this._setProperty('_alignment', value));
 
         this._element = new Copyright();
         this._layer = new CopyrightLayer(canvas, drawingContext);
@@ -48,6 +50,9 @@ export default class CopyrightEngine extends SubEngine {
 
     _drawLayer(forceRepaint = false) {
         this._layer.block = this._element.draw();
+        this._layer.alignment = this._alignment;
+        this._layer.borderWidth = this._borderWidth;
+        this._layer.border = this._hasBorder;
 
         const repaint = this._layer.isDirty() || forceRepaint;
         this._layer.draw(repaint);
