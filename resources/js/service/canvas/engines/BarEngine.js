@@ -18,6 +18,8 @@ export default class BarEngine extends DraggableSubEngine {
     _bars;
     _fontSizePercent;
     _previewDims;
+    _dragging;
+    _focus;
 
     _currentStyleSet;
     _textPadding;
@@ -34,6 +36,7 @@ export default class BarEngine extends DraggableSubEngine {
         this._events.on('_bars', value => this._setProperty('_bars', value));
         this._events.on('_fontSizePercent', value => this._setProperty('_fontSizePercent', value));
         this._events.on('_barDragging', value => this._setProperty('_dragging', value));
+        this._events.on('_barFocus', value => this._setProperty('_focus', value));
         this._events.on('_previewDims', value => this._setProperty('_previewDims', value));
     }
 
@@ -128,7 +131,7 @@ export default class BarEngine extends DraggableSubEngine {
             element.schema = this._bars[index].schema;
             element.imageWidth = this._visibleWidth;
             element.imageHeight = this._visibleHeight;
-            element.markSelected = this.getTouching();
+            element.markSelected = this.getTouching() && this._focus;
             element.markActive = this._dragging;
             element.previewDims = this._previewDims;
 

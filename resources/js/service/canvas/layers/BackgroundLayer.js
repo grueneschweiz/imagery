@@ -1,4 +1,5 @@
 import DraggableLayer from "./DraggableLayer";
+import * as MarkHelper from "../misc/MarkHelper";
 
 export default class BackgroundLayer extends DraggableLayer {
     constructor(canvas, context) {
@@ -13,6 +14,13 @@ export default class BackgroundLayer extends DraggableLayer {
         this._hasBorder = false;
         this._borderWidth = 0;
         this._bleed = 0;
+
+        this._markSelected = false;
+        this._markActive = false;
+        this._previewDims = {
+            width: 0,
+            height: 0,
+        };
     }
 
     set block(block) {
@@ -30,6 +38,22 @@ export default class BackgroundLayer extends DraggableLayer {
 
     set borderWidth(value) {
         this._borderWidth = value;
+    }
+
+    set bleed(value) {
+        this._bleed = value;
+    }
+
+    set markSelected(value) {
+        this._markSelected = value;
+    }
+
+    set markActive(value) {
+        this._markActive = value;
+    }
+
+    set previewDims(dims) {
+        this._previewDims = dims;
     }
 
     get draggable() {
@@ -65,6 +89,10 @@ export default class BackgroundLayer extends DraggableLayer {
         this._moveIntoCanvas();
 
         this._context.drawImage(this._block, this._x, this._y);
+
+        if (this._markSelected && this.draggable) {
+            this._drawSelectedMark();
+        }
     }
 
     _setZoomPosition() {
@@ -128,14 +156,22 @@ export default class BackgroundLayer extends DraggableLayer {
             return false;
         }
 
+        const offset = this._edgeToInnerDistance();
+
         const mouseX = this._mousePos.x;
         const mouseY = this._mousePos.y;
 
-        const posXstart = this._x;
-        const posXend = this._x + this._block.width;
+        const posXstart = Math.max(offset, this._x);
+        const posXend = Math.min(
+            this._canvas.width - offset,
+            this._x + this._block.width
+        );
 
-        const posYstart = this._y;
-        const posYend = this._y + this._block.height;
+        const posYstart = Math.max(offset, this._y);
+        const posYend = Math.min(
+            this._canvas.height - offset,
+            this._y + this._block.height
+        );
 
         const xTouch = mouseX >= posXstart && mouseX <= posXend;
         const yTouch = mouseY >= posYstart && mouseY <= posYend;
@@ -181,5 +217,22 @@ export default class BackgroundLayer extends DraggableLayer {
         }
 
         return this._bleed;
+    }
+
+    _drawSelectedMark() {
+        const offset = this._edgeToInnerDistance();
+        const lineWidth = MarkHelper.getMarkLineWidth(
+            this._previewDims,
+            {width: this._canvas.width, height: this._canvas.height}
+        );
+
+        this._context.lineWidth = lineWidth;
+        this._context.strokeStyle = MarkHelper.getMarkColor(this._markActive);
+        this._context.strokeRect(
+            offset + lineWidth / 2,
+            offset + lineWidth / 2,
+            this._innerCanvasWidth() - lineWidth,
+            this._innerCanvasHeight() - lineWidth
+        );
     }
 }

@@ -1,5 +1,6 @@
 import Bar from "./Bar";
-import {BarTypes, MarkColor, MarkWidth} from "../../Constants";
+import {BarTypes} from "../../Constants";
+import * as MarkHelper from "../../misc/MarkHelper";
 
 /**
  * If we multiply the font size with factor we should get the height of
@@ -97,10 +98,13 @@ export default class BarYoung extends Bar {
     }
 
     _drawSelectedMark() {
-        const lineWidth = this._getMarkLineWidth();
+        const lineWidth = MarkHelper.getMarkLineWidth(
+            this._previewDims,
+            {width: this._imageWidth, height: this._imageHeight}
+        );
 
         this._context.lineWidth = lineWidth;
-        this._context.strokeStyle = this._getMarkColor();
+        this._context.strokeStyle = MarkHelper.getMarkColor(this._markActive);
         this._context.strokeRect(
             lineWidth / 2,
             this._getMargin() + lineWidth / 2,

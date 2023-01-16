@@ -158,31 +158,11 @@ export default class ImageEngine {
      * @private
      */
     _dragging;
-    constructor() {
-        this._events = new EngineEvents();
-
-        this._canvas = document.createElement('canvas');
-        this._context = this._canvas.getContext('2d');
-        this._context.imageSmoothingEnabled = true;
-
-        this._events.on('_canvasWidth', w => this._canvas.width = w);
-        this._events.on('_canvasHeight', h => this._canvas.height = h);
-
-        this._events.on('_borderWidth', w => this._borderWidth = w);
-        this._events.on('_barPos', p => this._barPos = p);
-        this._events.on('_dragging', d => this._setDragging(d));
-        this._events.on('dirty', () => this._dirty = true);
-
-        this._logoEngine = new LogoEngine(this._events, this._canvas, this._context);
-        this._backgroundEngine = new BackgroundEngine(this._events, this._canvas, this._context);
-        this._barEngine = new BarEngine(this._events, this._canvas, this._context);
-        this._shadowEngine = new ShadowEngine(this._events, this._canvas, this._context);
-        this._borderEngine = new BorderEngine(this._events, this._canvas, this._context);
-        this._copyrightEngine = new CopyrightEngine(this._events, this._canvas, this._context);
-
-        // set default values
-        this._setProperty('_bleed', 0);
-    }
+    /**
+     * @param {boolean}
+     * @private
+     */
+    _backgroundFocus;
 
     /**
      * @type {LogoEngine}
@@ -243,6 +223,38 @@ export default class ImageEngine {
      * @private
      */
     _barDragging;
+    /**
+     * @param {boolean}
+     * @private
+     */
+    _barFocus;
+
+    constructor() {
+        this._events = new EngineEvents();
+
+        this._canvas = document.createElement('canvas');
+        this._context = this._canvas.getContext('2d');
+        this._context.imageSmoothingEnabled = true;
+
+        this._events.on('_canvasWidth', w => this._canvas.width = w);
+        this._events.on('_canvasHeight', h => this._canvas.height = h);
+
+        this._events.on('_borderWidth', w => this._borderWidth = w);
+        this._events.on('_barPos', p => this._barPos = p);
+        this._events.on('_dragging', d => this._setDragging(d));
+        this._events.on('_mousePos', () => this._setFocus());
+        this._events.on('dirty', () => this._dirty = true);
+
+        this._logoEngine = new LogoEngine(this._events, this._canvas, this._context);
+        this._backgroundEngine = new BackgroundEngine(this._events, this._canvas, this._context);
+        this._barEngine = new BarEngine(this._events, this._canvas, this._context);
+        this._shadowEngine = new ShadowEngine(this._events, this._canvas, this._context);
+        this._borderEngine = new BorderEngine(this._events, this._canvas, this._context);
+        this._copyrightEngine = new CopyrightEngine(this._events, this._canvas, this._context);
+
+        // set default values
+        this._setProperty('_bleed', 0);
+    }
 
     /**
      * Relative font size. Must be between 1 and 100
@@ -434,6 +446,24 @@ export default class ImageEngine {
         if (this._backgroundEngine.getTouching() && !this._barDragging) {
             this._setProperty('_backgroundDragging', true);
             this._setProperty('_barDragging', false);
+            return;
+        }
+    }
+
+    _setFocus() {
+        if (this._barDragging
+            || (this._barEngine.getTouching() && !this._backgroundDragging)
+        ) {
+            this._setProperty('_barFocus', true);
+            this._setProperty('_backgroundFocus', false);
+            return;
+        }
+
+        if (this._backgroundDragging
+            || (this._backgroundEngine.getTouching() && !this._barDragging)
+        ) {
+            this._setProperty('_backgroundFocus', true);
+            this._setProperty('_barFocus', false);
             return;
         }
     }

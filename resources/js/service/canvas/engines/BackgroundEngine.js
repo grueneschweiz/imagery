@@ -14,6 +14,9 @@ export default class BackgroundEngine extends DraggableSubEngine {
     _hasBorder;
     _borderWidth;
     _bleed;
+    _previewDims;
+    _dragging
+    _focus;
 
     _currentElementType;
 
@@ -25,9 +28,11 @@ export default class BackgroundEngine extends DraggableSubEngine {
         this._events.on('_backgroundZoom', value => this._setProperty('_backgroundZoom', value));
         this._events.on('_backgroundWatermarkText', value => this._setProperty('_backgroundWatermarkText', value));
         this._events.on('_backgroundDragging', value => this._setProperty('_dragging', value));
+        this._events.on('_backgroundFocus', value => this._setProperty('_focus', value));
         this._events.on('_hasBorder', value => this._setProperty('_hasBorder', value));
         this._events.on('_borderWidth', value => this._setProperty('_borderWidth', value));
         this._events.on('_bleed', value => this._setProperty('_bleed', value));
+        this._events.on('_previewDims', value => this._setProperty('_previewDims', value));
 
         this._layer = new BackgroundLayer(canvas, drawingContext);
     }
@@ -127,6 +132,9 @@ export default class BackgroundEngine extends DraggableSubEngine {
         this._layer.hasBorder = this._hasBorder;
         this._layer.borderWidth = this._borderWidth;
         this._layer.bleed = this._bleed;
+        this._layer.markSelected = this.getTouching() && this._focus;
+        this._layer.markActive = this._dragging;
+        this._layer.previewDims = this._previewDims;
         this._layer.block = this._element.draw();
 
         const repaint = this._layer.isDirty() || forceRepaint;

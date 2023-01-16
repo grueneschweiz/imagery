@@ -5,6 +5,7 @@ import {
     BarTypes as Types,
 } from "./../../Constants";
 import Bar from "./Bar";
+import * as MarkHelper from "../../misc/MarkHelper";
 
 
 /**
@@ -108,10 +109,13 @@ export default class BarGreen extends Bar {
     }
 
     _drawSelectedMark() {
-        const lineWidth = this._getMarkLineWidth();
+        const lineWidth = MarkHelper.getMarkLineWidth(
+            this._previewDims,
+            {width: this._imageWidth, height: this._imageHeight}
+        );
 
         this._context.lineWidth = lineWidth;
-        this._context.strokeStyle = this._getMarkColor();
+        this._context.strokeStyle = MarkHelper.getMarkColor(this._markActive);
         this._context.strokeRect(
             lineWidth / 2,
             lineWidth / 2,
