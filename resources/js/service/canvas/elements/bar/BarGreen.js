@@ -109,6 +109,14 @@ export default class BarGreen extends Bar {
     }
 
     _drawSelectedMark() {
+        this._context.fillStyle = MarkHelper.getMarkBackgroundColor(this._markActive);
+        this._context.fillRect(
+            0,
+            0,
+            this._canvas.width,
+            this._getBarHeight()
+        );
+
         const lineWidth = MarkHelper.getMarkLineWidth(
             this._previewDims,
             {width: this._imageWidth, height: this._imageHeight}

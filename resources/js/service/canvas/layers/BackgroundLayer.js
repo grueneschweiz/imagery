@@ -216,6 +216,15 @@ export default class BackgroundLayer extends DraggableLayer {
 
     _drawSelectedMark() {
         const offset = this._edgeToInnerDistance();
+
+        this._context.fillStyle = MarkHelper.getMarkBackgroundColor(this._markActive);
+        this._context.fillRect(
+            offset,
+            offset,
+            this._innerCanvasWidth(),
+            this._innerCanvasHeight()
+        );
+
         const lineWidth = MarkHelper.getMarkLineWidth(
             this._previewDims,
             {width: this._canvas.width, height: this._canvas.height}

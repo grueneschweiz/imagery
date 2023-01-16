@@ -62,6 +62,8 @@ export const Inch2mm = 25.4; // 1inch = 25.4mm
 
 export const MarkColor = '#ff8000';
 export const MarkColorActive = '#ff0000';
+export const MarkBackgroundColor = 'rgba(200, 200, 200, 0.2)';
+export const MarkBackgroundColorActive = 'rgba(200, 200, 200, 0.4)';
 export const MarkWidth = 2;
 
 export const BorderWidthFactor = 0.0175;

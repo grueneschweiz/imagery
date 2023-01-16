@@ -1,4 +1,12 @@
-import {MarkColor, MarkColorActive, MarkWidth} from "../Constants";
+import {MarkBackgroundColor, MarkBackgroundColorActive, MarkColor, MarkColorActive, MarkWidth} from "../Constants";
+
+export function getMarkBackgroundColor(active) {
+    if (active) {
+        return MarkBackgroundColorActive;
+    }
+
+    return MarkBackgroundColor;
+}
 
 export function getMarkColor(active) {
     if (active) {
