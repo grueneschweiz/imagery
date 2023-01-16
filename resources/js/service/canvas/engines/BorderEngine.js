@@ -53,6 +53,8 @@ export default class BorderEngine extends SubEngine {
     }
 
     _drawLayer(forceRepaint = false) {
+        this._layer.hasBorder = this._hasBorder;
+        this._layer.bleed = this._bleed;
         this._layer.block = this._element.draw();
 
         const repaint = this._layer.isDirty() || forceRepaint;

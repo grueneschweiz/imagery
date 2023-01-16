@@ -13,7 +13,6 @@ export default class BackgroundLayer extends DraggableLayer {
 
         this._hasBorder = false;
         this._borderWidth = 0;
-        this._bleed = 0;
 
         this._markSelected = false;
         this._markActive = false;
@@ -38,10 +37,6 @@ export default class BackgroundLayer extends DraggableLayer {
 
     set borderWidth(value) {
         this._borderWidth = value;
-    }
-
-    set bleed(value) {
-        this._bleed = value;
     }
 
     set markSelected(value) {
@@ -216,7 +211,7 @@ export default class BackgroundLayer extends DraggableLayer {
             return this._borderWidth + this._bleed;
         }
 
-        return this._bleed;
+        return 0;
     }
 
     _drawSelectedMark() {

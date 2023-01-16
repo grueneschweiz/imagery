@@ -76,6 +76,7 @@ export default class LogoEngine extends SubEngine {
         this._layer.block = this._block.draw();
         this._layer.barPos = this._barPos;
         this._layer.alignment = this._alignment;
+        this._layer.bleed = this._bleed;
 
         const repaint = this._layer.isDirty() || forceRepaint;
         this._layer.draw(repaint);

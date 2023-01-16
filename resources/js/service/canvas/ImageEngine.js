@@ -251,9 +251,6 @@ export default class ImageEngine {
         this._shadowEngine = new ShadowEngine(this._events, this._canvas, this._context);
         this._borderEngine = new BorderEngine(this._events, this._canvas, this._context);
         this._copyrightEngine = new CopyrightEngine(this._events, this._canvas, this._context);
-
-        // set default values
-        this._setProperty('_bleed', 0);
     }
 
     /**
@@ -286,6 +283,10 @@ export default class ImageEngine {
 
     set format(format) {
         this._setProperty('_format', format);
+    }
+
+    set bleed(bleed) {
+        this._setProperty('_bleed', bleed);
     }
 
     set visibleWidth(width) {

@@ -35,8 +35,8 @@ export default class LogoLayer extends Layer {
         this._setMargin();
 
         if (!this._barPos) {
-            this._x = this._margin;
-            this._y = this._margin;
+            this._x = this._margin + this._bleed;
+            this._y = this._margin + this._bleed;
             return;
         }
 
@@ -65,16 +65,24 @@ export default class LogoLayer extends Layer {
 
     _determineX0() {
         if (this._alignment === Alignments.left) {
-            return this._canvas.width - this._block.width - this._margin;
-        } else {
-            return this._margin;
+            return this._canvas.width
+                - this._bleed
+                - this._block.width
+                - this._margin;
         }
+        return this._margin
+            + this._bleed;
     }
 
     _determineY0(top) {
-        return top
-            ? this._margin
-            : this._canvas.height - this._block.height - this._margin;
+        if (top) {
+            return this._margin + this._bleed;
+        }
+
+        return this._canvas.height
+            - this._bleed
+            - this._block.height
+            - this._margin;
     }
 
 

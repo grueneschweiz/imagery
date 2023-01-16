@@ -25,7 +25,10 @@ export default class BarLayerYoung extends BarLayer {
 
     _getBottomLimit() {
         const margin = borderMarginFactor * this._borderWidth
-        return this._canvas.height - margin - this._getBlockHeight()
+        return this._canvas.height
+            - this._bleed
+            - margin
+            - this._getBlockHeight()
     }
 
     _drawBlockConcrete() {

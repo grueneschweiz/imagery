@@ -9,6 +9,7 @@ export default class SubEngine {
     _visibleHeight;
     _canvasWidth;
     _canvasHeight;
+    _bleed;
 
     _element;
     _block;
@@ -23,6 +24,7 @@ export default class SubEngine {
         this._events.on('_visibleHeight', value => this._setProperty('_visibleHeight', value));
         this._events.on('_canvasWidth', value => this._setProperty('_canvasWidth', value));
         this._events.on('_canvasHeight', value => this._setProperty('_canvasHeight', value));
+        this._events.on('_bleed', value => this._setProperty('_bleed', value));
     }
 
     draw(forceRepaint = false) {

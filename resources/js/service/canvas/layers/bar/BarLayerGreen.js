@@ -33,14 +33,19 @@ export default class BarLayerGreen extends BarLayer {
         const margin = this._alignment === Alignments.right
             ? borderMarginFactorRadius * this._borderWidth
             : borderMarginFactor * this._borderWidth
-        return margin + this._getFullHorizontalRotationTriangleHeight()
+        return margin
+            + this._bleed
+            + this._getFullHorizontalRotationTriangleHeight()
     }
 
     _getBottomLimit() {
         const margin = this._alignment === Alignments.left
             ? borderMarginFactorRadius * this._borderWidth
             : borderMarginFactor * this._borderWidth
-        return this._canvas.height - margin - this._getBlockHeight()
+        return this._canvas.height
+            - margin
+            - this._bleed
+            - this._getBlockHeight()
     }
 
     _drawBlockConcrete() {
@@ -57,9 +62,11 @@ export default class BarLayerGreen extends BarLayer {
     _getBlockXpos() {
         switch (this._alignment) {
             case Alignments.left:
-                return -this._getBlockOversize()
+                return this._bleed
+                    - this._getBlockOversize()
             case Alignments.right:
                 return this._canvas.width
+                    - this._bleed
                     - this._getBlockWidth()
                     + this._getBlockOversize()
             default:
@@ -97,11 +104,11 @@ export default class BarLayerGreen extends BarLayer {
         const paddingX = this._textPadding * textPaddingFactor;
 
         if (this._alignment === Alignments.left) {
-            return this._canvas.width * BarSizeFactor - paddingX;
+            return this._getVisibleCanvasWidth() * BarSizeFactor - paddingX;
         }
 
         const rotationCorr = Math.sin(RotationAngle) * this._getBlockHeight();
-        return this._canvas.width * BarSizeFactor + rotationCorr - paddingX;
+        return this._getVisibleCanvasWidth() * BarSizeFactor + rotationCorr - paddingX;
     }
 
     _getVisibleHorizontalRotationTriangleHeight() {
@@ -114,5 +121,9 @@ export default class BarLayerGreen extends BarLayer {
 
     _getVisibleBlockWidth() {
         return this._getBlockWidth() - this._getBlockOversize();
+    }
+
+    _getVisibleCanvasWidth() {
+        return this._canvas.width - 2 * this._bleed;
     }
 }

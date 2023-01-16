@@ -138,8 +138,8 @@ let requestedAnimationFrame;
                 logoType: 'canvas/getLogoType',
                 styleSet: 'canvas/getStyleSet',
                 format: 'canvas/getFormat',
-                height: 'canvas/getImageHeight',
-                width: 'canvas/getImageWidth',
+                visibleHeight: 'canvas/getImageHeight',
+                visibleWidth: 'canvas/getImageWidth',
                 backgroundType: 'canvas/getBackgroundType',
                 backgroundImage: 'canvas/getBackgroundImage',
                 backgroundZoom: 'canvas/getBackgroundZoom',
@@ -152,7 +152,16 @@ let requestedAnimationFrame;
                 copyrightText: 'canvas/getCopyrightText',
                 alignment: 'canvas/getAlignment',
                 fontsLoaded: 'canvas/getFontsLoaded',
+                bleed: 'canvas/getBleed',
             }),
+
+            canvasWidth() {
+                return this.visibleWidth + this.bleed * 2;
+            },
+
+            canvasHeight() {
+                return this.visibleHeight + this.bleed * 2;
+            },
 
             canvasClasses() {
                 return {
@@ -177,8 +186,8 @@ let requestedAnimationFrame;
                 const maxHeight = vw < 768 ? 250 : vh - paddingY;
                 const maxWidth = vw < 768 ? vw - paddingX : vw - this.canvasZoneLeft - paddingX;
 
-                const imgHeight = this.height / 2;
-                const imgWidth = this.width / 2;
+                const imgHeight = this.canvasHeight / 2;
+                const imgWidth = this.canvasWidth / 2;
 
                 const hRatio = imgHeight / maxHeight;
                 const wRatio = imgWidth / maxWidth;
@@ -211,8 +220,8 @@ let requestedAnimationFrame;
             this.setCanvasZoneLeft();
 
             this.$nextTick(() => {
-                this.canvas.width = this.width;
-                this.canvas.height = this.height;
+                this.canvas.width = this.canvasWidth;
+                this.canvas.height = this.canvasHeight;
                 this.context = this.canvas.getContext('2d');
 
                 this.setInitialEngineProps();
@@ -234,8 +243,9 @@ let requestedAnimationFrame;
                 engine.logoType = this.logoType;
                 engine.styleSet = this.styleSet;
                 engine.format = this.format;
-                engine.visibleWidth = this.width;
-                engine.visibleHeight = this.height;
+                engine.bleed = this.bleed;
+                engine.visibleWidth = this.visibleWidth;
+                engine.visibleHeight = this.visibleHeight;
                 engine.backgroundType = this.backgroundType;
                 engine.backgroundImage = this.backgroundImage;
                 engine.backgroundZoom = this.backgroundZoom;
@@ -273,7 +283,8 @@ let requestedAnimationFrame;
                 }
 
                 const drawFn = () => {
-                    this.context.clearRect(0, 0, this.width, this.height);
+                    this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+
                     this.context.drawImage(this.engine.draw(forceRepaint), 0, 0);
 
                     this.$store.dispatch('canvas/setTextFitsImage', this.engine.getTextFitsImage());
@@ -350,8 +361,8 @@ let requestedAnimationFrame;
             },
             relImagePos(absX, absY) {
                 return {
-                    x: (absX - this.canvasPos.x) * this.width / this.canvasPos.width,
-                    y: (absY - this.canvasPos.y) * this.height / this.canvasPos.height,
+                    x: (absX - this.canvasPos.x) * this.canvasWidth / this.canvasPos.width,
+                    y: (absY - this.canvasPos.y) * this.canvasHeight / this.canvasPos.height,
                 };
             },
 
@@ -380,16 +391,26 @@ let requestedAnimationFrame;
                 this.engine.format = value;
                 this.draw();
             },
-            height(value) {
-                this.canvas.height = value;
+            visibleHeight(value) {
                 this.engine.visibleHeight = value;
                 this.updateLogoWidth();
                 this.draw();
             },
-            width(value) {
-                this.canvas.width = value;
+            visibleWidth(value) {
                 this.engine.visibleWidth = value;
                 this.updateLogoWidth();
+                this.draw();
+            },
+            canvasHeight(value) {
+                this.canvas.height = value;
+                this.engine.bleed = this.bleed;
+                this.engine.visibleHeight = this.visibleHeight;
+                this.draw();
+            },
+            canvasWidth(value) {
+                this.canvas.width = value;
+                this.engine.bleed = this.bleed;
+                this.engine.visibleWidth = this.visibleWidth;
                 this.draw();
             },
             backgroundType(value) {
@@ -449,7 +470,11 @@ let requestedAnimationFrame;
             },
             previewDims(value) {
                 this.engine.previewDims = value;
-            }
+            },
+            bleed(value) {
+                this.engine.bleed = value;
+                this.draw();
+            },
         }
     }
 </script>

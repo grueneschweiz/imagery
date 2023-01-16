@@ -79,6 +79,7 @@ export default class BarEngine extends DraggableSubEngine {
         this._layer.textPadding = this._textPadding;
         this._layer.mousePos = this._mousePos;
         this._layer.dragging = this._dragging;
+        this._layer.bleed = this._bleed;
 
         const repaint = this._layer.isDirty() || forceRepaint;
         this._layer.draw(repaint);

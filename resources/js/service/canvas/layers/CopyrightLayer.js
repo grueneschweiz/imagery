@@ -59,12 +59,12 @@ export default class CopyrightLayer extends Layer {
             borderY = this._borderWidth;
         }
 
-        this._x = this._borderWidth + borderX;
+        this._x = this._borderWidth + borderX + this._bleed;
 
         if (this._alignment === Alignments.right) {
-            this._y = borderY;
+            this._y = borderY + this._bleed;
         } else {
-            this._y = -this._block.height - borderY;
+            this._y = -this._block.height - borderY - this._bleed;
         }
     }
 }

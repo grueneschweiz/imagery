@@ -53,6 +53,7 @@ export default class CopyrightEngine extends SubEngine {
         this._layer.alignment = this._alignment;
         this._layer.borderWidth = this._borderWidth;
         this._layer.border = this._hasBorder;
+        this._layer.bleed = this._bleed;
 
         const repaint = this._layer.isDirty() || forceRepaint;
         this._layer.draw(repaint);

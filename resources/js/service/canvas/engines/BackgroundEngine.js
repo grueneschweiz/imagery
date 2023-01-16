@@ -13,7 +13,6 @@ export default class BackgroundEngine extends DraggableSubEngine {
     _backgroundWatermarkText;
     _hasBorder;
     _borderWidth;
-    _bleed;
     _previewDims;
     _dragging
     _focus;
@@ -31,7 +30,6 @@ export default class BackgroundEngine extends DraggableSubEngine {
         this._events.on('_backgroundFocus', value => this._setProperty('_focus', value));
         this._events.on('_hasBorder', value => this._setProperty('_hasBorder', value));
         this._events.on('_borderWidth', value => this._setProperty('_borderWidth', value));
-        this._events.on('_bleed', value => this._setProperty('_bleed', value));
         this._events.on('_previewDims', value => this._setProperty('_previewDims', value));
 
         this._layer = new BackgroundLayer(canvas, drawingContext);
