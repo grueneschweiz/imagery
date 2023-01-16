@@ -501,10 +501,10 @@ let requestedAnimationFrame;
             &.bar-touching,
             &.image-touching {
                 cursor: grab;
-            }
 
-            &.dragging {
+                &.dragging {
                 cursor: grabbing !important;
+            }
             }
         }
     }
