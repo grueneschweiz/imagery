@@ -348,6 +348,8 @@ export default class ImageEngine {
             return this._canvas;
         }
 
+        this._setProperty('_borderWidth', this._borderEngine.getBorderWidth());
+
         this._backgroundEngine.draw(forceRepaint);
 
         if (this._styleSet === StyleSetTypes.young) {

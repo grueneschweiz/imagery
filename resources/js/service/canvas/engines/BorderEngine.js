@@ -25,10 +25,13 @@ export default class BorderEngine extends SubEngine {
         this._events.trigger('borderEngineDrawn', changed);
     }
 
+    getBorderWidth() {
+        this._setElementProps();
+        return this._element.borderWidth;
+    }
+
     _drawElement(forceRepaint = false) {
-        this._element.width = this._visibleWidth;
-        this._element.height = this._visibleHeight;
-        this._element.border = this._hasBorder;
+        this._setElementProps();
 
         const repaint = this._element.isDirty() || forceRepaint;
         this._element.draw(repaint);
@@ -41,6 +44,12 @@ export default class BorderEngine extends SubEngine {
         }
 
         return repaint;
+    }
+
+    _setElementProps() {
+        this._element.width = this._visibleWidth;
+        this._element.height = this._visibleHeight;
+        this._element.border = this._hasBorder;
     }
 
     _drawLayer(forceRepaint = false) {

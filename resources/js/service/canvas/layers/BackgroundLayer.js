@@ -9,6 +9,10 @@ export default class BackgroundLayer extends DraggableLayer {
 
         this._lastWidth = 0;
         this._lastHeight = 0;
+
+        this._hasBorder = false;
+        this._borderWidth = 0;
+        this._bleed = 0;
     }
 
     set block(block) {
@@ -20,13 +24,21 @@ export default class BackgroundLayer extends DraggableLayer {
         super.block = block;
     }
 
+    set hasBorder(value) {
+        this._hasBorder = value;
+    }
+
+    set borderWidth(value) {
+        this._borderWidth = value;
+    }
+
     get draggable() {
         if (!this._block) {
             return false;
         }
 
-        const oversizeX = this._block.width > this._canvas.width;
-        const oversizeY = this._block.height > this._canvas.height;
+        const oversizeX = this._block.width > this._innerCanvasWidth();
+        const oversizeY = this._block.height > this._innerCanvasHeight();
 
         return oversizeX || oversizeY;
     }
@@ -83,25 +95,27 @@ export default class BackgroundLayer extends DraggableLayer {
     _moveIntoCanvas() {
         this._x = this._getPositionBoundary(
             this._x,
-            this._canvas.width,
+            this._innerCanvasWidth(),
             this._block.width
         );
 
         this._y = this._getPositionBoundary(
             this._y,
-            this._canvas.height,
+            this._innerCanvasHeight(),
             this._block.height
         );
     }
 
-    _getPositionBoundary(axis, canvasSize, blockSize) {
-        if (blockSize < canvasSize) {
+    _getPositionBoundary(axis, innerCanvasSize, blockSize) {
+        const offset = this._edgeToInnerDistance();
+
+        if (blockSize < innerCanvasSize) {
             // center if the block is smaller than the canvas
-            return (canvasSize - blockSize) / 2;
+            return ((innerCanvasSize - blockSize) / 2) + offset;
         }
 
-        const lower = 0;
-        const upper = canvasSize - blockSize;
+        const lower = offset;
+        const upper = innerCanvasSize - blockSize + offset;
 
         if (axis > lower) return lower;
         if (axis < upper) return upper;
@@ -127,5 +141,45 @@ export default class BackgroundLayer extends DraggableLayer {
         const yTouch = mouseY >= posYstart && mouseY <= posYend;
 
         return xTouch && yTouch;
+    }
+
+    /**
+     * The width, that is effectively visible
+     *
+     * If the image has a border, it is the width inside the border. Else it is
+     * the canvas width (which may contain some printing bleed).
+     *
+     * @private
+     */
+    _innerCanvasWidth() {
+        if (this._hasBorder) {
+            return this._canvas.width - 2 * this._borderWidth - 2 * this._bleed;
+        }
+
+        return this._canvas.width;
+    }
+
+    /**
+     * The height, that is effectively visible
+     *
+     * If the image has a border, it is the height inside the border. Else it is
+     * the canvas height (which may contain some printing bleed).
+     *
+     * @private
+     */
+    _innerCanvasHeight() {
+        if (this._hasBorder) {
+            return this._canvas.height - 2 * this._borderWidth - 2 * this._bleed;
+        }
+
+        return this._canvas.height;
+    }
+
+    _edgeToInnerDistance() {
+        if (this._hasBorder) {
+            return this._borderWidth + this._bleed;
+        }
+
+        return this._bleed;
     }
 }

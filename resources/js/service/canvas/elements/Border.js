@@ -8,7 +8,6 @@ class Border extends DrawBase {
         super();
 
         this._border = true;
-        this._borderWidth = 0;
     }
 
     set border(enabled) {
@@ -24,13 +23,12 @@ class Border extends DrawBase {
     }
 
     get borderWidth() {
-        return this._borderWidth;
+        const area = this._canvas.width * this._canvas.height;
+        return Math.sqrt(area) * BorderWidthFactor;
     }
 
     _draw() {
         this._context.clearRect(0, 0, this._canvas.width, this._canvas.height);
-
-        this._setBorderWidth();
 
         if (this._border) {
             this._drawBorder();
@@ -47,7 +45,7 @@ class Border extends DrawBase {
 
     _setClippingArea() {
         const ctx = this._context;
-        const bWidth = this._borderWidth;
+        const bWidth = this.borderWidth;
         const radius = bWidth * BorderRadiusFactor;
         const width = this._canvas.width - 2 * bWidth;
         const height = this._canvas.height - 2 * bWidth;
@@ -63,11 +61,6 @@ class Border extends DrawBase {
         ctx.lineTo(bWidth + radius, bWidth);
         ctx.arcTo(bWidth, bWidth, bWidth, bWidth + radius, radius);
         ctx.fill();
-    }
-
-    _setBorderWidth() {
-        const area = this._canvas.width * this._canvas.height;
-        this._borderWidth = Math.sqrt(area) * BorderWidthFactor;
     }
 }
 

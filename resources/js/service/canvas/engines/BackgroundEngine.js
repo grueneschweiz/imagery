@@ -11,6 +11,9 @@ export default class BackgroundEngine extends DraggableSubEngine {
     _backgroundImage;
     _backgroundZoom;
     _backgroundWatermarkText;
+    _hasBorder;
+    _borderWidth;
+    _bleed;
 
     _currentElementType;
 
@@ -22,6 +25,9 @@ export default class BackgroundEngine extends DraggableSubEngine {
         this._events.on('_backgroundZoom', value => this._setProperty('_backgroundZoom', value));
         this._events.on('_backgroundWatermarkText', value => this._setProperty('_backgroundWatermarkText', value));
         this._events.on('_backgroundDragging', value => this._setProperty('_dragging', value));
+        this._events.on('_hasBorder', value => this._setProperty('_hasBorder', value));
+        this._events.on('_borderWidth', value => this._setProperty('_borderWidth', value));
+        this._events.on('_bleed', value => this._setProperty('_bleed', value));
 
         this._layer = new BackgroundLayer(canvas, drawingContext);
     }
@@ -85,8 +91,18 @@ export default class BackgroundEngine extends DraggableSubEngine {
     _drawElement(forceRepaint = false) {
         this._setElement();
 
-        this._element.width = this._canvasWidth;
-        this._element.height = this._canvasHeight;
+        let width, height;
+
+        if (this._hasBorder) {
+            width = this._visibleWidth - this._borderWidth * 2;
+            height = this._visibleHeight - this._borderWidth * 2;
+        } else {
+            width = this._canvasWidth;
+            height = this._canvasHeight;
+        }
+
+        this._element.width = width;
+        this._element.height = height;
 
         if (this._backgroundType === BackgroundTypes.placeholder) {
             this._element.watermarkText = this._backgroundWatermarkText;
@@ -108,6 +124,9 @@ export default class BackgroundEngine extends DraggableSubEngine {
     _drawLayer(forceRepaint = false) {
         this._layer.mousePos = this._mousePos;
         this._layer.dragging = this._dragging;
+        this._layer.hasBorder = this._hasBorder;
+        this._layer.borderWidth = this._borderWidth;
+        this._layer.bleed = this._bleed;
         this._layer.block = this._element.draw();
 
         const repaint = this._layer.isDirty() || forceRepaint;
