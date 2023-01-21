@@ -26,7 +26,7 @@
 
 <script>
     import {StyleSetTypes, LogoTypes} from "../../service/canvas/Constants";
-    import {ImageSizes} from "../../service/canvas/ImageSizes";
+    import {ImageSizeIds, ImageSizes} from "../../service/canvas/ImageSizes";
     import {mapGetters} from "vuex";
 
     export default {
@@ -114,7 +114,7 @@
 
                 if (StyleSetTypes.young === style) {
                     this.styleSet = StyleSetTypes.young;
-                } else if (ImageSizes.fbCoverGreen === this.selectedImageSize) {
+                } else if (ImageSizeIds.fbCoverGreen === this.selectedImageSize.id) {
                     this.styleSet = StyleSetTypes.greenCentered;
                 } else {
                     this.styleSet = StyleSetTypes.green;
