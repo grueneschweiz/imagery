@@ -33,6 +33,13 @@
             </label>
         </div>
 
+        <div
+            v-if="backgroundType === backgroundTypes.image && hugeImage"
+            class="alert alert-warning mt-1"
+            role="alert">
+            {{$t('images.create.hugeImage', {maxWidth: hugeImageSideLenLimit, maxHeight: hugeImageSideLenLimit})}}
+        </div>
+
         <div v-if="backgroundType === backgroundTypes.image && backgroundImage && !imageTooSmall" class="form-group">
             <label
                 class="mb-0 mt-2"
@@ -78,6 +85,8 @@
         'image/svg+xml'
     ];
 
+    const hugeImageSurfaceLimit = 5000**2; // 5000px * 5000px
+
     export default {
         name: "MBackgroundBlock",
         components: {},
@@ -87,6 +96,7 @@
             return {
                 mimeType: null,
                 backgroundTypes: BackgroundTypes,
+                hugeImageSideLenLimit: Math.sqrt(hugeImageSurfaceLimit),
             }
         },
 
@@ -139,6 +149,18 @@
                 }
 
                 if (this.backgroundImage.height < this.imageHeight) {
+                    return true;
+                }
+
+                return false;
+            },
+
+            hugeImage() {
+                if (!this.backgroundImage) {
+                    return false;
+                }
+
+                if (this.backgroundImage.width * this.backgroundImage.height > hugeImageSurfaceLimit) {
                     return true;
                 }
 

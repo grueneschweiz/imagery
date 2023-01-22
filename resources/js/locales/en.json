@@ -193,6 +193,7 @@
             "selectImage": "Click to select image to upload",
             "browse": "Browse",
             "imageTooSmall": "The selected image is too small to fill the canvas. Use a bigger one.",
+            "hugeImage": "The selected background image is very large. It may significantly slow down performance or even break image generation. Use a background image with less than {maxWidth}px * {maxHeight}px, if you run into problems.",
             "uploadedImageNotProcessable": "The uploaded image could not be read.",
             "mimeInvalid": "Only JPEG, PNG and SVG images are supported. Convert the image in one of those formats.",
             "border": "Border",
