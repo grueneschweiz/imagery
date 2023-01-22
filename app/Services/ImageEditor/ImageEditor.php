@@ -87,8 +87,8 @@ abstract class ImageEditor
         }
 
         $bleed  = $this->image->bleed;
-        $width  = $this->image->width - 2 * $bleed;
-        $height = $this->image->height - 2 * $bleed;
+        $width  = $im->getImageWidth() - 2 * $bleed;
+        $height = $im->getImageHeight() - 2 * $bleed;
         $im->cropImage($width, $height, $bleed, $bleed);
 
         return $im;
