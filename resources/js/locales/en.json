@@ -203,6 +203,7 @@
             "uploadFailed": "Failed to store image. Please try again.",
             "maxFileSizeExceededFinal": "The generated image could not be processed. It is too large. Try again with a lighter background image or reduced image dimensions.",
             "maxFileSizeExceededRaw": "The background image could not be processed. It is too large. Try again with a smaller background image.",
+            "processingFailed": "Failed to process image. Please try again.",
             "generating": "Generating image",
             "imageDownload": "Download image",
             "waitPlease": "I'm busy generating your image, please hang on a few ticks. I'll be right there. The last 10% are particularly hard, so please be patient.",
