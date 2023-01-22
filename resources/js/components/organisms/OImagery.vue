@@ -13,7 +13,7 @@
             <div class="o-imagery__canvas-zone" ref="canvasZone">
                 <canvas
                     :class="canvasClasses"
-                    :style="canvasStyleSize"
+                    :style="canvasStyles"
                     @mousedown.stop="mouseDragStart($event)"
                     @mousemove.stop="mouseMove($event)"
                     @mouseout.stop="mouseLeave($event)"
@@ -127,6 +127,7 @@ let requestedAnimationFrame;
                 dragging: false,
 
                 engine: new ImageEngine(),
+                finalImage: null,
 
                 dragObj: null,
             }
@@ -173,7 +174,7 @@ let requestedAnimationFrame;
                 }
             },
 
-            canvasStyleSize() {
+            canvasStyles() {
                 return `height: ${this.previewDims.height}px; width: ${this.previewDims.width}px;`;
             },
 
@@ -283,9 +284,22 @@ let requestedAnimationFrame;
                 }
 
                 const drawFn = () => {
-                    this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+                    this.finalImage = this.engine.draw(forceRepaint);
 
-                    this.context.drawImage(this.engine.draw(forceRepaint), 0, 0);
+                    this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+                    this.context.drawImage(this.finalImage, 0, 0);
+
+                    // grey out bleed area
+                    if (this.bleed) {
+                        this.context.lineWidth = this.bleed;
+                        this.context.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+                        this.context.strokeRect(
+                            this.bleed / 2,
+                            this.bleed / 2,
+                            this.visibleWidth + this.bleed,
+                            this.visibleHeight + this.bleed
+                        );
+                    }
 
                     this.$store.dispatch('canvas/setTextFitsImage', this.engine.getTextFitsImage());
                 };
@@ -368,7 +382,7 @@ let requestedAnimationFrame;
 
             save() {
                 this.$emit('save', {
-                    canvas: this.canvas,
+                    canvas: this.finalImage,
                 });
             },
         },
