@@ -2,6 +2,7 @@
 
 namespace App\Rules;
 
+use App\Services\ImageEditor\ImageEditorJpeg;
 use App\Services\ImageEditor\ImageEditorPdf;
 use App\Services\ImageEditor\ImageEditorPng;
 use Illuminate\Contracts\Validation\Rule;
@@ -32,6 +33,7 @@ class ImageColorProfileRule implements Rule
     {
         return match($this->format) {
             ImageEditorPng::FILE_FORMAT => $value === ImageEditorPng::COLOR_PROFILE,
+            ImageEditorJpeg::FILE_FORMAT => $value === ImageEditorJpeg::COLOR_PROFILE,
             ImageEditorPdf::FILE_FORMAT => $value === ImageEditorPdf::COLOR_PROFILE,
             default => false,
         };
@@ -42,8 +44,8 @@ class ImageColorProfileRule implements Rule
      *
      * @return string
      */
-    public function message()
+    public function message(): string
     {
-        return "Format {$this->format} doesn't allow color profile: :value";
+        return "Format {$this->format} doesn't allow color profile: :input";
     }
 }
