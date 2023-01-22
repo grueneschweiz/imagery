@@ -36,6 +36,13 @@ class ImageEditorFactory
                 ]
             ),
 
+            ImageEditorJpeg::FILE_FORMAT => app(
+                ImageEditorJpeg::class,
+                [
+                    'image' => $image
+                ]
+            ),
+
             default => throw new ImageEditorException("Unknown file format: $format")
         };
     }

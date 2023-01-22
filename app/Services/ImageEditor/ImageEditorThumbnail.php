@@ -11,10 +11,13 @@ class ImageEditorThumbnail extends ImageEditorPng
 
     private const THUMB_MAX_WIDTH = 600;
     private const THUMB_MAX_HEIGHT = 5000;
+    private const FILE_EXTENSION = 'png';
 
     protected function getFilename(): string
     {
-        return $this->image->filename;
+        $filename = pathinfo($this->image->filename, PATHINFO_FILENAME);
+
+        return $filename.'.'.self::FILE_EXTENSION;
     }
 
     /**

@@ -35,6 +35,18 @@ class ImageEditorFactoryTest extends TestCase
         $this->assertInstanceOf(\App\Services\ImageEditor\ImageEditorPng::class, $imageEditor);
     }
 
+    public function testMake__imageEditorJpeg(): void
+    {
+        $factory = new ImageEditorFactory();
+
+        $imageEditor = $factory->make(
+            $this->createMock(\App\Image::class),
+            'jpeg'
+        );
+
+        $this->assertInstanceOf(\App\Services\ImageEditor\ImageEditorJpeg::class, $imageEditor);
+    }
+
     public function testMake__imageEditorInvalidFileFormat(): void
     {
         $factory = new ImageEditorFactory();

@@ -16,6 +16,7 @@ use App\Rules\ImmutableRule;
 use App\Rules\UserLogoRule;
 use App\Services\ImageEditor\ImageEditor;
 use App\Services\ImageEditor\ImageEditorFactory;
+use App\Services\ImageEditor\ImageEditorJpeg;
 use App\Services\ImageEditor\ImageEditorPdf;
 use App\Services\ImageEditor\ImageEditorPng;
 use App\Services\ImageEditor\ImageEditorThumbnail;
@@ -285,7 +286,7 @@ class ImageController extends Controller
     public function showFile(Request $request, ImageEditorFactory $editorFactory, Image $image)
     {
         Validator::make($request->query(), [
-            'format'        => ['sometimes', 'in:'.ImageEditorPng::FILE_FORMAT.','.ImageEditorPdf::FILE_FORMAT],
+            'format'        => ['sometimes', 'in:'.ImageEditorPng::FILE_FORMAT.','.ImageEditorPdf::FILE_FORMAT.','.ImageEditorJpeg::FILE_FORMAT],
             'color_profile' => [
                 'requiredIf:format,'.ImageEditorPdf::FILE_FORMAT,
                 new ImageColorProfileRule($request),
