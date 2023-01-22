@@ -167,7 +167,7 @@
             "formatDigitalHelp": "Suited for social media, website, etc. but also if you want to insert the image in a Word file. ",
             "formatPrintSelfHelp": "Optimized for printing on a standard printer or copying machine.",
             "formatPrintProfessionalHelp": "Ideal for professional offset or digital printing. The printout must be trimmed.",
-            "fileFormat": "File format: {format}",
+            "fileFormat": "File format: PNG (small to medium images) or JPEG (large images)",
             "colorProfile": "Color profile: {profile}",
             "noBleed": "No bleed",
             "bleedAndCropMarks": "With {bleed} additional bleed and crop marks",

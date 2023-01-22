@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import {BackgroundTypes, Media} from "../../service/canvas/Constants";
+import {BackgroundTypes, Formats, Media} from "../../service/canvas/Constants";
     import Api from "../../service/Api";
     import ImageUpload from "../../service/ImageUpload";
     import SnackbarMixin from "../../mixins/SnackbarMixin";
@@ -52,6 +52,8 @@ import {BackgroundTypes, Media} from "../../service/canvas/Constants";
     const metaUploadProgress = 5;
     const legalUploadProgress = 5;
     const imageProcessingProgress = 10;
+
+    const jpegLimit = 5000**2; // images > 5000px * 5000px will be saved as jpeg
 
     export default {
         name: "OImageDialog",
@@ -92,9 +94,9 @@ import {BackgroundTypes, Media} from "../../service/canvas/Constants";
                 backgroundType: 'canvas/getBackgroundType',
                 bleed: 'canvas/getBleed',
                 colorEncoding: 'canvas/getColorEncoding',
-                fileFormat: 'canvas/getFileFormat',
                 resolution: 'canvas/getResolution',
                 media: 'canvas/getMedia',
+                format: 'canvas/getFormat',
             }),
 
             keywords() {
@@ -156,7 +158,7 @@ import {BackgroundTypes, Media} from "../../service/canvas/Constants";
 
             downloadLink() {
                 const url = new URL(this.finalImageSrc);
-                url.searchParams.append('format', this.fileFormat);
+                url.searchParams.append('format', this.downloadImageFileExtension);
                 url.searchParams.append('color_profile', this.colorEncoding);
                 url.searchParams.append('bleed', this.bleed > 0 ? '1' : '0');
 
@@ -168,7 +170,39 @@ import {BackgroundTypes, Media} from "../../service/canvas/Constants";
             },
 
             filenameDownload() {
-                return 'image.' + this.fileFormat.toLowerCase();
+                return `image.${this.downloadImageFileExtension}`;
+            },
+
+            finalImageFormat() {
+                if (this.imageData.canvas.width * this.imageData.canvas.height > jpegLimit) {
+                    return 'image/jpeg';
+                }
+
+                return 'image/png';
+            },
+
+            finalImageQuality() {
+                if (this.finalImageFormat === 'image/jpeg') {
+                    return 0.9;
+                }
+
+                return 1;
+            },
+
+            finalImageFileExtension() {
+                if (this.finalImageFormat === 'image/jpeg') {
+                    return 'jpeg';
+                }
+
+                return 'png';
+            },
+
+            downloadImageFileExtension() {
+                if (this.format === Formats.digital) {
+                    return this.finalImageFileExtension;
+                }
+
+                return 'pdf';
             }
         },
 
@@ -222,9 +256,9 @@ import {BackgroundTypes, Media} from "../../service/canvas/Constants";
             },
 
             uploadFinalImage() {
-                this.imageData.filenameFinal = `final-${this.imageData.filename}.png`;
+                this.imageData.filenameFinal = `final-${this.imageData.filename}.${this.finalImageFileExtension}`;
 
-                const image = this.imageData.canvas.toDataURL();
+                const image = this.imageData.canvas.toDataURL(this.finalImageFormat, this.finalImageQuality);
                 const filename = this.imageData.filenameFinal;
                 const uploader = new ImageUpload(image, filename);
 

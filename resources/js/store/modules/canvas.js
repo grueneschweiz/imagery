@@ -92,7 +92,6 @@ const getters = {
     getBleed: state => Math.round(PrintingBleed * (state.selectedImageSize.resolution / Inch2mm)),
     getShowBleed: state => state.format === Formats.printProfessional,
     getColorEncoding: state => state.format === Formats.digital ? ColorEncodings.sRGB : ColorEncodings.FOGRA51,
-    getFileFormat: state => state.format === Formats.digital ? FileFormats.png : FileFormats.pdf,
     getRotated: state => state.rotated,
     getFontsLoaded: state => state.fontsLoaded,
     getCopyrightText: state => state.copyrightText,

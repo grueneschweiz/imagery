@@ -7,7 +7,7 @@
         <h4 class="alert-heading">{{ heading }}</h4>
         <p>{{ desc }}</p>
         <ul>
-            <li>{{ $t('images.create.fileFormat', {'format': fileFormat}) }}</li>
+            <li>{{ $t('images.create.fileFormat') }}</li>
             <li>{{ $t('images.create.colorProfile', {'profile': colorProfile}) }}</li>
             <template v-if="format !== formats.digital">
                 <li>{{ $t('images.create.resolution') }}</li>
@@ -58,7 +58,6 @@ export default {
     computed: {
         ...mapGetters({
             format: 'canvas/getFormat',
-            fileFormat: 'canvas/getFileFormat',
             colorEncoding: 'canvas/getColorEncoding',
             hasBleed: 'canvas/getShowBleed',
         }),
