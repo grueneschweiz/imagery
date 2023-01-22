@@ -28,17 +28,19 @@
             v-show="!legalFormHidden"
         />
 
-        <button
-            @click="downloadAndClose($event)"
+        <a
+            :download="filenameDownload"
+            :href="downloadLink"
+            @click=" $emit('close')"
             class="btn btn-primary"
             v-if="downloadReady && !showLegalCheck"
         >{{$t('images.create.imageDownload')}}
-        </button>
+        </a>
     </ODialog>
 </template>
 
 <script>
-    import {BackgroundTypes} from "../../service/canvas/Constants";
+import {BackgroundTypes, Media} from "../../service/canvas/Constants";
     import Api from "../../service/Api";
     import ImageUpload from "../../service/ImageUpload";
     import SnackbarMixin from "../../mixins/SnackbarMixin";
@@ -49,6 +51,7 @@
 
     const metaUploadProgress = 5;
     const legalUploadProgress = 5;
+    const imageProcessingProgress = 10;
 
     export default {
         name: "OImageDialog",
@@ -62,11 +65,13 @@
                 uploadFinalStatus: 0,
                 uploadMetaStatus: 0,
                 uploadLegalStatus: 0,
+                imageProcessingStatus: 0,
                 downloadReady: false,
                 showLegalCheck: false,
                 uploadPromise: null,
                 resolveUpload: null,
                 legalFormHidden: false,
+                finalImageSrc: null,
             }
         },
 
@@ -83,7 +88,13 @@
             ...mapGetters({
                 logoId: 'canvas/getLogoId',
                 rawImage: 'canvas/getBackgroundImage',
+                rawImageMimeType: 'canvas/getBackgroundImageMimeType',
                 backgroundType: 'canvas/getBackgroundType',
+                bleed: 'canvas/getBleed',
+                colorEncoding: 'canvas/getColorEncoding',
+                fileFormat: 'canvas/getFileFormat',
+                resolution: 'canvas/getResolution',
+                media: 'canvas/getMedia',
             }),
 
             keywords() {
@@ -105,7 +116,7 @@
                     ? imageCount * metaUploadProgress + legalUploadProgress
                     : metaUploadProgress;
 
-                return uploadComplete - nonImageProgress;
+                return uploadComplete - nonImageProgress - imageProcessingProgress;
             },
 
             uploadRawWeight() {
@@ -124,7 +135,7 @@
             },
 
             rawImageExportType() {
-                return 'image/jpeg' === this.rawImage.mimeType ? 'image/jpeg' : 'image/png';
+                return 'image/jpeg' === this.rawImageMimeType ? 'image/jpeg' : 'image/png';
             },
 
             rawImageExtension() {
@@ -132,15 +143,33 @@
             },
 
             rawImageDataUrl() {
-                return this.rawImage.image.toDataURL(this.rawImageExportType);
+                return this.rawImage.toDataURL(this.rawImageExportType);
             },
 
             uploadStatus() {
                 return this.uploadRawStatus * this.uploadRawWeight
                     + this.uploadFinalStatus * this.uploadFinalWeight
                     + this.uploadMetaStatus * metaUploadProgress
-                    + this.uploadLegalStatus * legalUploadProgress;
+                    + this.uploadLegalStatus * legalUploadProgress
+                    + this.imageProcessingStatus * imageProcessingProgress;
             },
+
+            downloadLink() {
+                const url = new URL(this.finalImageSrc);
+                url.searchParams.append('format', this.fileFormat);
+                url.searchParams.append('color_profile', this.colorEncoding);
+                url.searchParams.append('bleed', this.bleed > 0 ? '1' : '0');
+
+                if (Media.print === this.media) {
+                    url.searchParams.append('resolution', this.resolution);
+                }
+
+                return url.href
+            },
+
+            filenameDownload() {
+                return 'image.' + this.fileFormat.toLowerCase();
+            }
         },
 
         created() {
@@ -166,7 +195,8 @@
                     upload = this.uploadFinalImage();
                 }
 
-                upload.then(() => this.downloadButtonShow());
+                upload.then(() => this.processImage())
+                    .then(() => this.downloadButtonShow());
             },
 
             uploadRawImage() {
@@ -216,9 +246,27 @@
                     original_id: this.imageData.originalId,
                     filename: this.imageData.filenameFinal,
                     keywords: this.keywords,
+                    bleed: this.bleed,
                 };
 
-                return this.uploadImageMeta(payload);
+                const cb = resp => this.finalImageSrc = resp.data.src;
+
+                return this.uploadImageMeta(payload, cb);
+            },
+
+            processImage() {
+                // trigger a download to process the image on the server
+                // it will cache processed image server sides and dramatically
+                // increase ux when clicking the download button.
+                //
+                // the response here is discarded.
+                return Api().get(this.downloadLink)
+                    .then(() => this.imageProcessingStatus = 1)
+                    .catch(error => this.handleUnauthorized(error))
+                    .catch(error => {
+                        this.snackErrorRetry(error, this.$t('images.create.processingFailed'))
+                            .then(() => this.processImage());
+                    });
             },
 
             uploadRawImageMeta() {
@@ -253,41 +301,6 @@
 
             downloadButtonShow() {
                 this.downloadReady = true;
-            },
-
-            executeDownload() {
-                /**
-                 * There is some picky stuff in here, especially for chrome.
-                 *
-                 * @see https://stackoverflow.com/questions/3916191/download-data-url-file
-                 * @see https://stackoverflow.com/questions/37135417/download-canvas-as-png-in-fabric-js-giving-network-error/
-                 * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob
-                 */
-                this.imageData.canvas.toBlob(imageBlob => {
-                    const link = document.createElement('a');
-
-                    link.download = 'image.png';
-                    link.href = URL.createObjectURL(imageBlob);
-
-                    document.body.appendChild(link);
-
-                    link.click();
-
-                    window.setTimeout(() => {
-                        // do this delayed, so the browser has time to navigate
-                        // to the URL (chrome) and doesn't release the memory
-                        // to early (safari on iOS).
-                        URL.revokeObjectURL(link.href);
-                        link.removeAttribute('href');
-                        document.body.removeChild(link);
-                    }, 1000);
-                });
-
-            },
-
-            downloadAndClose() {
-                this.executeDownload();
-                this.$emit('close');
             },
 
             onLegalUploadCompleted() {

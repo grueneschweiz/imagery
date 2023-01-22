@@ -2,8 +2,8 @@ import {Alignments} from "../../Constants";
 import Layer from "../Layer";
 
 export default class LogoLayer extends Layer {
-    constructor(canvas) {
-        super(canvas);
+    constructor(canvas, context) {
+        super(canvas, context);
 
         this._alignment = Alignments.left;
         this._barPos = {
@@ -19,11 +19,11 @@ export default class LogoLayer extends Layer {
     }
 
     set barPos(pos) {
-        this._barPos = pos;
+        this._setProperty('_barPos', pos);
     }
 
     set alignment(alignment) {
-        this._alignment = alignment;
+        this._setProperty('_alignment', alignment);
     }
 
     _drawBlock() {
@@ -35,8 +35,8 @@ export default class LogoLayer extends Layer {
         this._setMargin();
 
         if (!this._barPos) {
-            this._x = this._margin;
-            this._y = this._margin;
+            this._x = this._margin + this._bleed;
+            this._y = this._margin + this._bleed;
             return;
         }
 
@@ -65,16 +65,24 @@ export default class LogoLayer extends Layer {
 
     _determineX0() {
         if (this._alignment === Alignments.left) {
-            return this._canvas.width - this._block.width - this._margin;
-        } else {
-            return this._margin;
+            return this._canvas.width
+                - this._bleed
+                - this._block.width
+                - this._margin;
         }
+        return this._margin
+            + this._bleed;
     }
 
     _determineY0(top) {
-        return top
-            ? this._margin
-            : this._canvas.height - this._block.height - this._margin;
+        if (top) {
+            return this._margin + this._bleed;
+        }
+
+        return this._canvas.height
+            - this._bleed
+            - this._block.height
+            - this._margin;
     }
 
 

@@ -1,47 +1,26 @@
-import Layer from "../Layer";
+import DraggableLayer from "../DraggableLayer";
+import {Alignments} from "../../Constants";
 
-const shadowColorMouseOver = 'rgba(0,0,0,0.5)';
-const shadowMouseOverSize = 0.01;
-
-export default class BarLayer extends Layer {
-    constructor(canvas) {
-        super(canvas);
+export default class BarLayer extends DraggableLayer {
+    constructor(canvas, context) {
+        super(canvas, context);
 
         this._borderWidth = null;
         this._textPadding = 0;
         this._y = this._canvas.height;
-
-        this._touching = false;
-        this._dragging = true;
-        this._mousePos = {
-            x: 0,
-            y: 0,
-        };
+        this._alignment = Alignments.left;
     }
 
     set alignment(alignment) {
-        this._alignment = alignment;
-    }
-
-    set mousePos(mousePos) {
-        this._mousePos = mousePos;
-        this._touching = this._isHover();
-    }
-
-    set dragging(value) {
-        this._dragging = value;
+        this._setProperty('_alignment', alignment);
     }
 
     set borderWidth(value) {
-        this._borderWidth = value;
+        this._setProperty('_borderWidth', value);
     }
 
     set textPadding(value) {
-        this._textPadding = value;
-    }
-
-    get touching() {
-        return this._touching;
+        this._setProperty('_textPadding', value);
     }
 
     get boundingRect() {
@@ -57,7 +36,7 @@ export default class BarLayer extends Layer {
         };
     }
 
-    drag(pos) {
+    _drag(pos) {
         const deltaY = pos.y - this._mousePos.y;
         const y = this._y + deltaY;
 
@@ -65,22 +44,20 @@ export default class BarLayer extends Layer {
         const bottomLimit = this._getBottomLimit();
 
         if (y < topLimit) {
-            this._y = topLimit;
+            this._setProperty('_y', topLimit);
         } else if (y > bottomLimit) {
-            this._y = bottomLimit;
+            this._setProperty('_y', bottomLimit);
         } else {
-            this._y = y;
+            this._setProperty('_y', y);
         }
     }
 
     _getTopLimit() {
         throw new Error("Method '_getTopLimit()' must be implemented.")
-        return 0
     }
 
     _getBottomLimit() {
         throw new Error("Method '_getBottomLimit()' must be implemented.")
-        return 0
     }
 
     _drawBlock() {
@@ -88,11 +65,7 @@ export default class BarLayer extends Layer {
             return;
         }
 
-        this._setTouchEffect()
-
         this._drawBlockConcrete()
-
-        this._context.filter = 'none'
     }
 
     _drawBlockConcrete() {
@@ -103,19 +76,8 @@ export default class BarLayer extends Layer {
         return this._block && 0 < this._block.width && 0 < this._block.height;
     }
 
-    _setTouchEffect() {
-        if (this._touching) {
-            const shadowSize = Math.sqrt(this._canvas.width * this._canvas.height) * shadowMouseOverSize;
-
-            this._context.filter = `drop-shadow(0 0 ${shadowSize}px ${shadowColorMouseOver})`;
-        } else {
-            this._context.filter = 'none';
-        }
-    }
-
     _getBlockXpos() {
         throw new Error("Method '_getBlockXpos()' must be implemented.")
-        return 0
     }
 
     _getBlockYpos() {
@@ -139,8 +101,8 @@ export default class BarLayer extends Layer {
         const mouseX = this._mousePos.x;
         const mouseY = this._mousePos.y;
 
-        const posXstart = this._getXstart();
-        const posXend = this._getXend();
+        const posXstart = Math.max(0, this._getXstart());
+        const posXend = Math.min(this._canvas.width - 1, this._getXend());
 
         const posYstart = this._getYstart();
         const posYend = this._getYend();
@@ -153,21 +115,25 @@ export default class BarLayer extends Layer {
 
     _getXstart() {
         throw new Error("Method '_getXstart()' must be implemented.")
-        return 0
     }
 
     _getXend() {
         throw new Error("Method '_getXend()' must be implemented.")
-        return 0
     }
 
     _getYstart() {
         throw new Error("Method '_getYstart()' must be implemented.")
-        return 0
     }
 
     _getYend() {
         throw new Error("Method '_getYend()' must be implemented.")
-        return 0
+    }
+
+    _getBlockWidth() {
+        return this._block?.width || 0;
+    }
+
+    _getBlockHeight() {
+        return this._block?.height || 0;
     }
 }

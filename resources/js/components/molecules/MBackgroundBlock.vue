@@ -3,37 +3,37 @@
         <label class="mb-0 d-block">{{$t('images.create.background')}}</label>
         <div class="btn-group btn-group-toggle">
             <label v-if="gradientBackgroundAvailable"
-                   :class="{'active': background === backgroundTypes.gradient}"
+                   :class="{'active': backgroundType === backgroundTypes.gradient}"
                    class="btn btn-secondary btn-sm">
                 <input
                     :value="backgroundTypes.gradient"
                     name="background"
                     type="radio"
-                    v-model="background"
+                    v-model="backgroundType"
                 >{{$t('images.create.backgroundGreen')}}
             </label>
-            <label :class="{'active': background === backgroundTypes.transparent}"
+            <label :class="{'active': backgroundType === backgroundTypes.transparent}"
                    class="btn btn-secondary btn-sm">
                 <input
                     :value="backgroundTypes.transparent"
                     name="background"
                     type="radio"
-                    v-model="background"
+                    v-model="backgroundType"
                 >{{$t('images.create.backgroundTransparent')}}
             </label>
-            <label :class="{'active': background === backgroundTypes.image}"
+            <label :class="{'active': backgroundType === backgroundTypes.image}"
                    class="btn btn-secondary btn-sm">
                 <input
                     :value="backgroundTypes.image"
                     name="background"
                     type="radio"
-                    v-model="background"
+                    v-model="backgroundType"
                     @click="$refs.uploader.click()"
                 >{{$t('images.create.backgroundImage')}}
             </label>
         </div>
 
-        <div v-if="background === backgroundTypes.image && image && !imageTooSmall" class="form-group">
+        <div v-if="backgroundType === backgroundTypes.image && backgroundImage && !imageTooSmall" class="form-group">
             <label
                 class="mb-0 mt-2"
                 for="image-zoom"
@@ -41,7 +41,6 @@
             <input
                 :max="1"
                 :min="0"
-                @input="zoomImage()"
                 class="form-control-range"
                 id="image-zoom"
                 step="0.01"
@@ -58,9 +57,9 @@
         >
 
         <div
-            class="alert alert-warning"
+            class="alert alert-warning mt-1"
             role="alert"
-            v-if="background === backgroundTypes.image && imageTooSmall">
+            v-if="backgroundType === backgroundTypes.image && imageTooSmall">
             {{$t('images.create.imageTooSmall')}}
         </div>
     </div>
@@ -69,12 +68,8 @@
 <script>
     import {BackgroundTypes, StyleSetTypes} from "../../service/canvas/Constants";
     import SnackbarMixin from "../../mixins/SnackbarMixin";
-    import BackgroundGradient from "../../service/canvas/elements/background/BackgroundGradient";
-    import BackgroundTransparent from "../../service/canvas/elements/background/BackgroundTransparent";
-    import BackgroundImage from "../../service/canvas/elements/background/BackgroundImage";
     import loadImage from "blueimp-load-image";
     import {mapGetters} from "vuex";
-    import BackgroundPlaceholder from "../../service/canvas/elements/background/BackgroundPlaceholder";
 
     const mimeTypesAllowed = [
         'image/jpeg',
@@ -83,8 +78,6 @@
         'image/svg+xml'
     ];
 
-    let requestedAnimationFrame;
-
     export default {
         name: "MBackgroundBlock",
         components: {},
@@ -92,11 +85,8 @@
 
         data() {
             return {
-                block: null,
-                image: null,
                 mimeType: null,
                 backgroundTypes: BackgroundTypes,
-                zoom: 0,
             }
         },
 
@@ -108,12 +98,12 @@
                 user: 'user/object',
             }),
 
-            background: {
+            backgroundType: {
                 get() {
                     return this.$store.getters['canvas/getBackgroundType']
                 },
                 set(value) {
-                    if (BackgroundTypes.image === value && !this.image) {
+                    if (BackgroundTypes.image === value && !this.backgroundImage) {
                         return
                     }
 
@@ -121,16 +111,34 @@
                 }
             },
 
+            backgroundImage: {
+                get() {
+                    return this.$store.getters['canvas/getBackgroundImage']
+                },
+                set(value) {
+                    this.$store.dispatch('canvas/setBackgroundImage', value)
+                }
+            },
+
+            zoom: {
+                get() {
+                    return this.$store.getters['canvas/getBackgroundZoom']
+                },
+                set(value) {
+                    this.$store.dispatch('canvas/setBackgroundZoom', value)
+                }
+            },
+
             imageTooSmall() {
-                if (!this.image) {
+                if (!this.backgroundImage) {
                     return false;
                 }
 
-                if (this.image.width < this.imageWidth) {
+                if (this.backgroundImage.width < this.imageWidth) {
                     return true;
                 }
 
-                if (this.image.height < this.imageHeight) {
+                if (this.backgroundImage.height < this.imageHeight) {
                     return true;
                 }
 
@@ -138,91 +146,23 @@
             },
 
             gradientBackgroundAvailable() {
-                return this.styleSet === StyleSetTypes.green;
+                return this.styleSet === StyleSetTypes.green
+                    || this.styleSet === StyleSetTypes.greenCentered;
             },
         },
 
         mounted() {
-            if (this.styleSet === StyleSetTypes.young) {
-                this.background = BackgroundTypes.placeholder
-            }
+            this.setWatermarkText();
 
-            this.$nextTick(this.draw)
+            if (this.styleSet === StyleSetTypes.young) {
+                this.backgroundType = BackgroundTypes.placeholder
+            }
         },
 
         methods: {
-            draw() {
-                let canvas;
-
-                switch (this.background) {
-                    case BackgroundTypes.placeholder:
-                        canvas = this.drawPlaceholder();
-                        break;
-
-                    case BackgroundTypes.gradient:
-                        canvas = this.drawGradient();
-                        break;
-
-                    case BackgroundTypes.transparent:
-                        canvas = this.drawTransparent();
-                        break;
-
-                    case BackgroundTypes.image:
-                        canvas = this.drawImage();
-                        break;
-                }
-
-                this.$emit('drawn', canvas);
-            },
-
-            drawPlaceholder() {
-                this.block = this.backgroundFactory(BackgroundPlaceholder)
-                this.block.watermarkText = this.$t('images.create.placeholderWatermark', {first_name: this.user?.first_name ?? ''})
-                return this.block.draw()
-            },
-
-            drawGradient() {
-                this.block = this.backgroundFactory(BackgroundGradient);
-                return this.block.draw();
-            },
-
-            drawTransparent() {
-                this.block = this.backgroundFactory(BackgroundTransparent);
-                return this.block.draw();
-            },
-
-            drawImage() {
-                this.block = this.backgroundFactory(BackgroundImage);
-                this.block.image = this.image;
-                this.block.zoom = this.zoom;
-
-                try {
-                    return this.block.draw();
-                } catch (e) {
-                    this.snackErrorDismiss(
-                        e,
-                        this.$t('images.create.uploadedImageNotProcessable')
-                    );
-                }
-            },
-
-            backgroundFactory(type) {
-                const bg = new type();
-                bg.width = this.imageWidth;
-                bg.height = this.imageHeight;
-
-                return bg;
-            },
-
-            zoomImage() {
-                if (requestedAnimationFrame) {
-                    window.cancelAnimationFrame(requestedAnimationFrame);
-                }
-
-                requestedAnimationFrame = window.requestAnimationFrame(() => {
-                    this.block.zoom = this.zoom;
-                    this.$emit('drawn', this.block.draw());
-                });
+            setWatermarkText() {
+                const text = this.$t('images.create.placeholderWatermark', {first_name: this.user?.first_name ?? ''})
+                this.$store.dispatch('canvas/setBackgroundWatermarkText', text)
             },
 
             setImage(event) {
@@ -244,9 +184,9 @@
             },
 
             onImageLoaded(image) {
-                this.image = image
-                this.background = BackgroundTypes.image
-                this.$store.dispatch('canvas/setBackgroundImage', {image: image, mimeType: this.mimeType})
+                this.backgroundImage = image
+                this.backgroundType = BackgroundTypes.image
+                this.$store.dispatch('canvas/setBackgroundImageMimeType', this.mimeType)
                 this.$store.commit('legal/reset')
             },
 
@@ -264,35 +204,37 @@
             },
 
             adjustZoom(dimNew, dimOld) {
+                if (!dimOld) {
+                    return;
+                }
+
                 const ratio = dimNew / dimOld;
                 this.zoom *= ratio;
             }
         },
 
         watch: {
-            background() {
-                this.$nextTick(this.draw)
-            },
             image() {
                 this.zoom = 0;
-                this.draw();
             },
             imageWidth(valueNew, valueOld) {
                 this.adjustZoom(valueNew, valueOld);
-                this.draw();
             },
             imageHeight(valueNew, valueOld) {
                 this.adjustZoom(valueNew, valueOld);
-                this.draw();
             },
             styleSet(valueNew) {
-                if (StyleSetTypes.young === valueNew && BackgroundTypes.gradient === this.background) {
-                    this.background = BackgroundTypes.placeholder
+                if (StyleSetTypes.young === valueNew && BackgroundTypes.gradient === this.backgroundType) {
+                    this.backgroundType = BackgroundTypes.placeholder
                 }
-                if (StyleSetTypes.green === valueNew && BackgroundTypes.placeholder === this.background) {
-                    this.background = BackgroundTypes.gradient
+                if ((StyleSetTypes.green === valueNew || StyleSetTypes.greenCentered === valueNew )
+                    && BackgroundTypes.placeholder === this.backgroundType) {
+                    this.backgroundType = BackgroundTypes.gradient
                 }
-            }
+            },
+            user() {
+                this.setWatermarkText();
+            },
         },
     }
 </script>

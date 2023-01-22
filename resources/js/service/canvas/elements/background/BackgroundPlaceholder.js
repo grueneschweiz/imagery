@@ -6,9 +6,15 @@ const watermarkAngle = Math.PI / 16
 const fontSizeFactor = 30
 const fontFamily = 'Arial, sans-serif'
 
-export default class extends Background {
+export default class BackgroundPlaceholder extends Background {
+    constructor() {
+        super();
+
+        this._watermarkText = 'Upload Image';
+    }
+
     set watermarkText(val) {
-        this._watermarkText = val;
+        this._setProperty('_watermarkText', val);
     }
 
     _drawBackground() {

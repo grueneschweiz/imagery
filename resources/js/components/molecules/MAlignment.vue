@@ -25,7 +25,7 @@
             },
 
             hasBars() {
-                return this.$store.getters['canvas/hasBars']
+                return this.$store.getters['canvas/getBars'].filter(bar => bar.text.length).length > 0
             },
 
             options() {

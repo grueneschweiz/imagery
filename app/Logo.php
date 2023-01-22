@@ -46,7 +46,7 @@ use Illuminate\Support\Str;
  * @method static \Illuminate\Database\Query\Builder|\App\Logo withoutTrashed()
  * @mixin \Eloquent
  */
-class Logo extends Model implements FileModel
+class Logo extends Model
 {
     use SoftDeletes;
 
@@ -74,11 +74,6 @@ class Logo extends Model implements FileModel
         return $this->hasMany(Image::class);
     }
 
-    public function groups()
-    {
-        return $this->belongsToMany(Group::class);
-    }
-
     public function addedBy()
     {
         return $this->belongsTo(User::class, 'added_by');
@@ -99,23 +94,29 @@ class Logo extends Model implements FileModel
         return $this->groups()->select('groups.id')->get()->pluck('id');
     }
 
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class);
+    }
+
     public function getDownloadAttribute()
     {
         return route('logoPackage', ['logo' => $this->id]);
     }
 
     /**
-     * @param  array  $args
+     * @param  string  $color
+     * @param  int|null  $width
      * @return string
      */
-    public function getRelPath(array $args = []): string
+    public function getRelPath(
+        string $color = \App\Logo\Logo::LOGO_COLOR_DARK,
+        int    $width = null
+    ): string
     {
-        $defaults = [
-            \App\Logo\Logo::LOGO_COLOR_DARK,
-            config('app.logo_width'),
-        ];
-
-        [$color, $width] = array_merge($args, $defaults);
+        if (!$width) {
+            $width = (int) config('app.logo_width');
+        }
 
         try {
             $logo = LogoFactory::get($this->type, $color, [$this->name]);
@@ -128,15 +129,6 @@ class Logo extends Model implements FileModel
             Log::warning($e);
             return '';
         }
-    }
-
-    /**
-     * @return string
-     * @throws Exceptions\LogoException
-     */
-    public function getRelThumbPath(): string
-    {
-        return $this->getRelPath(\App\Logo\Logo::LOGO_COLOR_DARK);
     }
 
     /**

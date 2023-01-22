@@ -1,9 +1,9 @@
-import {Alignments, BarSchemes as Schemes, BarTypes as Types} from "./../../Constants"
+import {Alignments, BarSchemes as Schemes} from "./../../Constants"
+import DrawBase from "../../misc/DrawBase";
 
-export default class Bar {
+export default class Bar extends DrawBase {
     constructor() {
-        this._canvas = document.createElement('canvas')
-        this._context = this._canvas.getContext('2d')
+        super();
 
         this._text = ''
         this._fontSize = 16
@@ -12,43 +12,82 @@ export default class Bar {
         this._font = ''
 
         this._imageWidth = 0
+        this._imageHeight = 0
         this._textDims = {
             width: null,
             height: null,
             padding: null,
         }
+
+        this._markSelected = false
+        this._markActive = false
+        this._previewDims = {
+            width: 0,
+            height: 0,
+        }
     }
 
     set text(text) {
-        this._text = text.trim()
+        this._setProperty('_text', text.trim());
     }
 
     set baseFontSize(fontSize) {
-        this._fontSize = fontSize
+        this._setProperty('_fontSize', fontSize);
     }
 
     set alignment(alignment) {
-        this._alignment = alignment
+        this._setProperty('_alignment', alignment);
     }
 
     set schema(schema) {
-        this._schema = schema
+        this._setProperty('_schema', schema);
     }
 
     set type(type) {
-        throw new Error("Method 'draw()' must be implemented.")
+        throw new Error("Setter 'type(type)' must be implemented.")
     }
 
     set imageWidth(width) {
-        this._imageWidth = width
+        this._setProperty('_imageWidth', width);
+    }
+
+    set imageHeight(height) {
+        this._setProperty('_imageHeight', height);
+    }
+
+    set markSelected(mark) {
+        this._setProperty('_markSelected', mark);
+    }
+
+    set markActive(mark) {
+        this._setProperty('_markActive', mark);
+    }
+
+    set previewDims(dims) {
+        this._setProperty('_previewDims', dims)
     }
 
     get padding() {
         return this._textDims.padding
     }
 
-    draw() {
-        throw new Error("Method 'draw()' must be implemented.")
-        return this._canvas
+    calculateWidth(fontSize) {
+        throw new Error("Method 'calculateWidth()' must be implemented.")
+    }
+
+    _draw() {
+        this._drawConcrete();
+
+        if (this._markSelected) {
+            this._drawSelectedMark();
+        }
+    }
+
+    _drawConcrete() {
+        throw new Error("Method '_draw()' must be implemented.")
+    }
+
+    _drawSelectedMark() {
+        throw new Error("Method '_drawSelectedMark()' must be implemented.")
     }
 }

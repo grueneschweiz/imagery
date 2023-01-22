@@ -2,35 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class FontController extends Controller
 {
     public function show(string $font)
     {
-        $fontModel = new class($font) implements \App\FileModel
-        {
-            private $font;
+        $font = basename($font); // prevent directory traversal
 
-            public function __construct($font)
-            {
-                $this->font = $font;
-            }
-
-            public function getRelPath($arg = null): string
-            {
-                return config('app.protected_fonts_dir')
+        $relPath = config('app.protected_fonts_dir')
                        .DIRECTORY_SEPARATOR
-                       .$this->font;
-            }
+                       .$font;
 
-            public function getRelThumbPath(): string
-            {
-            }
-        };
+        if ( ! Storage::fileExists($relPath)) {
+            return response('File not found', 404);
+        }
 
-        $fileController = new FileController();
-
-        return $fileController->show($fontModel);
+        return response()->file(disk_path($relPath));
     }
 }

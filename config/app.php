@@ -372,7 +372,7 @@ return [
     |
     */
 
-    'uploads_max_file_size' => (float) env('APP_MAX_UPLOAD_SIZE', 8.0),
+    'uploads_max_file_size' => (float) env('APP_MAX_UPLOAD_SIZE', 32.0),
 
     /*
     |--------------------------------------------------------------------------

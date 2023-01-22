@@ -1,6 +1,6 @@
 import Background from "./Background";
 
-export default class extends Background {
+export default class BackgroundImage extends Background {
     constructor() {
         super();
 
@@ -13,19 +13,19 @@ export default class extends Background {
     }
 
     set width(width) {
-        this._containerWidth = width;
+        this._setProperty('_containerWidth', width);
     }
 
     set height(height) {
-        this._containerHeight = height;
+        this._setProperty('_containerHeight', height);
     }
 
     set image(image) {
-        this._image = image;
+        this._setProperty('_image', image);
     }
 
     set zoom(zoom) {
-        this._zoom = zoom;
+        this._setProperty('_zoom', zoom);
     }
 
     _drawBackground() {
@@ -59,10 +59,12 @@ export default class extends Background {
         let width, height;
 
         if (wRatio < hRatio) {
-            width = this._containerWidth + this._zoom * dW;
+            const w = dW ? this._containerWidth : this._image.width;
+            width = w + this._zoom * dW;
             height = width / aspectRatioImage;
         } else {
-            height = this._containerHeight + this._zoom * dH;
+            const h = dH ? this._containerHeight : this._image.height;
+            height = h + this._zoom * dH;
             width = height * aspectRatioImage;
         }
 

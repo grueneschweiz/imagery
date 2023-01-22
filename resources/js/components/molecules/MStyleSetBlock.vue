@@ -2,12 +2,12 @@
     <div v-if="! logoType && usableStyleSets.length > 1" class="form-group">
         <label class="mb-0 d-block">{{$t('images.create.styleSet')}}</label>
         <div class="btn-group btn-group-toggle">
-            <label :class="{'active': styleSet === styleSetTypes.green}"
+            <label :class="{'active': isGreenStyleSet}"
                    class="btn btn-secondary btn-sm">
                 <input
                     v-model="styleSet"
-                    :value="styleSetTypes.green"
-                    name="background"
+                    :value="greenStyleSetButtonValue"
+                    name="styleSet"
                     type="radio"
                 >{{$t('images.create.styleSetGreen')}}
             </label>
@@ -16,7 +16,7 @@
                 <input
                     v-model="styleSet"
                     :value="styleSetTypes.young"
-                    name="background"
+                    name="styleSet"
                     type="radio"
                 >{{$t('images.create.styleSetYoung')}}
             </label>
@@ -26,6 +26,7 @@
 
 <script>
     import {StyleSetTypes, LogoTypes} from "../../service/canvas/Constants";
+    import {ImageSizeIds, ImageSizes} from "../../service/canvas/ImageSizes";
     import {mapGetters} from "vuex";
 
     export default {
@@ -42,6 +43,8 @@
               getLogoById: 'logosUsable/getById',
               usableLogos: 'logosUsable/getAll',
               currentLogoId: 'canvas/getLogoId',
+              selectedImageSize: 'canvas/getSelectedImageSize',
+              logoType: 'canvas/getLogoType',
             }),
 
             styleSet: {
@@ -51,20 +54,6 @@
                 set(value) {
                     this.$store.commit('canvas/setStyleSet', value);
                 },
-            },
-
-            logoType() {
-                if (! this.currentLogoId) {
-                    return null
-                }
-
-                const logo = this.getLogoById(this.currentLogoId)
-
-                if (! logo) {
-                    return null;
-                }
-
-                return logo.type
             },
 
             usableLogoTypes() {
@@ -85,6 +74,25 @@
 
                 return logoTypes
                   .map(this.getStyleSetFromLogoType)
+            },
+
+            logoDefaultStyleSet() {
+                if (!this.logoType) {
+                    return null;
+                }
+
+                return this.getStyleSetFromLogoType(this.logoType);
+            },
+
+            greenStyleSetButtonValue() {
+                return this.selectedImageSize === ImageSizes.fbCoverGreen
+                    ? StyleSetTypes.greenCentered
+                    : StyleSetTypes.green;
+            },
+
+            isGreenStyleSet() {
+                return this.styleSet === StyleSetTypes.green
+                    || this.styleSet === StyleSetTypes.greenCentered
             }
         },
 
@@ -99,7 +107,19 @@
                     default:
                       return StyleSetTypes.green
                 }
-            }
+            },
+
+            applyCorrectStyleSet() {
+                const style = this.logoDefaultStyleSet || this.styleSet;
+
+                if (StyleSetTypes.young === style) {
+                    this.styleSet = StyleSetTypes.young;
+                } else if (ImageSizeIds.fbCoverGreen === this.selectedImageSize.id) {
+                    this.styleSet = StyleSetTypes.greenCentered;
+                } else {
+                    this.styleSet = StyleSetTypes.green;
+                }
+            },
         },
 
         mounted() {
@@ -109,9 +129,13 @@
         },
 
         watch: {
-            logoType(type) {
-                this.styleSet = this.getStyleSetFromLogoType(type)
-            }
+            logoType() {
+                this.applyCorrectStyleSet();
+            },
+
+            selectedImageSize() {
+                this.applyCorrectStyleSet();
+            },
         },
     }
 </script>

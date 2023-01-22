@@ -2,24 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\ThumbnailException;
+use App\Exceptions\ImageEditorException;
+use App\Http\Controllers\Upload\ChunkUploadStrategy;
 use App\Http\Controllers\Upload\RegularUploadStrategy;
 use App\Image;
-use App\Rules\EmptyIfRule;
 use App\Rules\FileExtensionRule;
 use App\Rules\ImageBackgroundRule;
+use App\Rules\ImageBleedRule;
+use App\Rules\ImageColorProfileRule;
 use App\Rules\ImageLogoRule;
 use App\Rules\ImageOriginalRule;
 use App\Rules\ImmutableRule;
 use App\Rules\UserLogoRule;
+use App\Services\ImageEditor\ImageEditor;
+use App\Services\ImageEditor\ImageEditorFactory;
+use App\Services\ImageEditor\ImageEditorPdf;
+use App\Services\ImageEditor\ImageEditorPng;
+use App\Services\ImageEditor\ImageEditorThumbnail;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ImageController extends Controller
 {
+    use FileResponseTrait;
+
     private const ALLOWED_EXT = ['png', 'svg', 'jpg', 'jpeg'];
 
     /**
@@ -31,19 +41,6 @@ class ImageController extends Controller
     {
         return Image::raw()
                     ->shareable()
-                    ->latest()
-                    ->paginate(50);
-    }
-
-    /**
-     * Return paginated list of all final images.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function indexFinal()
-    {
-        return Image::final()
-                    ->completed()
                     ->latest()
                     ->paginate(50);
     }
@@ -63,7 +60,7 @@ class ImageController extends Controller
     {
         $terms = $this->prepareTerms(urldecode($terms));
 
-        if ( ! $terms) {
+        if (!$terms) {
             return $this->indexFinal();
         }
 
@@ -72,6 +69,19 @@ class ImageController extends Controller
                     ->whereRaw('MATCH (keywords) AGAINST (? IN BOOLEAN MODE)', [$terms])
                     ->orderBy('score', 'desc')
                     ->orderBy('created_at', 'desc')
+                    ->paginate(50);
+    }
+
+    /**
+     * Return paginated list of all final images.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function indexFinal()
+    {
+        return Image::final()
+                    ->completed()
+                    ->latest()
                     ->paginate(50);
     }
 
@@ -98,12 +108,12 @@ class ImageController extends Controller
     public function destroy(Image $image)
     {
         if ($image->legal) {
-            if ( ! $image->legal->delete()) {
+            if (!$image->legal->delete()) {
                 return response('Could not delete images legal information. Image not deleted.', 500);
             }
         }
 
-        if ( ! $image->delete()) {
+        if (!$image->delete()) {
             return response('Could not delete image.', 500);
         }
 
@@ -156,6 +166,7 @@ class ImageController extends Controller
             ],
             'width'       => ['sometimes', new ImmutableRule($image)],
             'height'      => ['sometimes', new ImmutableRule($image)],
+            'bleed'       => ['sometimes', new ImageBleedRule($image)],
             'created_at'  => ['sometimes', new ImmutableRule($image)],
             'updated_at'  => ['sometimes', new ImmutableRule($image)],
             'deleted_at'  => ['sometimes', new ImmutableRule($image)],
@@ -163,14 +174,14 @@ class ImageController extends Controller
 
         if ($request->has('filename')) {
             $handler          = $this->makeUploadHandler($data['filename']);
-            $data['filename'] = $handler->storeFinal(Image::getImageStorageDir());
+            $data['filename'] = $handler->storeFinal(ImageEditor::getStorageDirOfUneditedImage());
         }
 
         $image->fill($data);
 
         $this->generateThumbnail($image);
 
-        if ( ! $image->save()) {
+        if (!$image->save()) {
             return response('Could not save image.', 500);
         }
 
@@ -217,19 +228,20 @@ class ImageController extends Controller
             ],
             'width'       => ['sometimes', new ImmutableRule($image)],
             'height'      => ['sometimes', new ImmutableRule($image)],
+            'bleed'       => ['requiredIf:type,'.Image::TYPE_FINAL, new ImageBleedRule($image)],
             'created_at'  => ['sometimes', new ImmutableRule($image)],
             'updated_at'  => ['sometimes', new ImmutableRule($image)],
             'deleted_at'  => ['sometimes', new ImmutableRule($image)],
         ]);
 
         $handler          = $this->makeUploadHandler($data['filename']);
-        $data['filename'] = $handler->storeFinal(Image::getImageStorageDir());
+        $data['filename'] = $handler->storeFinal(ImageEditor::getStorageDirOfUneditedImage());
 
         $image->fill($data);
 
         $this->generateThumbnail($image);
 
-        if ( ! $image->save()) {
+        if (!$image->save()) {
             return response('Could not save image.', 500);
         }
 
@@ -237,37 +249,70 @@ class ImageController extends Controller
     }
 
     /**
-     * Just a wrapper to handle errors of the generateThumbnail method of the
-     * model.
+     * Store a newly created resource in storage.
      *
-     * @param  Image  $image
+     * @param  Request  $request
      *
      * @return void
      */
-    private function generateThumbnail(Image $image)
+    public function storeChunk(Request $request)
     {
-        try {
-            $image->generateThumbnail();
-        } catch (\ImagickException | ThumbnailException $e) {
-            Log::error('Failed to generate thumbnail. File: '.$image->filename);
-
-            return abort(500, 'Failed to generate thumbnail.');
-        }
+        $handler = new ChunkUploadStrategy(self::ALLOWED_EXT);
+        $handler->storeTmp($request);
     }
 
     /**
-     * UploadHandler factory
+     * Display the specified resource file.
      *
-     * @param  string  $filename
+     * @param  Image  $image
      *
-     * @return RegularUploadStrategy
+     * @return BinaryFileResponse
      */
-    private function makeUploadHandler(string $filename)
+    public function showThumbnail(Image $image)
     {
-        return new RegularUploadStrategy(
-            self::ALLOWED_EXT,
-            $filename
-        );
+        $this->generateThumbnail($image);
+        $editor = app(ImageEditorThumbnail::class, ['image' => $image]);
+        return $this->fileResponse($editor->getRelPath());
+    }
+
+    /**
+     * Display the specified resource file.
+     *
+     * @param  Image  $image
+     *
+     * @return BinaryFileResponse
+     */
+    public function showFile(Request $request, ImageEditorFactory $editorFactory, Image $image)
+    {
+        Validator::make($request->query(), [
+            'format'        => ['sometimes', 'in:'.ImageEditorPng::FILE_FORMAT.','.ImageEditorPdf::FILE_FORMAT],
+            'color_profile' => [
+                'requiredIf:format,'.ImageEditorPdf::FILE_FORMAT,
+                new ImageColorProfileRule($request),
+            ],
+            'resolution'    => [
+                'requiredIf:format,'.ImageEditorPdf::FILE_FORMAT,
+                'integer',
+                'between:'.ImageEditorPdf::RESOLUTION_MIN.','.ImageEditorPdf::RESOLUTION_MAX
+            ],
+            'bleed'         => ['requiredIf:format,'.ImageEditorPdf::FILE_FORMAT, 'between:0,1']
+        ])->validate();
+
+        $format       = $request->query('format', ImageEditorPng::FILE_FORMAT);
+        $withBleed    = (bool) $request->query('bleed', false);
+        $resolution   = $request->query('resolution');
+        $colorProfile = $request->query('color_profile', ImageEditorPng::COLOR_PROFILE);
+
+        try {
+            $editor = $editorFactory->make($image, $format, $withBleed, $resolution, $colorProfile);
+            $editor->generateIfNeeded();
+        } catch (\ImagickException|ImageEditorException $e) {
+            Log::error($e);
+
+            abort(500, 'Failed to process image.');
+        }
+
+        return $this->fileResponse($editor->getRelPath());
     }
 
     /**
@@ -298,12 +343,47 @@ class ImageController extends Controller
         // if there are unquoted parts left, process them for partial matches
         if ($string) {
             $terms = preg_split("/[^\w\+\-\.]+/Uu", $string, 0, PREG_SPLIT_NO_EMPTY);
-            if ( ! $terms) {
+            if (!$terms) {
                 return $query;
             }
             $query .= implode('* ', $terms).'*';
         }
 
         return $query;
+    }
+
+    /**
+     * UploadHandler factory
+     *
+     * @param  string  $filename
+     *
+     * @return RegularUploadStrategy
+     */
+    private function makeUploadHandler(string $filename)
+    {
+        return new RegularUploadStrategy(
+            self::ALLOWED_EXT,
+            $filename
+        );
+    }
+
+    /**
+     * Just a wrapper to handle errors of the generateThumbnail method of the
+     * model.
+     *
+     * @param  Image  $image
+     *
+     * @return void
+     */
+    private function generateThumbnail(Image $image): void
+    {
+        try {
+            $editor = app(ImageEditorThumbnail::class, ['image' => $image]);
+            $editor->generateIfNeeded();
+        } catch (\ImagickException|ImageEditorException $e) {
+            Log::error($e);
+
+            abort(500, 'Failed to generate thumbnail.');
+        }
     }
 }

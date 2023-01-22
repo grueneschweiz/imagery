@@ -1,5 +1,6 @@
 import Bar from "./Bar";
 import {BarTypes} from "../../Constants";
+import * as MarkHelper from "../../misc/MarkHelper";
 
 /**
  * If we multiply the font size with factor we should get the height of
@@ -39,32 +40,53 @@ export default class BarYoung extends Bar {
     }
 
     set type(type) {
+        let font;
+
         switch (type) {
             case BarTypes.headline:
-                this._font = fontFamily.headline
+                font = fontFamily.headline
                 break;
             case BarTypes.subline:
-                this._font = fontFamily.subline
+                font = fontFamily.subline
                 break;
             default:
                 throw new Error(`BarType ${type} is not implemented.`)
         }
+
+        this._setProperty('_font', font);
     }
 
     set baseFontSize(fontSize) {
+        let size;
+
         if (this._font === fontFamily.subline) {
-            this._fontSize = fontSize * sublineHeadlineSizeRatio
-            return
+            size = fontSize * sublineHeadlineSizeRatio
+        } else {
+            size = fontSize
         }
 
-        this._fontSize = fontSize
+        this._setProperty('_fontSize', size);
     }
 
     set isFirstSubline(val) {
-        this._hasMargin = val
+        this._setProperty('_hasMargin', val);
     }
 
-    draw() {
+    calculateWidth(fontSize) {
+        const originalFontSize = this._fontSize;
+
+        this.baseFontSize = fontSize;
+        this._setFont();
+        this._setTextDims();
+
+        const width = this._calculateCanvasWidth();
+
+        this._fontSize = originalFontSize;
+
+        return width;
+    }
+
+    _drawConcrete() {
         this._setFont();
         this._setTextDims();
         this._setCanvasWidth();
@@ -73,8 +95,22 @@ export default class BarYoung extends Bar {
 
         this._drawBackground();
         this._drawFont();
+    }
 
-        return this._canvas;
+    _drawSelectedMark() {
+        const lineWidth = MarkHelper.getMarkLineWidth(
+            this._previewDims,
+            {width: this._imageWidth, height: this._imageHeight}
+        );
+
+        this._context.lineWidth = lineWidth;
+        this._context.strokeStyle = MarkHelper.getMarkColor(this._markActive);
+        this._context.strokeRect(
+            lineWidth / 2,
+            this._getMargin() + lineWidth / 2,
+            this._canvas.width - lineWidth,
+            this._getBarHeight() - lineWidth
+        );
     }
 
     _setFont() {
@@ -88,10 +124,14 @@ export default class BarYoung extends Bar {
     }
 
     _setCanvasWidth() {
+        this._canvas.width = this._calculateCanvasWidth();
+    }
+
+    _calculateCanvasWidth() {
         const textWidth = this._textDims.width;
         const padding = this._textDims.padding;
 
-        this._canvas.width = textWidth + 2 * padding;
+        return textWidth + 2 * padding;
     }
 
     _setCanvasHeight() {

@@ -2,13 +2,10 @@
 
 namespace App;
 
-use App\Exceptions\ThumbnailException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Storage;
-use Imagick;
 
 /**
  * Class Image
@@ -28,6 +25,7 @@ use Imagick;
  * @property string $filename
  * @property int $width
  * @property int $height
+ * @property int|null $bleed  pixels
  * @property string $src
  * @property string $thumb_src
  * @property string $file_type
@@ -61,15 +59,9 @@ use Imagick;
  * @method static \Illuminate\Database\Query\Builder|\App\Image withoutTrashed()
  * @mixin \Eloquent
  */
-class Image extends Model implements FileModel
+class Image extends Model
 {
     use SoftDeletes;
-
-    private const THUMB_MAX_WIDTH = 600;
-    private const THUMB_MAX_HEIGHT = 5000;
-
-    private const PATH_FULL = 'full';
-    private const PATH_THUMB = 'thumb';
 
     public const TYPE_RAW = 'raw';
     public const TYPE_FINAL = 'final';
@@ -111,24 +103,9 @@ class Image extends Model implements FileModel
         return $this->belongsTo(User::class);
     }
 
-    public function legal()
-    {
-        return $this->hasOne(Legal::class);
-    }
-
     public function logo()
     {
         return $this->belongsTo(Logo::class);
-    }
-
-    public function original()
-    {
-        return $this->belongsTo(__CLASS__, 'original_id');
-    }
-
-    public function isFinal()
-    {
-        return $this->type === self::TYPE_FINAL;
     }
 
     public function isShareable()
@@ -149,51 +126,19 @@ class Image extends Model implements FileModel
         return (bool) $this->legal;
     }
 
-    public static function getImageStorageDir()
+    public function legal()
     {
-        $dir = self::getBaseDir().DIRECTORY_SEPARATOR.self::PATH_FULL;
-
-        return create_dir($dir);
+        return $this->hasOne(Legal::class);
     }
 
-    public static function getThumbnailStorageDir()
+    public function original()
     {
-        $dir = self::getBaseDir().DIRECTORY_SEPARATOR.self::PATH_THUMB;
-
-        return create_dir($dir);
+        return $this->belongsTo(__CLASS__, 'original_id');
     }
 
-    private static function getBaseDir()
+    public function isFinal()
     {
-        return trim(config('app.image_dir'), '/');
-    }
-
-    /**
-     * Generate a thumbnail of this image
-     *
-     * @throws \ImagickException
-     * @throws ThumbnailException
-     */
-    public function generateThumbnail()
-    {
-        $thumbPath = $this->getRelThumbPath();
-
-        if (Storage::exists($thumbPath)) {
-            return;
-        }
-
-        $imagePath = disk_path($this->getRelPath());
-        $image     = new Imagick(realpath($imagePath));
-
-        if (!(
-            $image->thumbnailImage(self::THUMB_MAX_WIDTH, self::THUMB_MAX_HEIGHT, true)
-            && $image->writeImage(disk_path($thumbPath))
-            && $image->destroy()
-        )) {
-            throw new ThumbnailException('Thumbnail generation failed.');
-        }
-
-        Storage::setVisibility($thumbPath, 'private');
+        return $this->type === self::TYPE_FINAL;
     }
 
     /**
@@ -269,15 +214,5 @@ class Image extends Model implements FileModel
     public function getFileTypeAttribute()
     {
         return substr($this->filename, strpos($this->filename, '.') + 1);
-    }
-
-    public function getRelPath(array $args = []): string
-    {
-        return self::getImageStorageDir().DIRECTORY_SEPARATOR.$this->filename;
-    }
-
-    public function getRelThumbPath(): string
-    {
-        return self::getThumbnailStorageDir().DIRECTORY_SEPARATOR.$this->filename;
     }
 }

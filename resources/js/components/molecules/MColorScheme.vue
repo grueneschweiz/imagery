@@ -1,5 +1,5 @@
 <template>
-    <div class="form-group">
+    <div v-if="backgroundType !== backgroundTypes.gradient" class="form-group">
         <AButtonGroup
             :options="options"
             :title="$t('images.create.colorScheme')"
@@ -10,8 +10,9 @@
     </div>
 </template>
 <script>
-import {ColorSchemes, StyleSetTypes} from "../../service/canvas/Constants";
-    import AButtonGroup from "../atoms/AButtonGroup";
+import {BackgroundTypes, ColorSchemes, StyleSetTypes} from "../../service/canvas/Constants";
+import AButtonGroup from "../atoms/AButtonGroup";
+import {mapGetters} from "vuex";
 
     export default {
         name: 'MColorScheme',
@@ -19,9 +20,15 @@ import {ColorSchemes, StyleSetTypes} from "../../service/canvas/Constants";
         data() {
             return {
                 schemes: ColorSchemes,
+                backgroundTypes: BackgroundTypes,
             }
         },
         computed: {
+            ...mapGetters({
+                styleSet: 'canvas/getStyleSet',
+                backgroundType: 'canvas/getBackgroundType',
+            }),
+
             scheme: {
                 get() {
                     return this.$store.getters['canvas/getColorSchema']
@@ -31,17 +38,14 @@ import {ColorSchemes, StyleSetTypes} from "../../service/canvas/Constants";
                 }
             },
 
-            styleSet() {
-                return this.$store.getters['canvas/getStyleSet']
-            },
-
             options() {
                 const options = [
                   {value: ColorSchemes.white, text: this.$t('images.create.white')},
                   {value: ColorSchemes.green, text: this.$t('images.create.green')},
                 ]
 
-                if (StyleSetTypes.green === this.styleSet) {
+                if (StyleSetTypes.green === this.styleSet
+                    || StyleSetTypes.greenCentered === this.styleSet) {
                     options.push(
                         {value: ColorSchemes.greengreen, text: this.$t('images.create.greengreen')}
                     );
@@ -57,7 +61,12 @@ import {ColorSchemes, StyleSetTypes} from "../../service/canvas/Constants";
                     && ColorSchemes.greengreen === this.scheme) {
                     this.scheme = ColorSchemes.green
                 }
-            }
+            },
+            backgroundType(value) {
+                this.scheme = BackgroundTypes.gradient === value
+                        ? ColorSchemes.white
+                        : ColorSchemes.green
+            },
         },
     }
 </script>

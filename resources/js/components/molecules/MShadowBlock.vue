@@ -31,31 +31,17 @@
 </template>
 
 <script>
-import {mapGetters} from "vuex"
-import {Shadow} from "../../service/canvas/elements/Shadow"
 
 export default {
     name: 'MShadowBlock',
 
-    data() {
-        return {
-            block: new Shadow(),
-        }
-    },
-
     computed: {
-        ...mapGetters({
-            imageHeight: 'canvas/getImageHeight',
-            imageWidth: 'canvas/getImageWidth',
-        }),
-
         top: {
             get() {
                 return this.$store.getters['canvas/getHasTopShadow']
             },
             set(val) {
                 this.$store.dispatch('canvas/setHasTopShadow', val)
-                this.draw()
             }
         },
 
@@ -65,31 +51,7 @@ export default {
             },
             set(val) {
                 this.$store.dispatch('canvas/setHasBottomShadow', val)
-                this.draw()
             }
-        },
-    },
-
-    mounted() {
-        this.draw()
-    },
-
-    methods: {
-        draw() {
-            this.block.top = this.top
-            this.block.bottom = this.bottom
-            this.block.width = this.imageWidth
-            this.block.height = this.imageHeight
-            this.$emit('drawn', this.block.draw())
-        },
-    },
-
-    watch: {
-        imageWidth() {
-            this.draw();
-        },
-        imageHeight() {
-            this.draw();
         },
     },
 }

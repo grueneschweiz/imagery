@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!isStyleYoung" class="form-group">
+    <div v-if="styleHasBorder" class="form-group">
         <label
             class="mb-0"
             for="border-switch"
@@ -24,7 +24,6 @@
 </template>
 
 <script>
-    import {Border} from "../../service/canvas/elements/Border";
     import ASelect from "../atoms/ASelect";
     import {mapGetters} from "vuex";
     import {StyleSetTypes} from "../../service/canvas/Constants";
@@ -32,16 +31,9 @@
     export default {
         name: "MBorderBlock",
         components: {ASelect},
-        data() {
-            return {
-                block: new Border(),
-            }
-        },
 
         computed: {
             ...mapGetters({
-                imageHeight: 'canvas/getImageHeight',
-                imageWidth: 'canvas/getImageWidth',
                 styleSet: 'canvas/getStyleSet',
             }),
 
@@ -54,42 +46,14 @@
                 }
             },
 
-            isStyleYoung() {
-                return StyleSetTypes.young === this.styleSet
+            styleHasBorder() {
+                return StyleSetTypes.green === this.styleSet
             }
         },
 
-        mounted() {
-            this.draw()
-
-            // enable / disable border only in next tick so the border with is
-            // calculated and set first, as the placement of the bars depends
-            // on it.
-            this.$nextTick(() => this.border = ! this.isStyleYoung)
-        },
-
-        methods: {
-            draw() {
-                this.block.width = this.imageWidth;
-                this.block.height = this.imageHeight;
-                this.block.border = this.border;
-                this.$emit('drawn', this.block.draw());
-                this.$store.dispatch('canvas/setBorderWidth', this.block.borderWidth)
-            },
-        },
-
         watch: {
-            imageWidth() {
-                this.draw();
-            },
-            imageHeight() {
-                this.draw();
-            },
-            border() {
-                this.draw();
-            },
             styleSet() {
-                this.border = ! this.isStyleYoung
+                this.border = this.styleHasBorder;
             }
         },
     }

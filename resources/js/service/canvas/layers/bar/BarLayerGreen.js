@@ -25,22 +25,27 @@ const borderMarginFactorRadius = 2;
 const textPaddingFactor = 2;
 
 export default class BarLayerGreen extends BarLayer {
-    constructor(canvas) {
-        super(canvas);
+    constructor(canvas, context) {
+        super(canvas, context);
     }
 
     _getTopLimit() {
         const margin = this._alignment === Alignments.right
             ? borderMarginFactorRadius * this._borderWidth
             : borderMarginFactor * this._borderWidth
-        return margin + this._getFullHorizontalRotationTriangleHeight()
+        return margin
+            + this._bleed
+            + this._getFullHorizontalRotationTriangleHeight()
     }
 
     _getBottomLimit() {
         const margin = this._alignment === Alignments.left
             ? borderMarginFactorRadius * this._borderWidth
             : borderMarginFactor * this._borderWidth
-        return this._canvas.height - margin - this._block.height
+        return this._canvas.height
+            - margin
+            - this._bleed
+            - this._getBlockHeight()
     }
 
     _drawBlockConcrete() {
@@ -57,13 +62,15 @@ export default class BarLayerGreen extends BarLayer {
     _getBlockXpos() {
         switch (this._alignment) {
             case Alignments.left:
-                return -this._getBlockOversize()
+                return this._bleed
+                    - this._getBlockOversize()
             case Alignments.right:
                 return this._canvas.width
-                    - this._block.width
+                    - this._bleed
+                    - this._getBlockWidth()
                     + this._getBlockOversize()
             default:
-                return (this._canvas.width - this._block.width) / 2
+                return (this._canvas.width - this._getBlockWidth()) / 2
         }
     }
 
@@ -86,22 +93,22 @@ export default class BarLayerGreen extends BarLayer {
     }
 
     _getRotatedVisibleHeight() {
-        return this._block.height + this._getVisibleHorizontalRotationTriangleHeight();
+        return this._getBlockHeight() + this._getVisibleHorizontalRotationTriangleHeight();
     }
 
     _getRotatedFullWidth() {
-        return this._block.width + Math.sin(-RotationAngle) * this._block.height;
+        return this._getBlockWidth() + Math.sin(-RotationAngle) * this._getBlockHeight();
     }
 
     _getBlockOversize() {
         const paddingX = this._textPadding * textPaddingFactor;
 
         if (this._alignment === Alignments.left) {
-            return this._canvas.width * BarSizeFactor - paddingX;
+            return this._getVisibleCanvasWidth() * BarSizeFactor - paddingX;
         }
 
-        const rotationCorr = Math.sin(RotationAngle) * this._block.height;
-        return this._canvas.width * BarSizeFactor + rotationCorr - paddingX;
+        const rotationCorr = Math.sin(RotationAngle) * this._getBlockHeight();
+        return this._getVisibleCanvasWidth() * BarSizeFactor + rotationCorr - paddingX;
     }
 
     _getVisibleHorizontalRotationTriangleHeight() {
@@ -109,10 +116,14 @@ export default class BarLayerGreen extends BarLayer {
     }
 
     _getFullHorizontalRotationTriangleHeight() {
-        return Math.sin(-RotationAngle) * this._block.width;
+        return Math.sin(-RotationAngle) * this._getBlockWidth();
     }
 
     _getVisibleBlockWidth() {
-        return this._block.width - this._getBlockOversize();
+        return this._getBlockWidth() - this._getBlockOversize();
+    }
+
+    _getVisibleCanvasWidth() {
+        return this._canvas.width - 2 * this._bleed;
     }
 }

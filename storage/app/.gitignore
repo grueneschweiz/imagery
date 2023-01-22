@@ -6,3 +6,4 @@
 !reference_logos
 !reference_logos/*
 !.gitignore
+!/*.icc
