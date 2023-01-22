@@ -24,7 +24,8 @@ class Border extends DrawBase {
 
     get borderWidth() {
         const area = this._canvas.width * this._canvas.height;
-        return Math.sqrt(area) * BorderWidthFactor;
+        const width = Math.sqrt(area) * BorderWidthFactor;
+        return Math.ceil(width);
     }
 
     _draw() {
