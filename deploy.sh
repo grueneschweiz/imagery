@@ -130,6 +130,7 @@ sync() {
         --include='/storage/app/base_logos/***' \
         --include='/storage/app/fonts/***' \
         --include='/storage/app/vector_logo_templates/***' \
+        --include='/storage/app/*.icc' \
         --exclude='/storage/app/logo_cache' \
         --exclude='/storage/app/logo_package_cache' \
         --exclude='/storage/temp' \
