@@ -301,16 +301,8 @@ let requestedAnimationFrame;
                     this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
                     this.context.drawImage(this.finalImage, offset, offset, width, height, 0, 0, width, height);
 
-                    // grey out bleed area
-                    if (this.bleed) {
-                        this.context.lineWidth = this.bleed;
-                        this.context.strokeStyle = 'rgba(0, 0, 0, 0.2)';
-                        this.context.strokeRect(
-                            this.bleed / 2,
-                            this.bleed / 2,
-                            this.visibleWidth + this.bleed,
-                            this.visibleHeight + this.bleed
-                        );
+                    if (this.showBleed) {
+                       this.drawTrimArea();
                     }
 
                     this.$store.dispatch('canvas/setTextFitsImage', this.engine.getTextFitsImage());
@@ -323,6 +315,55 @@ let requestedAnimationFrame;
                 } else {
                     requestedAnimationFrame = window.requestAnimationFrame(drawFn);
                 }
+            },
+
+            drawTrimArea() {
+                const ctx = this.context;
+                const bleed = this.bleed;
+
+                // grey out trim area
+                ctx.lineWidth = bleed;
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.strokeRect(
+                    bleed / 2,
+                    bleed / 2,
+                    this.visibleWidth + bleed,
+                    this.visibleHeight + bleed
+                );
+
+                // draw trim marks
+                const onePx = this.canvasWidth / this.previewDims.width;
+                const trimLineLen = bleed / 3 * 2;
+                ctx.lineWidth = onePx;
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
+
+                ctx.beginPath();
+
+                // top left
+                ctx.moveTo(0, bleed);
+                ctx.lineTo(trimLineLen, bleed);
+                ctx.moveTo(bleed, 0);
+                ctx.lineTo(bleed, trimLineLen);
+
+                // top right
+                ctx.moveTo(this.canvasWidth, bleed);
+                ctx.lineTo(this.canvasWidth - trimLineLen, bleed);
+                ctx.moveTo(this.canvasWidth - bleed, 0);
+                ctx.lineTo(this.canvasWidth - bleed, trimLineLen);
+
+                // bottom left
+                ctx.moveTo(0, this.canvasHeight - bleed);
+                ctx.lineTo(trimLineLen, this.canvasHeight - bleed);
+                ctx.moveTo(bleed, this.canvasHeight);
+                ctx.lineTo(bleed, this.canvasHeight - trimLineLen);
+
+                // bottom right
+                ctx.moveTo(this.canvasWidth, this.canvasHeight - bleed);
+                ctx.lineTo(this.canvasWidth - trimLineLen, this.canvasHeight - bleed);
+                ctx.moveTo(this.canvasWidth - bleed, this.canvasHeight);
+                ctx.lineTo(this.canvasWidth - bleed, this.canvasHeight - trimLineLen);
+
+                ctx.stroke();
             },
 
             setCanvasZoneLeft: debounce(function () {
