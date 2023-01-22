@@ -19,6 +19,12 @@
             </template>
         </ul>
 
+        <p v-if="format !== this.formats.digital">
+            {{$t('images.create.betaLongDesc')}}
+            &rarr;
+            <router-link :to="{name: 'feedbackIndex'}">{{ $t('images.create.feedback') }}</router-link>
+        </p>
+
         <button
             class="close"
             @click="$emit('input', false)"

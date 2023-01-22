@@ -172,6 +172,8 @@
             "noBleed": "No bleed",
             "bleedAndCropMarks": "With {bleed} additional bleed and crop marks",
             "resolution": "Resolution: 300dpi for A-Formats, 150dpi for F-Formats",
+            "betaLongDesc": "This feature is still in beta. If you encounter any problems, please let us know.",
+            "feedback": "Feedback",
             "switchOrientation": "Switch page orientation",
             "rotate": "Rotate",
             "fontSize": "Font size",
