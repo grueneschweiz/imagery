@@ -126,6 +126,7 @@ let requestedAnimationFrame;
                 },
                 dragging: false,
 
+                drawPromises: new Map(),
                 engine: new ImageEngine(),
                 initialized: false,
                 finalImage: null,
@@ -229,7 +230,7 @@ let requestedAnimationFrame;
 
                 this.setInitialEngineProps();
                 this.updateLogoWidth();
-                this.draw();
+                this.draw().catch(console.debug);
             });
         },
 
@@ -280,18 +281,20 @@ let requestedAnimationFrame;
 
             draw(forceRepaint = false) {
                 if (!this.initialized) {
-                    return;
+                    return Promise.reject(new Error('Image engine not yet initialized.'));
                 }
 
                 if (!forceRepaint && !this.engine.needsRepaint()) {
-                    return;
+                    return Promise.reject(new Error('No repaint needed.'));
                 }
 
                 if (requestedAnimationFrame) {
                     window.cancelAnimationFrame(requestedAnimationFrame);
+                    this.drawPromises.get(requestedAnimationFrame)?.reject(new Error('Repaint cancelled.'));
+                    this.drawPromises.delete(requestedAnimationFrame);
                 }
 
-                const drawFn = () => {
+                const drawFn = (resolve) => {
                     this.finalImage = this.engine.draw(forceRepaint);
 
                     const width = this.canvasWidth;
@@ -305,16 +308,28 @@ let requestedAnimationFrame;
                        this.drawTrimArea();
                     }
 
-                    this.$store.dispatch('canvas/setTextFitsImage', this.engine.getTextFitsImage());
+                    this.$store.commit('canvas/setTextFitsImage', this.engine.getTextFitsImage());
+
+                    resolve();
+                    this.drawPromises.delete(requestedAnimationFrame);
+                    requestedAnimationFrame = null;
                 };
 
                 if (forceRepaint) {
                     // draw immediately to avoid draw event canceling.
                     // this is needed when the font is loaded.
-                    drawFn();
-                } else {
-                    requestedAnimationFrame = window.requestAnimationFrame(drawFn);
+                    return new Promise(res => drawFn(res));
                 }
+
+                let resolve, reject;
+                const promise = new Promise((res, rej) => {
+                    resolve = res;
+                    reject = rej;
+                });
+                requestedAnimationFrame = window.requestAnimationFrame(() => drawFn(resolve));
+                this.drawPromises.set(requestedAnimationFrame, {resolve, reject});
+
+                return promise;
             },
 
             drawTrimArea() {
@@ -433,7 +448,12 @@ let requestedAnimationFrame;
                 };
             },
 
-            save() {
+            async save() {
+                if (this.engine.getBarTouching() || this.engine.getBackgroundTouching()) {
+                    this.engine.mousePos = {x: -1, y: -1};
+                    await this.draw(true);
+                }
+
                 this.$emit('save', {
                     canvas: this.finalImage,
                 });
@@ -443,102 +463,102 @@ let requestedAnimationFrame;
         watch: {
             logoImage(value) {
                 this.engine.logoImage = value;
-                this.draw();
+                this.draw().catch(console.debug);
             },
             logoType(value) {
                 this.engine.logoType = value;
                 this.updateLogoWidth();
-                this.draw();
+                this.draw().catch(console.debug);
             },
             styleSet(value) {
                 this.engine.styleSet = value;
-                this.draw();
+                this.draw().catch(console.debug);
             },
             format(value) {
                 this.engine.format = value;
-                this.draw(true);
+                this.draw(true).catch(console.debug);
             },
             visibleHeight(value) {
                 this.engine.bleed = this.bleed;
                 this.engine.visibleHeight = value;
                 this.updateLogoWidth();
-                this.draw();
+                this.draw().catch(console.debug);
             },
             visibleWidth(value) {
                 this.engine.bleed = this.bleed;
                 this.engine.visibleWidth = value;
                 this.updateLogoWidth();
-                this.draw();
+                this.draw().catch(console.debug);
             },
             canvasHeight(value) {
                 this.canvas.height = value;
-                this.draw(true);
+                this.draw(true).catch(console.debug);
             },
             canvasWidth(value) {
                 this.canvas.width = value;
-                this.draw(true);
+                this.draw(true).catch(console.debug);
             },
             backgroundType(value) {
                 this.engine.backgroundType = value;
-                this.draw();
+                this.draw().catch(console.debug);
             },
             backgroundImage(value) {
                 this.engine.backgroundImage = value;
-                this.draw();
+                this.draw().catch(console.debug);
             },
             backgroundZoom(value) {
                 this.engine.backgroundZoom = value;
-                this.draw();
+                this.draw().catch(console.debug);
             },
             backgroundWatermarkText(value) {
                 this.engine.backgroundWatermarkText = value;
-                this.draw();
+                this.draw().catch(console.debug);
             },
             bars(value) {
                 this.engine.bars = value;
-                this.draw(true);
+                this.draw(true).catch(console.debug);
             },
             fontSizePercent(value) {
                 this.engine.fontSizePercent = value;
-                this.draw();
+                this.draw().catch(console.debug);
             },
             hasTopShadow(value) {
                 this.engine.topShadow = value;
-                this.draw();
+                this.draw().catch(console.debug);
             },
             hasBottomShadow(value) {
                 this.engine.bottomShadow = value;
-                this.draw();
+                this.draw().catch(console.debug);
             },
             hasBorder(value) {
                 this.engine.hasBorder = value;
-                this.draw();
+                this.draw().catch(console.debug);
             },
             copyrightText() {
                 this.setCopyrightText();
-                this.draw();
+                this.draw().catch(console.debug);
             },
             alignment(value) {
                 this.engine.alignment = value;
-                this.draw();
+                this.draw().catch(console.debug);
             },
             fontsLoaded() {
-                this.draw(true);
+                this.draw(true).catch(console.debug);
             },
             mousePos() {
                 this.engine.mousePos = this.mousePos;
-                this.draw();
+                this.draw().catch(console.debug);
             },
             dragging() {
                 this.engine.dragging = this.dragging;
-                this.draw();
+                this.draw().catch(console.debug);
             },
             previewDims(value) {
                 this.engine.previewDims = value;
             },
             bleed(value) {
                 this.engine.bleed = value;
-                this.draw();
+                this.draw().catch(console.debug);
             },
         }
     }
