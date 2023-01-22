@@ -127,6 +127,7 @@ let requestedAnimationFrame;
                 dragging: false,
 
                 engine: new ImageEngine(),
+                initialized: false,
                 finalImage: null,
 
                 dragObj: null,
@@ -154,14 +155,15 @@ let requestedAnimationFrame;
                 alignment: 'canvas/getAlignment',
                 fontsLoaded: 'canvas/getFontsLoaded',
                 bleed: 'canvas/getBleed',
+                showBleed: 'canvas/getShowBleed',
             }),
 
             canvasWidth() {
-                return this.visibleWidth + this.bleed * 2;
+                return this.showBleed ? this.visibleWidth + this.bleed * 2 : this.visibleWidth;
             },
 
             canvasHeight() {
-                return this.visibleHeight + this.bleed * 2;
+                return this.showBleed ? this.visibleHeight + this.bleed * 2 : this.visibleHeight;
             },
 
             canvasClasses() {
@@ -260,6 +262,8 @@ let requestedAnimationFrame;
                 engine.alignment = this.alignment;
                 engine.mousePos = this.mousePos;
                 engine.dragging = this.dragging;
+
+                this.initialized = true;
             },
 
             updateLogoWidth() {
@@ -275,6 +279,10 @@ let requestedAnimationFrame;
             },
 
             draw(forceRepaint = false) {
+                if (!this.initialized) {
+                    return;
+                }
+
                 if (!forceRepaint && !this.engine.needsRepaint()) {
                     return;
                 }
@@ -286,8 +294,12 @@ let requestedAnimationFrame;
                 const drawFn = () => {
                     this.finalImage = this.engine.draw(forceRepaint);
 
+                    const width = this.canvasWidth;
+                    const height = this.canvasHeight;
+                    const offset = this.showBleed ? 0 : this.bleed;
+
                     this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-                    this.context.drawImage(this.finalImage, 0, 0);
+                    this.context.drawImage(this.finalImage, offset, offset, width, height, 0, 0, width, height);
 
                     // grey out bleed area
                     if (this.bleed) {
@@ -403,29 +415,27 @@ let requestedAnimationFrame;
             },
             format(value) {
                 this.engine.format = value;
-                this.draw();
+                this.draw(true);
             },
             visibleHeight(value) {
+                this.engine.bleed = this.bleed;
                 this.engine.visibleHeight = value;
                 this.updateLogoWidth();
                 this.draw();
             },
             visibleWidth(value) {
+                this.engine.bleed = this.bleed;
                 this.engine.visibleWidth = value;
                 this.updateLogoWidth();
                 this.draw();
             },
             canvasHeight(value) {
                 this.canvas.height = value;
-                this.engine.bleed = this.bleed;
-                this.engine.visibleHeight = this.visibleHeight;
-                this.draw();
+                this.draw(true);
             },
             canvasWidth(value) {
                 this.canvas.width = value;
-                this.engine.bleed = this.bleed;
-                this.engine.visibleWidth = this.visibleWidth;
-                this.draw();
+                this.draw(true);
             },
             backgroundType(value) {
                 this.engine.backgroundType = value;

@@ -11,7 +11,7 @@
             <li>{{ $t('images.create.colorProfile', {'profile': colorProfile}) }}</li>
             <template v-if="format !== formats.digital">
                 <li>{{ $t('images.create.resolution') }}</li>
-                <li v-if="bleed">{{
+                <li v-if="hasBleed">{{
                         $t('images.create.bleedAndCropMarks', {bleed: `${bleed}mm`})
                     }}
                 </li>
@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import {ColorEncodings, Formats} from "../../service/canvas/Constants";
+import {ColorEncodings, Formats, PrintingBleed} from "../../service/canvas/Constants";
 import {mapGetters} from "vuex";
 
 export default {
@@ -45,6 +45,7 @@ export default {
     data() {
         return {
             formats: Formats,
+            bleed: PrintingBleed,
         }
     },
 
@@ -53,7 +54,7 @@ export default {
             format: 'canvas/getFormat',
             fileFormat: 'canvas/getFileFormat',
             colorEncoding: 'canvas/getColorEncoding',
-            bleed: 'canvas/getBleed',
+            hasBleed: 'canvas/getShowBleed',
         }),
 
         heading() {
