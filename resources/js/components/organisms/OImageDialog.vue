@@ -211,6 +211,11 @@ import {BackgroundTypes, Media} from "../../service/canvas/Constants";
                 return uploader.upload('files/images')
                     .then(() => this.uploadRawImageMeta())
                     .catch(error => {
+                        if (error.response?.data?.errors?.base64data?.[0] === 'Max file size exceeded.') {
+                            this.snackErrorDismiss(error, this.$t('images.create.maxFileSizeExceededRaw'));
+                            return;
+                        }
+
                         this.snackErrorRetry(error, this.$t('images.create.uploadFailed'))
                             .then(this.uploadRawImage);
                     });
@@ -228,6 +233,11 @@ import {BackgroundTypes, Media} from "../../service/canvas/Constants";
                 return uploader.upload('files/images')
                     .then(() => this.uploadFinalImageMeta())
                     .catch(error => {
+                        if (error.response?.data?.errors?.base64data?.[0] === 'Max file size exceeded.') {
+                            this.snackErrorDismiss(error, this.$t('images.create.maxFileSizeExceededFinal'));
+                            return;
+                        }
+
                         this.snackErrorRetry(error, this.$t('images.create.uploadFailed'))
                             .then(this.uploadFinalImage);
                     });
