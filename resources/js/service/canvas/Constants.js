@@ -73,6 +73,19 @@ export const HugeImageJpegQuality = 0.9;
 export const RegularImageQuality = 1; // jpeg AND png
 export const HugeImageSurfaceLimit = 5000**2; // 5000px x 5000px
 
+/**
+ * How much can the background image be zoomed up?
+ *
+ * 2 = 200% (twice the pixel size)
+ * 1 = 100% (do not scale up the image)
+ *
+ * @type {number}
+ */
+export const MaxImageZoomFactor = 2;
+
+// https://stackoverflow.com/a/11585939
+export const CanvasMaxSideLen = 16384
+
 export const BarSchemes = {
     white: {
         background: '#ffffff',

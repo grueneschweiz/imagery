@@ -58,6 +58,10 @@ export default class BackgroundEngine extends DraggableSubEngine {
         return this._layer.touching;
     }
 
+    getScaleUpLimit() {
+        return this._element?.scaleUpLimit || 0;
+    }
+
     _setElement() {
         if (this._currentElementType === this._backgroundType) {
             return;

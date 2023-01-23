@@ -8,7 +8,6 @@ import {
     StyleSetTypes,
     Media,
     ColorEncodings,
-    FileFormats,
     PrintingBleed,
     Inch2mm
 } from "../../service/canvas/Constants";
@@ -39,6 +38,7 @@ const state = {
     rotated: false,
     fontsLoaded: false,
     copyrightText: '',
+    scaleUpLimit: 1,
     bars: [
         {
             type: BarTypes.headline,
@@ -95,6 +95,7 @@ const getters = {
     getRotated: state => state.rotated,
     getFontsLoaded: state => state.fontsLoaded,
     getCopyrightText: state => state.copyrightText,
+    getScaleUpLimit: state => state.scaleUpLimit,
 };
 
 const mutations = {
@@ -125,6 +126,7 @@ const mutations = {
     setRotated: (state, rotated) => state.rotated = rotated,
     setFontsLoaded: (state, loaded) => state.fontsLoaded = loaded,
     setCopyrightText: (state, text) => state.copyrightText = text,
+    setScaleUpLimit: (state, limit) => state.scaleUpLimit = limit,
 };
 
 const actions = {
@@ -208,6 +210,9 @@ const actions = {
     },
     setCopyrightText({commit}, text) {
         commit('setCopyrightText', text)
+    },
+    setScaleUpLimit({commit}, limit) {
+        commit('setScaleUpLimit', limit)
     },
 };
 

@@ -87,13 +87,13 @@
 
 <script>
 import {ModelSelect} from 'vue-search-select'
-import {HugeImageSurfaceLimit, Inch2mm, Media, StyleSetTypes} from "../../service/canvas/Constants";
+import {CanvasMaxSideLen, HugeImageSurfaceLimit, Inch2mm, Media, StyleSetTypes} from "../../service/canvas/Constants";
 import {ImageSizeIds, ImageSizes} from "../../service/canvas/ImageSizes";
 import {mapGetters} from "vuex";
 import AImageSize from "../atoms/AImageSize.vue";
 
 const minSize = 100
-const maxSize = 16384 // https://stackoverflow.com/a/11585939
+const maxSize = CanvasMaxSideLen
 
 export default {
     name: "MSizeBlock",

@@ -1,4 +1,5 @@
 import Background from "./Background";
+import {CanvasMaxSideLen, MaxImageZoomFactor} from "../../Constants";
 
 export default class BackgroundImage extends Background {
     constructor() {
@@ -28,14 +29,28 @@ export default class BackgroundImage extends Background {
         this._setProperty('_zoom', zoom);
     }
 
+    get scaleUpLimit() {
+        const naturalWidth = this._image.width;
+        const minWidth = this._minImageWidth();
+        const maxWidth = this._maxImageWidth();
+        return (naturalWidth - minWidth) / (maxWidth - minWidth);
+    }
+
     _drawBackground() {
         this._setCanvasSize();
 
-        const width = Math.min(this._canvas.width, this._image.width);
-        const height = Math.min(this._canvas.height, this._image.height);
-
         if (this._image) {
-            this._context.drawImage(this._image, 0, 0, width, height);
+            this._context.drawImage(
+                this._image,
+                0,
+                0,
+                this._image.width,
+                this._image.height,
+                0,
+                0,
+                this._canvas.width,
+                this._canvas.height
+            );
 
             // if we just draw the image, we dont get an error if the uploaded
             // document isn't a processable image. if we, however repaint it
@@ -47,28 +62,48 @@ export default class BackgroundImage extends Background {
     _setCanvasSize() {
         const aspectRatioImage = this._image.width / this._image.height;
 
-        const wRatio = this._image.width / this._containerWidth;
-        const hRatio = this._image.height / this._containerHeight;
+        const minImageWidth = this._minImageWidth();
+        const maxImageWidth = this._maxImageWidth();
 
-        let dW = this._image.width - this._containerWidth;
-        let dH = this._image.height - this._containerHeight;
-
-        dW = dW > 0 ? dW : 0;
-        dH = dH > 0 ? dH : 0;
-
-        let width, height;
-
-        if (wRatio < hRatio) {
-            const w = dW ? this._containerWidth : this._image.width;
-            width = w + this._zoom * dW;
-            height = width / aspectRatioImage;
-        } else {
-            const h = dH ? this._containerHeight : this._image.height;
-            height = h + this._zoom * dH;
-            width = height * aspectRatioImage;
-        }
+        const width = minImageWidth + (maxImageWidth - minImageWidth) * this._zoom;
+        const height = width / aspectRatioImage;
 
         this._canvas.width = width;
         this._canvas.height = height;
+    }
+
+    _minImageWidth() {
+        const wRatio = this._image.width / this._containerWidth;
+        const hRatio = this._image.height / this._containerHeight;
+        const ratio = Math.min(wRatio, hRatio);
+
+        // if image is smaller than container, we want to use the image size
+        if (ratio < 1) {
+            return this._image.width;
+        }
+
+        // use the container width if the width ratio is smaller than the height ratio
+        if (wRatio < hRatio) {
+            return this._containerWidth;
+        }
+
+        // adjust the minimal width to fill the container height
+        const aspectRatio = this._image.width / this._image.height;
+        return this._containerHeight * aspectRatio;
+    }
+
+    _maxImageWidth() {
+        const aspectRatio = this._image.width / this._image.height;
+
+        if (aspectRatio > 1) {
+            // landscape
+            const maxZoomedWidth = this._image.width * MaxImageZoomFactor;
+            return Math.min(maxZoomedWidth, CanvasMaxSideLen);
+        }
+
+        // portrait
+        const maxZoomedHeight = this._image.height * MaxImageZoomFactor;
+        const maxHeight = Math.min(maxZoomedHeight, CanvasMaxSideLen);
+        return maxHeight * aspectRatio;
     }
 }

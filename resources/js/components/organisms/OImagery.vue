@@ -273,7 +273,15 @@ let requestedAnimationFrame;
             },
 
             updateLogoWidth() {
-                this.$store.commit('canvas/setLogoWidth', this.engine.getLogoWidth())
+                this.$store.dispatch('canvas/setLogoWidth', this.engine.getLogoWidth())
+            },
+
+            updateScaleUpLimit() {
+                this.$store.dispatch('canvas/setScaleUpLimit', this.engine.getScaleUpLimit())
+            },
+
+            updateTextFitsImage() {
+                this.$store.dispatch('canvas/setTextFitsImage', this.engine.getTextFitsImage())
             },
 
             setCopyrightText() {
@@ -313,7 +321,8 @@ let requestedAnimationFrame;
                        this.drawTrimArea();
                     }
 
-                    this.$store.commit('canvas/setTextFitsImage', this.engine.getTextFitsImage());
+                    this.updateTextFitsImage();
+                    this.updateScaleUpLimit();
 
                     resolve();
                     this.drawPromises.delete(requestedAnimationFrame);

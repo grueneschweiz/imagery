@@ -201,6 +201,7 @@
             "borderShow": "Show borders",
             "borderNone": "The border is part of the corporate design. You may omit the border if you use the image in a context where a border looks ugly, but this should be an exception.",
             "imageZoom": "Image Zoom",
+            "scaleUpDesc": "Zooming into the red part will make the final image pixelated.",
             "uploadFailed": "Failed to store image. Please try again.",
             "maxFileSizeExceededFinal": "The generated image could not be processed. It is too large. Try again with a lighter background image or reduced image dimensions.",
             "maxFileSizeExceededRaw": "The background image could not be processed. It is too large. Try again with a smaller background image.",

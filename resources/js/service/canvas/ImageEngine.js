@@ -414,6 +414,10 @@ export default class ImageEngine {
         return this._barEngine.getTextFitsImage();
     }
 
+    getScaleUpLimit() {
+        return this._backgroundEngine.getScaleUpLimit();
+    }
+
     needsRepaint() {
         return this._dirty;
     }

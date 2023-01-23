@@ -42,7 +42,14 @@
             {{$t('images.create.hugeImage', {maxWidth: hugeImageSideLenLimit, maxHeight: hugeImageSideLenLimit})}}
         </div>
 
-        <div v-if="backgroundType === backgroundTypes.image && backgroundImage && !imageTooSmall" class="form-group">
+        <div
+            v-if="backgroundType === backgroundTypes.image && backgroundImage"
+            class="form-group m-background-block__zoom"
+        >
+            <div
+                :style="`width: ${Math.min((1-scaleUpLimit)*100, 99)}%;`"
+                class="m-background-block__scale-up-zone"
+            />
             <label
                 class="mb-0 mt-2"
                 for="image-zoom"
@@ -56,6 +63,12 @@
                 type="range"
                 v-model.number="zoom"
             >
+            <small
+                :class="{'m-background-block__scale-up-desc--visible': zoom > scaleUpLimit}"
+                class="m-background-block__scale-up-desc"
+            >
+                {{$t('images.create.scaleUpDesc')}}
+            </small>
         </div>
 
         <input
@@ -106,6 +119,7 @@ import {BackgroundTypes, HugeImageSurfaceLimit, StyleSetTypes} from "../../servi
                 imageWidth: 'canvas/getImageWidth',
                 styleSet: 'canvas/getStyleSet',
                 user: 'user/object',
+                scaleUpLimit: 'canvas/getScaleUpLimit',
             }),
 
             backgroundType: {
@@ -281,5 +295,33 @@ import {BackgroundTypes, HugeImageSurfaceLimit, StyleSetTypes} from "../../servi
 <style lang="scss" scoped>
     .custom-file-input {
         display: none;
+    }
+
+    .m-background-block__zoom {
+        position: relative;
+    }
+
+    .m-background-block__scale-up-desc {
+        color: darkred;
+        opacity: 0;
+        width: 100%;
+        text-align: right;
+        display: block;
+        transition: all 0.4s ease;
+    }
+
+    .m-background-block__scale-up-desc--visible {
+        opacity: 1;
+    }
+
+    .m-background-block__scale-up-zone {
+        position: absolute;
+        right: 0;
+        height: 8px;
+        background: rgba(227, 52, 47, 0.35);
+        user-select: none;
+        pointer-events: none;
+        top: 37.6px;
+        border-radius: 0 8px 8px 0;
     }
 </style>
