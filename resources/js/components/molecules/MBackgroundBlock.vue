@@ -13,7 +13,9 @@
                 >{{$t('images.create.backgroundGreen')}}
             </label>
             <label :class="{'active': backgroundType === backgroundTypes.transparent}"
-                   class="btn btn-secondary btn-sm">
+                   v-if="!hugeCanvas"
+                   class="btn btn-secondary btn-sm"
+            >
                 <input
                     :value="backgroundTypes.transparent"
                     name="background"
@@ -73,7 +75,7 @@
 </template>
 
 <script>
-    import {BackgroundTypes, StyleSetTypes} from "../../service/canvas/Constants";
+import {BackgroundTypes, HugeImageSurfaceLimit, StyleSetTypes} from "../../service/canvas/Constants";
     import SnackbarMixin from "../../mixins/SnackbarMixin";
     import loadImage from "blueimp-load-image";
     import {mapGetters} from "vuex";
@@ -85,8 +87,6 @@
         'image/svg+xml'
     ];
 
-    const hugeImageSurfaceLimit = 5000**2; // 5000px * 5000px
-
     export default {
         name: "MBackgroundBlock",
         components: {},
@@ -96,7 +96,7 @@
             return {
                 mimeType: null,
                 backgroundTypes: BackgroundTypes,
-                hugeImageSideLenLimit: Math.sqrt(hugeImageSurfaceLimit),
+                hugeImageSideLenLimit: Math.sqrt(HugeImageSurfaceLimit),
             }
         },
 
@@ -160,11 +160,11 @@
                     return false;
                 }
 
-                if (this.backgroundImage.width * this.backgroundImage.height > hugeImageSurfaceLimit) {
-                    return true;
-                }
+                return this.backgroundImage.width * this.backgroundImage.height > HugeImageSurfaceLimit;
+            },
 
-                return false;
+            hugeCanvas() {
+                return this.imageWidth * this.imageHeight > HugeImageSurfaceLimit;
             },
 
             gradientBackgroundAvailable() {
@@ -232,7 +232,22 @@
 
                 const ratio = dimNew / dimOld;
                 this.zoom *= ratio;
-            }
+            },
+
+            maybeDisableTransparentBackground() {
+                if (this.hugeCanvas && this.backgroundType === BackgroundTypes.transparent) {
+                    if (this.styleSet === StyleSetTypes.young) {
+                        this.backgroundType = BackgroundTypes.placeholder
+                    } else {
+                        this.backgroundType = BackgroundTypes.gradient;
+                    }
+
+                    this.snackErrorDismiss(
+                        new Error(`Max canvas size for transparent background is: ${HugeImageSurfaceLimit}px²`),
+                        this.$t('images.create.transparentBackgroundDisabled'),
+                    );
+                }
+            },
         },
 
         watch: {
@@ -241,9 +256,11 @@
             },
             imageWidth(valueNew, valueOld) {
                 this.adjustZoom(valueNew, valueOld);
+                this.maybeDisableTransparentBackground();
             },
             imageHeight(valueNew, valueOld) {
                 this.adjustZoom(valueNew, valueOld);
+                this.maybeDisableTransparentBackground();
             },
             styleSet(valueNew) {
                 if (StyleSetTypes.young === valueNew && BackgroundTypes.gradient === this.backgroundType) {

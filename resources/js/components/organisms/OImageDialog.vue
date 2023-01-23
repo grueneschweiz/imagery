@@ -40,7 +40,13 @@
 </template>
 
 <script>
-import {BackgroundTypes, Formats, Media} from "../../service/canvas/Constants";
+import {
+    BackgroundTypes,
+    Formats,
+    HugeImageJpegQuality,
+    HugeImageSurfaceLimit,
+    Media, RegularImageQuality
+} from "../../service/canvas/Constants";
     import Api from "../../service/Api";
     import ImageUpload from "../../service/ImageUpload";
     import SnackbarMixin from "../../mixins/SnackbarMixin";
@@ -52,8 +58,6 @@ import {BackgroundTypes, Formats, Media} from "../../service/canvas/Constants";
     const metaUploadProgress = 5;
     const legalUploadProgress = 5;
     const imageProcessingProgress = 10;
-
-    const jpegLimit = 5000**2; // images > 5000px * 5000px will be saved as jpeg
 
     export default {
         name: "OImageDialog",
@@ -127,7 +131,7 @@ import {BackgroundTypes, Formats, Media} from "../../service/canvas/Constants";
                 }
 
                 const raw = this.rawImageDataUrl.length;
-                const final = this.imageData.canvas.toDataURL().length;
+                const final = this.finalImageDataUrl.length;
 
                 return this.uploadImagesTotalWeight * raw / (raw + final);
             },
@@ -136,16 +140,28 @@ import {BackgroundTypes, Formats, Media} from "../../service/canvas/Constants";
                 return this.uploadImagesTotalWeight - this.uploadRawWeight;
             },
 
-            rawImageExportType() {
-                return 'image/jpeg' === this.rawImageMimeType ? 'image/jpeg' : 'image/png';
+            rawImageExportFormat() {
+                return 'image/jpeg' === this.rawImageMimeType || this.isHuge(this.rawImage)
+                    ? 'image/jpeg'
+                    : 'image/png';
             },
 
             rawImageExtension() {
-                return 'image/jpeg' === this.rawImageExportType ? 'jpeg' : 'png';
+                return this.getFileExtensionFromMimeType(this.rawImageExportFormat);
             },
 
             rawImageDataUrl() {
-                return this.rawImage.toDataURL(this.rawImageExportType);
+                const quality = this.getJpegQuality(this.rawImage);
+                return this.rawImage.toDataURL(this.rawImageExportFormat, quality);
+            },
+
+            finalImageFormat() {
+                return this.isHuge(this.imageData.canvas, this.bleed) ? 'image/jpeg' : 'image/png';
+            },
+
+            finalImageDataUrl() {
+                const quality = this.getJpegQuality(this.imageData.canvas, this.bleed);
+                return this.imageData.canvas.toDataURL(this.finalImageFormat, quality);
             },
 
             uploadStatus() {
@@ -173,28 +189,8 @@ import {BackgroundTypes, Formats, Media} from "../../service/canvas/Constants";
                 return `image.${this.downloadImageFileExtension}`;
             },
 
-            finalImageFormat() {
-                if (this.imageData.canvas.width * this.imageData.canvas.height > jpegLimit) {
-                    return 'image/jpeg';
-                }
-
-                return 'image/png';
-            },
-
-            finalImageQuality() {
-                if (this.finalImageFormat === 'image/jpeg') {
-                    return 0.9;
-                }
-
-                return 1;
-            },
-
             finalImageFileExtension() {
-                if (this.finalImageFormat === 'image/jpeg') {
-                    return 'jpeg';
-                }
-
-                return 'png';
+                return this.getFileExtensionFromMimeType(this.finalImageFormat);
             },
 
             downloadImageFileExtension() {
@@ -216,6 +212,25 @@ import {BackgroundTypes, Formats, Media} from "../../service/canvas/Constants";
 
 
         methods: {
+            isHuge(canvas, bleed = 0) {
+                const visibleSurface = (canvas.width - 2 * bleed) * (canvas.height - 2 * bleed);
+                return visibleSurface > HugeImageSurfaceLimit;
+            },
+
+            getFileExtensionFromMimeType(mimeString) {
+                switch (mimeString) {
+                    case 'image/jpeg':
+                        return 'jpeg'
+                    case 'image/png':
+                    default:
+                        return 'png'
+                }
+            },
+
+            getJpegQuality(canvas, bleed = 0) {
+                return this.isHuge(canvas, bleed) ? HugeImageJpegQuality : RegularImageQuality;
+            },
+
             save() {
                 this.imageData.filename = this.uniqueFilename();
                 let upload;
@@ -258,7 +273,7 @@ import {BackgroundTypes, Formats, Media} from "../../service/canvas/Constants";
             uploadFinalImage() {
                 this.imageData.filenameFinal = `final-${this.imageData.filename}.${this.finalImageFileExtension}`;
 
-                const image = this.imageData.canvas.toDataURL(this.finalImageFormat, this.finalImageQuality);
+                const image = this.finalImageDataUrl;
                 const filename = this.imageData.filenameFinal;
                 const uploader = new ImageUpload(image, filename);
 

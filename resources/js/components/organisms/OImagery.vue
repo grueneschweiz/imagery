@@ -69,7 +69,7 @@
 </template>
 
 <script>
-import {BackgroundTypes, StyleSetTypes} from "../../service/canvas/Constants";
+import {BackgroundTypes, HugeImageSurfaceLimit, StyleSetTypes} from "../../service/canvas/Constants";
 import MBarBlock from "../molecules/MBarBlock";
 import MBackgroundBlock from "../molecules/MBackgroundBlock";
 import MBorderBlock from "../molecules/MBorderBlock";
@@ -174,11 +174,16 @@ let requestedAnimationFrame;
                     'bar-touching': this.engine.getBarDraggable() && this.engine.getBarTouching(),
                     'transparent': this.backgroundType === BackgroundTypes.transparent,
                     'image': this.backgroundType === BackgroundTypes.image,
+                    'huge': this.hugeCanvas,
                 }
             },
 
             canvasStyles() {
                 return `height: ${this.previewDims.height}px; width: ${this.previewDims.width}px;`;
+            },
+
+            hugeCanvas() {
+                return this.visibleWidth * this.visibleHeight > HugeImageSurfaceLimit;
             },
 
             previewDims() {
@@ -606,6 +611,10 @@ let requestedAnimationFrame;
                 linear-gradient(-45deg, transparent 75%, #d7d7d7 75%);
                 background-size: 20px 20px;
                 background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+
+                &.huge {
+                    background: black;
+                }
             }
 
             &.bar-touching,

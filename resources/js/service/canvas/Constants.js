@@ -69,6 +69,10 @@ export const MarkWidth = 2;
 export const BorderWidthFactor = 0.0175;
 export const BorderRadiusFactor = 1;
 
+export const HugeImageJpegQuality = 0.9;
+export const RegularImageQuality = 1; // jpeg AND png
+export const HugeImageSurfaceLimit = 5000**2; // 5000px x 5000px
+
 export const BarSchemes = {
     white: {
         background: '#ffffff',

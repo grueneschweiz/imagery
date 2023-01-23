@@ -77,7 +77,7 @@
             {{ $t('images.create.oversizeError', {maxWidth: maxSize, maxHeight: maxSize}) }}
         </div>
         <div
-            v-if="width*height > 3000**2"
+            v-if="hugeCanvas"
             class="alert alert-warning mt-3"
             role="alert">
             {{ $t('images.create.oversizeWarning') }}
@@ -87,7 +87,7 @@
 
 <script>
 import {ModelSelect} from 'vue-search-select'
-import {Inch2mm, Media, StyleSetTypes} from "../../service/canvas/Constants";
+import {HugeImageSurfaceLimit, Inch2mm, Media, StyleSetTypes} from "../../service/canvas/Constants";
 import {ImageSizeIds, ImageSizes} from "../../service/canvas/ImageSizes";
 import {mapGetters} from "vuex";
 import AImageSize from "../atoms/AImageSize.vue";
@@ -187,6 +187,10 @@ export default {
 
         isMediaPrint() {
             return this.sizeSelected.media === Media.print;
+        },
+
+        hugeCanvas() {
+            return this.width * this.height > HugeImageSurfaceLimit;
         },
     },
 
