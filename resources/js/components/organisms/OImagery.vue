@@ -456,9 +456,13 @@ let requestedAnimationFrame;
                 this.mousePos = this.relImagePos(event.pageX, event.pageY);
             },
             relImagePos(absX, absY) {
+                const offset = this.showBleed ? 0 : this.bleed;
+                const wRatio = this.canvasWidth / this.canvasPos.width;
+                const hRatio = this.canvasHeight / this.canvasPos.height;
+
                 return {
-                    x: (absX - this.canvasPos.x) * this.canvasWidth / this.canvasPos.width,
-                    y: (absY - this.canvasPos.y) * this.canvasHeight / this.canvasPos.height,
+                    x: (absX - this.canvasPos.x) * wRatio + offset,
+                    y: (absY - this.canvasPos.y) * hRatio + offset,
                 };
             },
 
