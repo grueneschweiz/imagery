@@ -101,8 +101,8 @@ export default class BarLayer extends DraggableLayer {
         const mouseX = this._mousePos.x;
         const mouseY = this._mousePos.y;
 
-        const posXstart = Math.max(0, this._getXstart());
-        const posXend = Math.min(this._canvas.width - 1, this._getXend());
+        const posXstart = Math.max(this._bleed, this._getXstart());
+        const posXend = Math.min(this._canvas.width - this._bleed, this._getXend());
 
         const posYstart = this._getYstart();
         const posYend = this._getYend();
