@@ -167,7 +167,7 @@
             "formatDigitalHelp": "Geeignet für soziale Medien, Websites usw., aber auch wenn du das Bild in eine Word-Datei einfügen möchtest. ",
             "formatPrintSelfHelp": "Optimiert für den Druck auf einem Standarddrucker oder Kopiergerät.",
             "formatPrintProfessionalHelp": "Ideal für den professionellen Offset- oder Digitaldruck. Der Ausdruck muss beschnitten werden.",
-            "fileFormat": "Dateiformat: {format}",
+            "fileFormat": "Dateiformat: PNG (kleine bis mittlere Bilder) oder JPEG (große Bilder)",
             "colorProfile": "Farbprofil: {profile}",
             "noBleed": "Keine Beschnittzugabe",
             "bleedAndCropMarks": "Mit {bleed} Beschnittzugabe und Schnittmarken",
