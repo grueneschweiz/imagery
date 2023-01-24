@@ -130,7 +130,7 @@ export default class BackgroundLayer extends DraggableLayer {
     }
 
     _getPositionBoundary(axis, innerCanvasSize, blockSize) {
-        const offset = this._edgeToInnerDistance();
+        let offset = this._edgeToInnerDistance();
 
         if (blockSize < innerCanvasSize) {
             // center if the block is smaller than the canvas
@@ -151,7 +151,11 @@ export default class BackgroundLayer extends DraggableLayer {
             return false;
         }
 
-        const offset = this._edgeToInnerDistance();
+        let offset = this._edgeToInnerDistance();
+
+        if (!this._hasBorder) {
+            offset += this._bleed;
+        }
 
         const mouseX = this._mousePos.x;
         const mouseY = this._mousePos.y;
