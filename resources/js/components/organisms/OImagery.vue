@@ -417,9 +417,9 @@ let requestedAnimationFrame;
             ensureEventPosOutsideCanvas(event) {
                 const leave = [
                     {axis: 'x', distance: event.pageX - this.canvasPos.x, out: this.canvasPos.x - 1},
-                    {axis: 'x', distance: event.pageX - this.canvasPos.x - this.canvasPos.width, out: this.canvasPos.x - this.canvasPos.width + 1},
+                    {axis: 'x', distance: event.pageX - this.canvasPos.x - this.canvasPos.width, out: this.canvasPos.x + this.canvasPos.width + 1},
                     {axis: 'y', distance: event.pageY - this.canvasPos.y, out: this.canvasPos.y - 1},
-                    {axis: 'y', distance: event.pageY - this.canvasPos.y - this.canvasPos.height, out: this.canvasPos.y - this.canvasPos.height + 1},
+                    {axis: 'y', distance: event.pageY - this.canvasPos.y - this.canvasPos.height, out: this.canvasPos.y + this.canvasPos.height + 1},
                 ]
                     .map(value => {
                         value.distance = Math.abs(value.distance)
