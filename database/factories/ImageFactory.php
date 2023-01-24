@@ -38,5 +38,6 @@ $factory->define(Image::class, function (Faker $faker) {
         'width'      => $imageWidth,
         'height'     => $imageHeight,
         'bleed'      => null,
+        'resolution' => 300,
     ];
 });

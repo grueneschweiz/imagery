@@ -351,6 +351,7 @@ class ImageTest extends TestCase
             'type'       => Image::TYPE_FINAL,
             'logo_id'    => null,
             'bleed'      => 3,
+            'resolution' => 150,
         ]);
 
         $image->id        = 1; // needed for route creation of image url
@@ -374,6 +375,7 @@ class ImageTest extends TestCase
         $response->assertJsonFragment(['src' => route('image', ['image' => $imageId])]);
         $response->assertJsonFragment(['thumb_src' => route('thumbnail', ['image' => $imageId])]);
         $response->assertJsonFragment(['file_type' => 'png']);
+        $response->assertJsonFragment(['resolution' => 150]);
         $response->assertJsonMissing(['filename']);
         $response->assertJsonMissing(['deleted_at']);
         $this->assertDatabaseHas('images', [
@@ -385,6 +387,7 @@ class ImageTest extends TestCase
             'width' => 24,
             'height' => 24,
             'bleed' => 3,
+            'resolution' => 150,
         ]);
 
         $finalFilename = DB::table('images')->find($imageId)->filename;
@@ -400,6 +403,7 @@ class ImageTest extends TestCase
             'background' => Image::BG_CUSTOM,
             'type'       => Image::TYPE_RAW,
             'user_id'    => $user->id,
+            'resolution' => null,
         ]);
 
         $filename = 'Image007.png';
