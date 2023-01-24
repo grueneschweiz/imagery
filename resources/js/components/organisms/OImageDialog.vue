@@ -28,17 +28,25 @@
             v-show="!legalFormHidden"
         />
 
-        <button
-            @click="downloadAndClose($event)"
+        <a
+            :download="filenameDownload"
+            :href="downloadLink"
+            @click=" $emit('close')"
             class="btn btn-primary"
             v-if="downloadReady && !showLegalCheck"
         >{{$t('images.create.imageDownload')}}
-        </button>
+        </a>
     </ODialog>
 </template>
 
 <script>
-    import {BackgroundTypes} from "../../service/canvas/Constants";
+import {
+    BackgroundTypes,
+    Formats,
+    HugeImageJpegQuality,
+    HugeImageSurfaceLimit,
+    Media, RegularImageQuality
+} from "../../service/canvas/Constants";
     import Api from "../../service/Api";
     import ImageUpload from "../../service/ImageUpload";
     import SnackbarMixin from "../../mixins/SnackbarMixin";
@@ -49,6 +57,7 @@
 
     const metaUploadProgress = 5;
     const legalUploadProgress = 5;
+    const imageProcessingProgress = 10;
 
     export default {
         name: "OImageDialog",
@@ -62,11 +71,13 @@
                 uploadFinalStatus: 0,
                 uploadMetaStatus: 0,
                 uploadLegalStatus: 0,
+                imageProcessingStatus: 0,
                 downloadReady: false,
                 showLegalCheck: false,
                 uploadPromise: null,
                 resolveUpload: null,
                 legalFormHidden: false,
+                finalImageSrc: null,
             }
         },
 
@@ -83,7 +94,13 @@
             ...mapGetters({
                 logoId: 'canvas/getLogoId',
                 rawImage: 'canvas/getBackgroundImage',
+                rawImageMimeType: 'canvas/getBackgroundImageMimeType',
                 backgroundType: 'canvas/getBackgroundType',
+                bleed: 'canvas/getBleed',
+                colorEncoding: 'canvas/getColorEncoding',
+                resolution: 'canvas/getResolution',
+                media: 'canvas/getMedia',
+                format: 'canvas/getFormat',
             }),
 
             keywords() {
@@ -105,7 +122,7 @@
                     ? imageCount * metaUploadProgress + legalUploadProgress
                     : metaUploadProgress;
 
-                return uploadComplete - nonImageProgress;
+                return uploadComplete - nonImageProgress - imageProcessingProgress;
             },
 
             uploadRawWeight() {
@@ -114,7 +131,7 @@
                 }
 
                 const raw = this.rawImageDataUrl.length;
-                const final = this.imageData.canvas.toDataURL().length;
+                const final = this.finalImageDataUrl.length;
 
                 return this.uploadImagesTotalWeight * raw / (raw + final);
             },
@@ -123,24 +140,66 @@
                 return this.uploadImagesTotalWeight - this.uploadRawWeight;
             },
 
-            rawImageExportType() {
-                return 'image/jpeg' === this.rawImage.mimeType ? 'image/jpeg' : 'image/png';
+            rawImageExportFormat() {
+                return 'image/jpeg' === this.rawImageMimeType || this.isHuge(this.rawImage)
+                    ? 'image/jpeg'
+                    : 'image/png';
             },
 
             rawImageExtension() {
-                return 'image/jpeg' === this.rawImageExportType ? 'jpeg' : 'png';
+                return this.getFileExtensionFromMimeType(this.rawImageExportFormat);
             },
 
             rawImageDataUrl() {
-                return this.rawImage.image.toDataURL(this.rawImageExportType);
+                const quality = this.getJpegQuality(this.rawImage);
+                return this.rawImage.toDataURL(this.rawImageExportFormat, quality);
+            },
+
+            finalImageFormat() {
+                return this.isHuge(this.imageData.canvas, this.bleed) ? 'image/jpeg' : 'image/png';
+            },
+
+            finalImageDataUrl() {
+                const quality = this.getJpegQuality(this.imageData.canvas, this.bleed);
+                return this.imageData.canvas.toDataURL(this.finalImageFormat, quality);
             },
 
             uploadStatus() {
                 return this.uploadRawStatus * this.uploadRawWeight
                     + this.uploadFinalStatus * this.uploadFinalWeight
                     + this.uploadMetaStatus * metaUploadProgress
-                    + this.uploadLegalStatus * legalUploadProgress;
+                    + this.uploadLegalStatus * legalUploadProgress
+                    + this.imageProcessingStatus * imageProcessingProgress;
             },
+
+            downloadLink() {
+                const url = new URL(this.finalImageSrc);
+                url.searchParams.append('format', this.downloadImageFileExtension);
+                url.searchParams.append('color_profile', this.colorEncoding);
+                url.searchParams.append('bleed', this.bleed > 0 ? '1' : '0');
+
+                if (Media.print === this.media) {
+                    url.searchParams.append('resolution', this.resolution);
+                }
+
+                return url.href
+            },
+
+            filenameDownload() {
+                return `image.${this.downloadImageFileExtension}`;
+            },
+
+            finalImageFileExtension() {
+                return this.getFileExtensionFromMimeType(this.finalImageFormat);
+            },
+
+            downloadImageFileExtension() {
+                if (this.format === Formats.digital) {
+                    return this.finalImageFileExtension;
+                }
+
+                return 'pdf';
+            }
         },
 
         created() {
@@ -153,6 +212,25 @@
 
 
         methods: {
+            isHuge(canvas, bleed = 0) {
+                const visibleSurface = (canvas.width - 2 * bleed) * (canvas.height - 2 * bleed);
+                return visibleSurface > HugeImageSurfaceLimit;
+            },
+
+            getFileExtensionFromMimeType(mimeString) {
+                switch (mimeString) {
+                    case 'image/jpeg':
+                        return 'jpeg'
+                    case 'image/png':
+                    default:
+                        return 'png'
+                }
+            },
+
+            getJpegQuality(canvas, bleed = 0) {
+                return this.isHuge(canvas, bleed) ? HugeImageJpegQuality : RegularImageQuality;
+            },
+
             save() {
                 this.imageData.filename = this.uniqueFilename();
                 let upload;
@@ -166,7 +244,8 @@
                     upload = this.uploadFinalImage();
                 }
 
-                upload.then(() => this.downloadButtonShow());
+                upload.then(() => this.processImage())
+                    .then(() => this.downloadButtonShow());
             },
 
             uploadRawImage() {
@@ -181,15 +260,20 @@
                 return uploader.upload('files/images')
                     .then(() => this.uploadRawImageMeta())
                     .catch(error => {
+                        if (error.response?.data?.errors?.base64data?.[0] === 'Max file size exceeded.') {
+                            this.snackErrorDismiss(error, this.$t('images.create.maxFileSizeExceededRaw'));
+                            return;
+                        }
+
                         this.snackErrorRetry(error, this.$t('images.create.uploadFailed'))
                             .then(this.uploadRawImage);
                     });
             },
 
             uploadFinalImage() {
-                this.imageData.filenameFinal = `final-${this.imageData.filename}.png`;
+                this.imageData.filenameFinal = `final-${this.imageData.filename}.${this.finalImageFileExtension}`;
 
-                const image = this.imageData.canvas.toDataURL();
+                const image = this.finalImageDataUrl;
                 const filename = this.imageData.filenameFinal;
                 const uploader = new ImageUpload(image, filename);
 
@@ -198,6 +282,11 @@
                 return uploader.upload('files/images')
                     .then(() => this.uploadFinalImageMeta())
                     .catch(error => {
+                        if (error.response?.data?.errors?.base64data?.[0] === 'Max file size exceeded.') {
+                            this.snackErrorDismiss(error, this.$t('images.create.maxFileSizeExceededFinal'));
+                            return;
+                        }
+
                         this.snackErrorRetry(error, this.$t('images.create.uploadFailed'))
                             .then(this.uploadFinalImage);
                     });
@@ -216,9 +305,28 @@
                     original_id: this.imageData.originalId,
                     filename: this.imageData.filenameFinal,
                     keywords: this.keywords,
+                    bleed: this.bleed,
+                    resolution: this.resolution,
                 };
 
-                return this.uploadImageMeta(payload);
+                const cb = resp => this.finalImageSrc = resp.data.src;
+
+                return this.uploadImageMeta(payload, cb);
+            },
+
+            processImage() {
+                // trigger a download to process the image on the server
+                // it will cache processed image server sides and dramatically
+                // increase ux when clicking the download button.
+                //
+                // the response here is discarded.
+                return Api().get(this.downloadLink)
+                    .then(() => this.imageProcessingStatus = 1)
+                    .catch(error => this.handleUnauthorized(error))
+                    .catch(error => {
+                        this.snackErrorRetry(error, this.$t('images.create.processingFailed'))
+                            .then(() => this.processImage());
+                    });
             },
 
             uploadRawImageMeta() {
@@ -253,41 +361,6 @@
 
             downloadButtonShow() {
                 this.downloadReady = true;
-            },
-
-            executeDownload() {
-                /**
-                 * There is some picky stuff in here, especially for chrome.
-                 *
-                 * @see https://stackoverflow.com/questions/3916191/download-data-url-file
-                 * @see https://stackoverflow.com/questions/37135417/download-canvas-as-png-in-fabric-js-giving-network-error/
-                 * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob
-                 */
-                this.imageData.canvas.toBlob(imageBlob => {
-                    const link = document.createElement('a');
-
-                    link.download = 'image.png';
-                    link.href = URL.createObjectURL(imageBlob);
-
-                    document.body.appendChild(link);
-
-                    link.click();
-
-                    window.setTimeout(() => {
-                        // do this delayed, so the browser has time to navigate
-                        // to the URL (chrome) and doesn't release the memory
-                        // to early (safari on iOS).
-                        URL.revokeObjectURL(link.href);
-                        link.removeAttribute('href');
-                        document.body.removeChild(link);
-                    }, 1000);
-                });
-
-            },
-
-            downloadAndClose() {
-                this.executeDownload();
-                this.$emit('close');
             },
 
             onLegalUploadCompleted() {

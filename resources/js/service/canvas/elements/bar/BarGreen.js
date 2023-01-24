@@ -1,5 +1,11 @@
-import {Alignments, BarSchemes as Schemes, BarSizeFactor, BarTypes as Types} from "./../../Constants";
+import {
+    Alignments,
+    BarSchemes as Schemes,
+    BarSizeFactor,
+    BarTypes as Types,
+} from "./../../Constants";
 import Bar from "./Bar";
+import * as MarkHelper from "../../misc/MarkHelper";
 
 
 /**
@@ -43,32 +49,54 @@ export default class BarGreen extends Bar {
     }
 
     set text(text) {
-        this._text = text.toLocaleUpperCase().trim();
+        super.text = text.toLocaleUpperCase();
     }
 
     set type(type) {
+        let font;
+
         switch (type) {
             case Types.headline:
-                this._font = fontFamily.headline
+                font = fontFamily.headline
                 break;
             case Types.subline:
-                this._font = fontFamily.subline
+                font = fontFamily.subline
                 break;
             default:
                 throw new Error(`BarType ${type} is not implemented.`)
         }
+
+        this._setProperty('_font', font);
     }
 
     set baseFontSize(fontSize) {
+        let size;
+
         if (this._font === fontFamily.subline) {
-            this._fontSize = fontSize * sublineHeadlineSizeRatio
-            return
+            size = fontSize * sublineHeadlineSizeRatio
+        } else {
+            size = fontSize
         }
 
-        this._fontSize = fontSize
+        this._setProperty('_fontSize', size);
     }
 
-    draw() {
+    calculateWidth(fontSize) {
+        const originalFontSize = this._fontSize;
+
+        this.baseFontSize = fontSize;
+        this._setFont();
+        this._setTextDims();
+        this._setBarOversize();
+
+        const width = this._calculateCanvasWidth();
+
+        this._fontSize = originalFontSize;
+
+        return width;
+    }
+
+    _drawConcrete() {
         this._setFont();
         this._setTextDims();
         this._setBarOversize();
@@ -78,8 +106,30 @@ export default class BarGreen extends Bar {
 
         this._drawBackground();
         this._drawFont();
+    }
 
-        return this._canvas;
+    _drawSelectedMark() {
+        this._context.fillStyle = MarkHelper.getMarkBackgroundColor(this._markActive);
+        this._context.fillRect(
+            0,
+            0,
+            this._canvas.width,
+            this._getBarHeight()
+        );
+
+        const lineWidth = MarkHelper.getMarkLineWidth(
+            this._previewDims,
+            {width: this._imageWidth, height: this._imageHeight}
+        );
+
+        this._context.lineWidth = lineWidth;
+        this._context.strokeStyle = MarkHelper.getMarkColor(this._markActive);
+        this._context.strokeRect(
+            lineWidth / 2,
+            lineWidth / 2,
+            this._canvas.width - lineWidth,
+            this._getBarHeight() - lineWidth
+        );
     }
 
     _setFont() {
@@ -87,11 +137,7 @@ export default class BarGreen extends Bar {
     }
 
     _setBarOversize() {
-        if (Alignments.center === this._alignment) {
-            this._barOversize = this._textDims.padding;
-        } else {
-            this._barOversize = this._imageWidth * BarSizeFactor;
-        }
+        this._barOversize = this._imageWidth * BarSizeFactor;
     }
 
     _setTextDims() {
@@ -101,10 +147,14 @@ export default class BarGreen extends Bar {
     }
 
     _setCanvasWidth() {
-        const textWidth = this._textDims.width;
+        this._canvas.width = this._calculateCanvasWidth();
+    }
+
+    _calculateCanvasWidth() {
+        const textWidth = this._context.measureText(this._text).width;
         const padding = this._textDims.padding;
 
-        this._canvas.width = this._barOversize + textWidth + padding;
+        return this._barOversize + textWidth + padding;
     }
 
     _setCanvasHeight() {

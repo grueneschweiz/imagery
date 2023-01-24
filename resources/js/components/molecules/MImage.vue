@@ -1,11 +1,17 @@
 <template>
-    <figure class="m-image mb-0">
+    <figure
+        :style="`width: ${thumbWidth}px; height: ${thumbHeight}px;`"
+        class="m-image mb-0"
+    >
         <img
             class="m-image__image"
             :class="{transparent: data.background === 'transparent'}"
             @click="toggleDetails()"
             :src="data.thumb_src"
-            :alt="data.keywords">
+            :alt="data.keywords"
+            :style="`width: ${thumbWidth}px; height: ${thumbHeight}px;`"
+            loading="lazy"
+        >
         <transition name="fade"
                     enter-active-class="fadeInUp"
                     leave-active-class="fadeOutDown">
@@ -15,11 +21,38 @@
             >
                 <p class="" v-if="loading">{{$t('images.gallery.loading')}}</p>
                 <p v-else v-html="created"/>
-                <a :download="`image.${data.file_type}`" :href="data.src">
-                    <button class="btn btn-outline-primary btn-sm">
-                        {{$t('images.gallery.download')}}
+                <div class="btn-group" role="group">
+                    <button
+                        :aria-expanded="showDownload"
+                        class="btn btn-outline-primary btn-sm dropdown-toggle"
+                        data-toggle="dropdown"
+                        type="button"
+                        @click="showDownload = !showDownload"
+                    >
+                      {{$t('images.gallery.download')}}
                     </button>
-                </a>
+                    <div :class="{'show': showDownload}" class="m-image__download-dropdown dropdown-menu">
+                        <a
+                            :download="`image.${data.file_type}`"
+                            :href="downloadUrlDigital"
+                            class="dropdown-item"
+                            @click="showDownload = false"
+                        >{{$t('images.gallery.digital')}}</a>
+                        <a
+                            :href="downloadUrlSelfPrint"
+                            class="dropdown-item"
+                            download="image.pdf"
+                            @click="showDownload = false"
+                        >{{$t('images.gallery.selfPrint')}}</a>
+                        <a
+                            :class="{disabled: !data.bleed}"
+                            :href="downloadUrlProfessionalPrint"
+                            class="dropdown-item"
+                            download="image.pdf"
+                            @click="showDownload = false"
+                        >{{$t('images.gallery.professionalPrint')}}</a>
+                    </div>
+                </div>
                 <button
                     v-if="canDeleteImage"
                     @click="remove()"
@@ -41,6 +74,7 @@
     import SnackbarMixin from "../../mixins/SnackbarMixin";
     import escape from 'lodash/escape';
     import UnauthorizedHandlerMixin from "../../mixins/UnauthorizedHandlerMixin";
+    import {ColorEncodings, FileFormats} from "../../service/canvas/Constants";
 
     const lang = {
         en: english,
@@ -59,12 +93,14 @@
             return {
                 creator: null,
                 open: this.showDetails,
+                showDownload: false,
             }
         },
 
         props: {
             data: {required: true, type: Object},
-            showDetails: {required: true, type: Boolean}
+            showDetails: {required: true, type: Boolean},
+            viewWidth: {required: true, type: Number},
         },
 
         computed: {
@@ -102,6 +138,53 @@
 
                 return superAdmin || myImage;
             },
+
+            thumbWidth() {
+                if (this.viewWidth < 768) {
+                    return this.viewWidth - 30; // see css
+                }
+
+                if (this.viewWidth < 992) {
+                    return (this.viewWidth / 2) - 15; // see css
+                }
+
+                return 300; // see css
+            },
+
+            thumbHeight() {
+                const imgRatio = this.data.width / this.data.height;
+                return this.thumbWidth / imgRatio;
+            },
+
+            downloadUrlDigital() {
+                const url = new URL(this.data.src);
+                url.searchParams.append('format', this.data.file_type);
+                url.searchParams.append('color_profile', ColorEncodings.sRGB);
+                url.searchParams.append('bleed', '0');
+                url.searchParams.append('resolution', this.data.resolution);
+
+                return url.href
+            },
+
+            downloadUrlSelfPrint() {
+                const url = new URL(this.data.src);
+                url.searchParams.append('format', FileFormats.pdf);
+                url.searchParams.append('color_profile', ColorEncodings.FOGRA51);
+                url.searchParams.append('bleed', '0');
+                url.searchParams.append('resolution', this.data.resolution);
+
+                return url.href
+            },
+
+            downloadUrlProfessionalPrint() {
+                const url = new URL(this.data.src);
+                url.searchParams.append('format', FileFormats.pdf);
+                url.searchParams.append('color_profile', ColorEncodings.FOGRA51);
+                url.searchParams.append('bleed', '1');
+                url.searchParams.append('resolution', this.data.resolution);
+
+                return url.href
+            },
         },
 
         methods: {
@@ -110,6 +193,8 @@
 
                 if (this.open) {
                     this.$emit('opened');
+                } else {
+                    this.showDownload = false;
                 }
 
                 if (null === this.creator){
@@ -136,7 +221,7 @@
         watch: {
             showDetails(value) {
                 this.open = value;
-            }
+            },
         }
     }
 </script>
@@ -146,20 +231,8 @@
         width: 100%;
         position: relative;
         cursor: pointer;
-        overflow: hidden;
 
-        @include media-breakpoint-up(md) {
-            max-width: calc(50vw - 15px);
-        }
-
-        @include media-breakpoint-up(lg) {
-            max-width: 300px;
-        }
-
-        &__image {
-            width: 100%;
-
-            &.transparent {
+        &__image.transparent {
                 // https://stackoverflow.com/a/35362074
                 background-image: linear-gradient(45deg, #d7d7d7 25%, transparent 25%),
                 linear-gradient(-45deg, #d7d7d7 25%, transparent 25%),
@@ -167,7 +240,6 @@
                 linear-gradient(-45deg, transparent 75%, #d7d7d7 75%);
                 background-size: 20px 20px;
                 background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-            }
         }
 
         &__caption {
@@ -178,6 +250,10 @@
             width: 100%;
             background: rgba(255, 255, 255, 0.95);
             padding: 0.5em;
+        }
+
+        &__download-dropdown {
+            transform: translateY(0);
         }
     }
 </style>

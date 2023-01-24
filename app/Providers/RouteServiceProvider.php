@@ -29,10 +29,6 @@ class RouteServiceProvider extends ServiceProvider
         // in the role routes
         Route::model('user', \App\User::class);
         Route::model('role', \App\Role::class);
-
-        // Bind logo and image explicitly for file controller
-        Route::model('logo', \App\Logo::class);
-        Route::model('image', \App\Image::class);
     }
 
     /**

@@ -4,6 +4,7 @@
 
 use App\Image;
 use App\Logo;
+use App\Services\ImageEditor\ImageEditor;
 use App\User;
 use Faker\Generator as Faker;
 use Illuminate\Support\Facades\Storage;
@@ -12,7 +13,7 @@ $factory->define(Image::class, function (Faker $faker) {
     $imageWidth  = 1080;
     $imageHeight = 1080;
 
-    $relDir = Image::getImageStorageDir();
+    $relDir = ImageEditor::getStorageDir();
 
     Storage::makeDirectory($relDir);
 
@@ -35,6 +36,8 @@ $factory->define(Image::class, function (Faker $faker) {
         'keywords'   => $faker->words(5, true),
         'filename'   => $filename,
         'width'      => $imageWidth,
-        'height'     => $imageHeight
+        'height'     => $imageHeight,
+        'bleed'      => null,
+        'resolution' => 300,
     ];
 });

@@ -1,6 +1,46 @@
 export const StyleSetTypes = {
     green: 'green',
+    greenCentered: 'greenCentered',
     young: 'young'
+}
+
+export const MinFontSizeFactors = {
+    [StyleSetTypes.green]: 0.0625, // the correct 175% would be 0.0925
+    [StyleSetTypes.greenCentered]: 0.0625, // the correct 175% would be 0.0925
+    [StyleSetTypes.young]: 0.0575,
+}
+
+export const MaxFontSizeFactors = {
+    [StyleSetTypes.green]: 0.99,
+    [StyleSetTypes.greenCentered]: 0.99,
+    [StyleSetTypes.young]: 0.9,
+}
+
+export const MinToMaxFontSizeFactors = {
+    [StyleSetTypes.green]: 4,
+    [StyleSetTypes.greenCentered]: 4,
+    [StyleSetTypes.young]: 4,
+}
+
+export const Media = {
+    screen: 'screen',
+    print: 'print',
+}
+
+export const Formats = {
+    digital: 'digital',
+    printSelf: 'printSelf',
+    printProfessional: 'printProfessional',
+}
+
+export const FileFormats = {
+    png: 'png',
+    pdf: 'pdf',
+}
+
+export const ColorEncodings = {
+    sRGB: 'sRGB',
+    FOGRA51: 'FOGRA51', // FOGRA51 === PSO Coated v3
 }
 
 export const Alignments = {
@@ -15,6 +55,36 @@ export const BackgroundTypes = {
     transparent: 'transparent',
     image: 'custom'
 };
+
+export const PrintingBleed = 3; // mm
+
+export const Inch2mm = 25.4; // 1inch = 25.4mm
+
+export const MarkColor = '#ff8000';
+export const MarkColorActive = '#ff0000';
+export const MarkBackgroundColor = 'rgba(200, 200, 200, 0.2)';
+export const MarkBackgroundColorActive = 'rgba(200, 200, 200, 0.4)';
+export const MarkWidth = 2;
+
+export const BorderWidthFactor = 0.0175;
+export const BorderRadiusFactor = 1;
+
+export const HugeImageJpegQuality = 0.9;
+export const RegularImageQuality = 1; // jpeg AND png
+export const HugeImageSurfaceLimit = 5000**2; // 5000px x 5000px
+
+/**
+ * How much can the background image be zoomed up?
+ *
+ * 2 = 200% (twice the pixel size)
+ * 1 = 100% (do not scale up the image)
+ *
+ * @type {number}
+ */
+export const MaxImageZoomFactor = 2;
+
+// https://stackoverflow.com/a/11585939
+export const CanvasMaxSideLen = 16384
 
 export const BarSchemes = {
     white: {
@@ -33,6 +103,11 @@ export const BarSchemes = {
         background: 'rgba(0,0,0,0)',
         text: '#ffffff',
     },
+};
+
+export const CopyrightColors = {
+    withBorder: '#666666',
+    noBorder: '#ffffff',
 };
 
 export const ColorSchemes = {
@@ -66,72 +141,24 @@ export const LogoTypes = {
     verts: 'verts',
 };
 
-export const LogoSublineRatios = {
-    [LogoTypes.alternative]: {
-        topMargin: 0.1,
-        left: 0.3,
-        fontSize: 0.3
-    },
-    [LogoTypes['alternative-risch']]: {
-        topMargin: 0.1,
-        left: 0.3,
-        fontSize: 0.3
-    },
-    [LogoTypes.basta]: {
-        topMargin: 0.1,
-        left: 0.3,
-        fontSize: 0.3
-    },
-    [LogoTypes['giovani-verdi']]: {
-        topMargin: 0,
-        left: 0,
-        fontSize: 0.3
-    },
-    [LogoTypes.gruene]: {
-        topMargin: 0.032,
-        left: 0.33,
-        fontSize: 0.14225
-    },
-    [LogoTypes["gruene-vert-e-s"]]: {
-        topMargin: 0.02,
-        left: 0.26,
-        fontSize: 0.094
-    },
-    [LogoTypes["gruene-verts"]]: {
-        topMargin: 0.02175,
-        left: 0.296,
-        fontSize: 0.09375
-    },
-    [LogoTypes['jeunes-vert-e-s']]: {
-        topMargin: 0,
-        left: 0,
-        fontSize: 0.3
-    },
-    [LogoTypes['junge-gruene']]: {
-        topMargin: 0,
-        left: 0,
-        fontSize: 0.3
-    },
-    [LogoTypes.verda]: {
-        topMargin: 0.0255,
-        left: 0.3375,
-        fontSize: 0.1425
-    },
-    [LogoTypes.verdi]: {
-        topMargin: 0.03,
-        left: 0.32,
-        fontSize: 0.141
-    },
-    [LogoTypes['vert-e-s']]: {
-        topMargin: 0.0315,
-        left: 0.2215,
-        fontSize: 0.1425
-    },
-    [LogoTypes.verts]: {
-        topMargin: 0.031,
-        left: 0.25375,
-        fontSize: 0.1425
-    },
+export const LogoTypeRatios = {
+    [LogoTypes.alternative]: 4,
+    [LogoTypes['alternative-baar']]: 4,
+    [LogoTypes['alternative-cham']]: 4,
+    [LogoTypes['alternative-risch']]: 4,
+    [LogoTypes['alternative-stadt-zug']]: 4,
+    [LogoTypes['alternative-unteraegeri']]: 4,
+    [LogoTypes['giovani-verdi']]: 3.45,
+    [LogoTypes.basta]: 4,
+    [LogoTypes.gruene]: 4,
+    [LogoTypes['gruene-vert-e-s']]: 4,
+    [LogoTypes['gruene-verts']]: 4,
+    [LogoTypes['jeunes-vert-e-s']]: 3,
+    [LogoTypes['junge-gruene']]: 3.2,
+    [LogoTypes.verda]: 4,
+    [LogoTypes.verdi]: 4,
+    [LogoTypes['vert-e-s']]: 4,
+    [LogoTypes.verts]: 4,
 };
 
 /**

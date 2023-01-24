@@ -3,37 +3,53 @@
         <label class="mb-0 d-block">{{$t('images.create.background')}}</label>
         <div class="btn-group btn-group-toggle">
             <label v-if="gradientBackgroundAvailable"
-                   :class="{'active': background === backgroundTypes.gradient}"
+                   :class="{'active': backgroundType === backgroundTypes.gradient}"
                    class="btn btn-secondary btn-sm">
                 <input
                     :value="backgroundTypes.gradient"
                     name="background"
                     type="radio"
-                    v-model="background"
+                    v-model="backgroundType"
                 >{{$t('images.create.backgroundGreen')}}
             </label>
-            <label :class="{'active': background === backgroundTypes.transparent}"
-                   class="btn btn-secondary btn-sm">
+            <label :class="{'active': backgroundType === backgroundTypes.transparent}"
+                   v-if="!hugeCanvas"
+                   class="btn btn-secondary btn-sm"
+            >
                 <input
                     :value="backgroundTypes.transparent"
                     name="background"
                     type="radio"
-                    v-model="background"
+                    v-model="backgroundType"
                 >{{$t('images.create.backgroundTransparent')}}
             </label>
-            <label :class="{'active': background === backgroundTypes.image}"
+            <label :class="{'active': backgroundType === backgroundTypes.image}"
                    class="btn btn-secondary btn-sm">
                 <input
                     :value="backgroundTypes.image"
                     name="background"
                     type="radio"
-                    v-model="background"
+                    v-model="backgroundType"
                     @click="$refs.uploader.click()"
                 >{{$t('images.create.backgroundImage')}}
             </label>
         </div>
 
-        <div v-if="background === backgroundTypes.image && image && !imageTooSmall" class="form-group">
+        <div
+            v-if="backgroundType === backgroundTypes.image && hugeImage"
+            class="alert alert-warning mt-1"
+            role="alert">
+            {{$t('images.create.hugeImage', {maxWidth: hugeImageSideLenLimit, maxHeight: hugeImageSideLenLimit})}}
+        </div>
+
+        <div
+            v-if="backgroundType === backgroundTypes.image && backgroundImage"
+            class="form-group m-background-block__zoom"
+        >
+            <div
+                :style="`width: ${Math.min((1-scaleUpLimit)*100, 99)}%;`"
+                class="m-background-block__scale-up-zone"
+            />
             <label
                 class="mb-0 mt-2"
                 for="image-zoom"
@@ -41,13 +57,18 @@
             <input
                 :max="1"
                 :min="0"
-                @input="zoomImage()"
                 class="form-control-range"
                 id="image-zoom"
                 step="0.01"
                 type="range"
                 v-model.number="zoom"
             >
+            <small
+                :class="{'m-background-block__scale-up-desc--visible': zoom > scaleUpLimit}"
+                class="m-background-block__scale-up-desc"
+            >
+                {{$t('images.create.scaleUpDesc')}}
+            </small>
         </div>
 
         <input
@@ -58,23 +79,19 @@
         >
 
         <div
-            class="alert alert-warning"
+            class="alert alert-warning mt-1"
             role="alert"
-            v-if="background === backgroundTypes.image && imageTooSmall">
+            v-if="backgroundType === backgroundTypes.image && imageTooSmall">
             {{$t('images.create.imageTooSmall')}}
         </div>
     </div>
 </template>
 
 <script>
-    import {BackgroundTypes, StyleSetTypes} from "../../service/canvas/Constants";
+import {BackgroundTypes, HugeImageSurfaceLimit, StyleSetTypes} from "../../service/canvas/Constants";
     import SnackbarMixin from "../../mixins/SnackbarMixin";
-    import BackgroundGradient from "../../service/canvas/elements/background/BackgroundGradient";
-    import BackgroundTransparent from "../../service/canvas/elements/background/BackgroundTransparent";
-    import BackgroundImage from "../../service/canvas/elements/background/BackgroundImage";
     import loadImage from "blueimp-load-image";
     import {mapGetters} from "vuex";
-    import BackgroundPlaceholder from "../../service/canvas/elements/background/BackgroundPlaceholder";
 
     const mimeTypesAllowed = [
         'image/jpeg',
@@ -83,8 +100,6 @@
         'image/svg+xml'
     ];
 
-    let requestedAnimationFrame;
-
     export default {
         name: "MBackgroundBlock",
         components: {},
@@ -92,11 +107,9 @@
 
         data() {
             return {
-                block: null,
-                image: null,
                 mimeType: null,
                 backgroundTypes: BackgroundTypes,
-                zoom: 0,
+                hugeImageSideLenLimit: Math.sqrt(HugeImageSurfaceLimit),
             }
         },
 
@@ -106,14 +119,15 @@
                 imageWidth: 'canvas/getImageWidth',
                 styleSet: 'canvas/getStyleSet',
                 user: 'user/object',
+                scaleUpLimit: 'canvas/getScaleUpLimit',
             }),
 
-            background: {
+            backgroundType: {
                 get() {
                     return this.$store.getters['canvas/getBackgroundType']
                 },
                 set(value) {
-                    if (BackgroundTypes.image === value && !this.image) {
+                    if (BackgroundTypes.image === value && !this.backgroundImage) {
                         return
                     }
 
@@ -121,108 +135,70 @@
                 }
             },
 
+            backgroundImage: {
+                get() {
+                    return this.$store.getters['canvas/getBackgroundImage']
+                },
+                set(value) {
+                    this.$store.dispatch('canvas/setBackgroundImage', value)
+                }
+            },
+
+            zoom: {
+                get() {
+                    return this.$store.getters['canvas/getBackgroundZoom']
+                },
+                set(value) {
+                    this.$store.dispatch('canvas/setBackgroundZoom', value)
+                }
+            },
+
             imageTooSmall() {
-                if (!this.image) {
+                if (!this.backgroundImage) {
                     return false;
                 }
 
-                if (this.image.width < this.imageWidth) {
+                if (this.backgroundImage.width < this.imageWidth) {
                     return true;
                 }
 
-                if (this.image.height < this.imageHeight) {
+                if (this.backgroundImage.height < this.imageHeight) {
                     return true;
                 }
 
                 return false;
             },
 
+            hugeImage() {
+                if (!this.backgroundImage) {
+                    return false;
+                }
+
+                return this.backgroundImage.width * this.backgroundImage.height > HugeImageSurfaceLimit;
+            },
+
+            hugeCanvas() {
+                return this.imageWidth * this.imageHeight > HugeImageSurfaceLimit;
+            },
+
             gradientBackgroundAvailable() {
-                return this.styleSet === StyleSetTypes.green;
+                return this.styleSet === StyleSetTypes.green
+                    || this.styleSet === StyleSetTypes.greenCentered;
             },
         },
 
         mounted() {
-            if (this.styleSet === StyleSetTypes.young) {
-                this.background = BackgroundTypes.placeholder
-            }
+            this.setWatermarkText();
 
-            this.$nextTick(this.draw)
+            if (this.styleSet === StyleSetTypes.young) {
+                this.backgroundType = BackgroundTypes.placeholder
+            }
         },
 
         methods: {
-            draw() {
-                let canvas;
-
-                switch (this.background) {
-                    case BackgroundTypes.placeholder:
-                        canvas = this.drawPlaceholder();
-                        break;
-
-                    case BackgroundTypes.gradient:
-                        canvas = this.drawGradient();
-                        break;
-
-                    case BackgroundTypes.transparent:
-                        canvas = this.drawTransparent();
-                        break;
-
-                    case BackgroundTypes.image:
-                        canvas = this.drawImage();
-                        break;
-                }
-
-                this.$emit('drawn', canvas);
-            },
-
-            drawPlaceholder() {
-                this.block = this.backgroundFactory(BackgroundPlaceholder)
-                this.block.watermarkText = this.$t('images.create.placeholderWatermark', {first_name: this.user?.first_name ?? ''})
-                return this.block.draw()
-            },
-
-            drawGradient() {
-                this.block = this.backgroundFactory(BackgroundGradient);
-                return this.block.draw();
-            },
-
-            drawTransparent() {
-                this.block = this.backgroundFactory(BackgroundTransparent);
-                return this.block.draw();
-            },
-
-            drawImage() {
-                this.block = this.backgroundFactory(BackgroundImage);
-                this.block.image = this.image;
-                this.block.zoom = this.zoom;
-
-                try {
-                    return this.block.draw();
-                } catch (e) {
-                    this.snackErrorDismiss(
-                        e,
-                        this.$t('images.create.uploadedImageNotProcessable')
-                    );
-                }
-            },
-
-            backgroundFactory(type) {
-                const bg = new type();
-                bg.width = this.imageWidth;
-                bg.height = this.imageHeight;
-
-                return bg;
-            },
-
-            zoomImage() {
-                if (requestedAnimationFrame) {
-                    window.cancelAnimationFrame(requestedAnimationFrame);
-                }
-
-                requestedAnimationFrame = window.requestAnimationFrame(() => {
-                    this.block.zoom = this.zoom;
-                    this.$emit('drawn', this.block.draw());
-                });
+            setWatermarkText() {
+                const text = this.$t('images.create.placeholderWatermark', {first_name: this.user?.first_name ?? ''})
+                this.$store.dispatch('canvas/setBackgroundWatermarkText', text)
             },
 
             setImage(event) {
@@ -244,9 +220,9 @@
             },
 
             onImageLoaded(image) {
-                this.image = image
-                this.background = BackgroundTypes.image
-                this.$store.dispatch('canvas/setBackgroundImage', {image: image, mimeType: this.mimeType})
+                this.backgroundImage = image
+                this.backgroundType = BackgroundTypes.image
+                this.$store.dispatch('canvas/setBackgroundImageMimeType', this.mimeType)
                 this.$store.commit('legal/reset')
             },
 
@@ -264,35 +240,54 @@
             },
 
             adjustZoom(dimNew, dimOld) {
+                if (!dimOld) {
+                    return;
+                }
+
                 const ratio = dimNew / dimOld;
                 this.zoom *= ratio;
-            }
+            },
+
+            maybeDisableTransparentBackground() {
+                if (this.hugeCanvas && this.backgroundType === BackgroundTypes.transparent) {
+                    if (this.styleSet === StyleSetTypes.young) {
+                        this.backgroundType = BackgroundTypes.placeholder
+                    } else {
+                        this.backgroundType = BackgroundTypes.gradient;
+                    }
+
+                    this.snackErrorDismiss(
+                        new Error(`Max canvas size for transparent background is: ${HugeImageSurfaceLimit}px²`),
+                        this.$t('images.create.transparentBackgroundDisabled'),
+                    );
+                }
+            },
         },
 
         watch: {
-            background() {
-                this.$nextTick(this.draw)
-            },
             image() {
                 this.zoom = 0;
-                this.draw();
             },
             imageWidth(valueNew, valueOld) {
                 this.adjustZoom(valueNew, valueOld);
-                this.draw();
+                this.maybeDisableTransparentBackground();
             },
             imageHeight(valueNew, valueOld) {
                 this.adjustZoom(valueNew, valueOld);
-                this.draw();
+                this.maybeDisableTransparentBackground();
             },
             styleSet(valueNew) {
-                if (StyleSetTypes.young === valueNew && BackgroundTypes.gradient === this.background) {
-                    this.background = BackgroundTypes.placeholder
+                if (StyleSetTypes.young === valueNew && BackgroundTypes.gradient === this.backgroundType) {
+                    this.backgroundType = BackgroundTypes.placeholder
                 }
-                if (StyleSetTypes.green === valueNew && BackgroundTypes.placeholder === this.background) {
-                    this.background = BackgroundTypes.gradient
+                if ((StyleSetTypes.green === valueNew || StyleSetTypes.greenCentered === valueNew )
+                    && BackgroundTypes.placeholder === this.backgroundType) {
+                    this.backgroundType = BackgroundTypes.gradient
                 }
-            }
+            },
+            user() {
+                this.setWatermarkText();
+            },
         },
     }
 </script>
@@ -300,5 +295,33 @@
 <style lang="scss" scoped>
     .custom-file-input {
         display: none;
+    }
+
+    .m-background-block__zoom {
+        position: relative;
+    }
+
+    .m-background-block__scale-up-desc {
+        color: darkred;
+        opacity: 0;
+        width: 100%;
+        text-align: right;
+        display: block;
+        transition: all 0.4s ease;
+    }
+
+    .m-background-block__scale-up-desc--visible {
+        opacity: 1;
+    }
+
+    .m-background-block__scale-up-zone {
+        position: absolute;
+        right: 0;
+        height: 8px;
+        background: rgba(227, 52, 47, 0.35);
+        user-select: none;
+        pointer-events: none;
+        top: 37.6px;
+        border-radius: 0 8px 8px 0;
     }
 </style>

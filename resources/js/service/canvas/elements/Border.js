@@ -1,45 +1,42 @@
-import BorderHelper from "../BorderHelper";
+import DrawBase from "../misc/DrawBase";
+import {BorderRadiusFactor, BorderWidthFactor} from "../Constants";
 
 const borderColor = '#ffffff';
 
-class Border {
+class Border extends DrawBase {
     constructor() {
-        this._canvas = document.createElement('canvas');
-        this._context = this._canvas.getContext('2d');
+        super();
 
         this._border = true;
-        this._borderWidth = 0;
     }
 
     set border(enabled) {
-        this._border = enabled;
+        this._setProperty('_border', enabled);
     }
 
     set width(width) {
-        this._canvas.width = width;
+        this._setProperty('_canvas.width', width);
     }
 
     set height(height) {
-        this._canvas.height = height;
+        this._setProperty('_canvas.height', height);
     }
 
     get borderWidth() {
-        return this._borderWidth;
+        const area = this._canvas.width * this._canvas.height;
+        const width = Math.sqrt(area) * BorderWidthFactor;
+        return Math.ceil(width);
     }
 
-    draw() {
+    _draw() {
         this._context.clearRect(0, 0, this._canvas.width, this._canvas.height);
 
         if (this._border) {
             this._drawBorder();
         }
-
-        return this._canvas;
     }
 
     _drawBorder() {
-        this._setBorderWidth();
-
         this._context.fillStyle = borderColor;
         this._context.fillRect(0, 0, this._canvas.width, this._canvas.height);
 
@@ -49,8 +46,8 @@ class Border {
 
     _setClippingArea() {
         const ctx = this._context;
-        const bWidth = this._borderWidth;
-        const radius = BorderHelper.radius(bWidth);
+        const bWidth = this.borderWidth;
+        const radius = bWidth * BorderRadiusFactor;
         const width = this._canvas.width - 2 * bWidth;
         const height = this._canvas.height - 2 * bWidth;
 
@@ -65,10 +62,6 @@ class Border {
         ctx.lineTo(bWidth + radius, bWidth);
         ctx.arcTo(bWidth, bWidth, bWidth, bWidth + radius, radius);
         ctx.fill();
-    }
-
-    _setBorderWidth() {
-        this._borderWidth = BorderHelper.width(this._canvas.width, this._canvas.height);
     }
 }
 

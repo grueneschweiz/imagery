@@ -1,19 +1,22 @@
-export default class Layer {
-    constructor(canvas) {
-        this._canvas = canvas;
+import DrawBase from "../misc/DrawBase";
+
+export default class Layer extends DrawBase {
+    constructor(canvas, context) {
+        super(canvas, context);
 
         this._block = null;
-        this._context = null; // deferred loading because we have to create this
-                              // object before the canvas in the dom is ready
+        this._bleed = 0;
     }
 
     set block(block) {
-        this._block = block;
+        this._setProperty('_block', block);
     }
 
-    draw() {
-        this._setContext();
+    set bleed(value) {
+        this._setProperty('_bleed', value);
+    }
 
+    _draw() {
         if (!this._block) {
             return;
         }
@@ -21,10 +24,7 @@ export default class Layer {
         this._drawBlock();
     }
 
-    _setContext() {
-        if (!this._context) {
-            this._context = this._canvas.getContext('2d');
-            this._context.imageSmoothingEnabled = true;
-        }
+    _drawBlock() {
+        throw new Error("Method '_drawBlock()' must be implemented.")
     }
 }

@@ -5,12 +5,13 @@ namespace Tests\Feature\Http\Controllers;
 use App\Image;
 use App\Legal;
 use App\Logo;
+use App\Services\ImageEditor\ImageEditorPng;
+use App\Services\ImageEditor\ImageEditorThumbnail;
 use App\User;
-use Illuminate\Support\Facades\DB;
-use RootSeeder;
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Database\Seeders\RootSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Tests\TestCase;
 
 class ImageTest extends TestCase
 {
@@ -284,8 +285,114 @@ class ImageTest extends TestCase
         ]);
 
         $finalFilename = DB::table('images')->find($imageId)->filename;
-        $this->assertFileExists(disk_path(Image::getImageStorageDir().'/'.$finalFilename));
-        $this->assertFileExists(disk_path(Image::getThumbnailStorageDir().'/'.$finalFilename));
+        $this->assertFileExists(disk_path(ImageEditorPng::getStorageDir().'/'.$finalFilename));
+        $this->assertFileExists(disk_path(ImageEditorThumbnail::getStorageDir().'/'.$finalFilename));
+    }
+
+    public function testPostImage__final__422()
+    {
+        $user     = factory(User::class)->create(['enabled' => true]);
+        $filename = 'Image007.png';
+        $payload  = [
+            'base64data' => 'data:application/octet-stream;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAMAAADXqc3KAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAACmAAAApgHdff84AAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAMBQTFRF//////9V/79A/8wz/99A/9VA/89A/+lQ/+dN/+NO/+VO/+VR/+ZQ/+ZR/+VQ/+ZQ/+ZP/+ZR/+dQ/9dA/9hC/+ZQ/9dB/+dQ/+dQ/+FL/9dA/9dA/9dC/9tF/9tF/99J/99I/9dB/9hD/9dB/9hC/9hD/9lD/tZB/+NN/tZA/uNO/9dB/9dB/+ZQ/+VP/9dB/NA//9dB/+ZQtNJGvMZDxbhAzqs90qU826w83K4877w+770++M1E/NBA/9dB/+ZQfYTn/wAAADN0Uk5TAAMEBQgMECMrLjFFRmhtcHF7f4eIj5GSk6nGysrOz9bX2drb4ODi8PHy8/X5+fv8/v7+6tieJQAAAS5JREFUKFN9UldzwmAMEyEQKIQSymjYe+/1QQDp//+rPpAS6LXVk0+6s2zZwB0WAM8Li2d0inFnsXDixc4rn9iw7EpumZtExGZyKXvOlS/5K87tt/dMKOS0LdXIptQk659SLhRSW6lF9qU+2ZK2qbC/XZI04Gi5HHEgqWQnAFidzbzWlsbr2/V6W4+ldm2+6VhAkSSHUwVnY86BpkOS/AAQL69Iri/GHI/GXNYkV+U4AMf1G93J7WQO+/3BnG6TbsN3HcBbSNLyao773W5/NNelJC28vwU4rt/sj6JWo37Td53IPLibB5F5kSQHYwUnY06BxoNwXKvHWbX1vGCrOmPPApCM/Ywklvw/ROSkSv0ReyWKPZtPPx8qnc/igd9PCwC972fovfKwARQKYQEAX2+6R0mYkO06AAAAAElFTkSuQmCC',
+            'part'       => 0,
+            'filename'   => $filename,
+        ];
+
+        $response = $this->actingAs($user)
+                         ->postJson("/api/1/files/images", $payload);
+
+        $response->assertStatus(200);
+
+        /**
+         * Above was precondition, the real test starts here
+         */
+        $image = factory(Image::class)->make([
+            'background' => Image::BG_CUSTOM,
+            'type'       => Image::TYPE_FINAL,
+            'logo_id'    => null,
+        ]);
+
+        $image->id        = 1; // needed for route creation of image url
+        $data             = $image->toArray();
+        $data['filename'] = $filename; // excluded from toArray method
+
+        unset($data['id']); // but must not be present in post data
+        unset($data['user_id']);
+        unset($data['width']);
+        unset($data['height']);
+
+        $response = $this->actingAs($user)
+                         ->postJson("/api/1/images", $data);
+
+        $response->assertStatus(422);
+    }
+
+    public function testPostImage__final__200()
+    {
+        $user     = factory(User::class)->create(['enabled' => true]);
+        $filename = 'Image007.png';
+        $payload  = [
+            'base64data' => 'data:application/octet-stream;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAMAAADXqc3KAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAACmAAAApgHdff84AAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAMBQTFRF//////9V/79A/8wz/99A/9VA/89A/+lQ/+dN/+NO/+VO/+VR/+ZQ/+ZR/+VQ/+ZQ/+ZP/+ZR/+dQ/9dA/9hC/+ZQ/9dB/+dQ/+dQ/+FL/9dA/9dA/9dC/9tF/9tF/99J/99I/9dB/9hD/9dB/9hC/9hD/9lD/tZB/+NN/tZA/uNO/9dB/9dB/+ZQ/+VP/9dB/NA//9dB/+ZQtNJGvMZDxbhAzqs90qU826w83K4877w+770++M1E/NBA/9dB/+ZQfYTn/wAAADN0Uk5TAAMEBQgMECMrLjFFRmhtcHF7f4eIj5GSk6nGysrOz9bX2drb4ODi8PHy8/X5+fv8/v7+6tieJQAAAS5JREFUKFN9UldzwmAMEyEQKIQSymjYe+/1QQDp//+rPpAS6LXVk0+6s2zZwB0WAM8Li2d0inFnsXDixc4rn9iw7EpumZtExGZyKXvOlS/5K87tt/dMKOS0LdXIptQk659SLhRSW6lF9qU+2ZK2qbC/XZI04Gi5HHEgqWQnAFidzbzWlsbr2/V6W4+ldm2+6VhAkSSHUwVnY86BpkOS/AAQL69Iri/GHI/GXNYkV+U4AMf1G93J7WQO+/3BnG6TbsN3HcBbSNLyao773W5/NNelJC28vwU4rt/sj6JWo37Td53IPLibB5F5kSQHYwUnY06BxoNwXKvHWbX1vGCrOmPPApCM/Ywklvw/ROSkSv0ReyWKPZtPPx8qnc/igd9PCwC972fovfKwARQKYQEAX2+6R0mYkO06AAAAAElFTkSuQmCC',
+            'part'       => 0,
+            'filename'   => $filename,
+        ];
+
+        $response = $this->actingAs($user)
+                         ->postJson("/api/1/files/images", $payload);
+
+        $response->assertStatus(200);
+
+        /**
+         * Above was precondition, the real test starts here
+         */
+        $image = factory(Image::class)->make([
+            'background' => Image::BG_CUSTOM,
+            'type'       => Image::TYPE_FINAL,
+            'logo_id'    => null,
+            'bleed'      => 3,
+            'resolution' => 150,
+        ]);
+
+        $image->id        = 1; // needed for route creation of image url
+        $data             = $image->toArray();
+        $data['filename'] = $filename; // excluded from toArray method
+
+        unset($data['id']); // but must not be present in post data
+        unset($data['user_id']);
+        unset($data['width']);
+        unset($data['height']);
+
+        $response = $this->actingAs($user)
+                         ->postJson("/api/1/images", $data);
+
+        $imageId = $response->json('id');
+
+        $response->assertStatus(201);
+        $response->assertJsonFragment(['user_id' => $user->id]);
+        $response->assertJsonFragment(['width' => 24]);
+        $response->assertJsonFragment(['height' => 24]);
+        $response->assertJsonFragment(['src' => route('image', ['image' => $imageId])]);
+        $response->assertJsonFragment(['thumb_src' => route('thumbnail', ['image' => $imageId])]);
+        $response->assertJsonFragment(['file_type' => 'png']);
+        $response->assertJsonFragment(['resolution' => 150]);
+        $response->assertJsonMissing(['filename']);
+        $response->assertJsonMissing(['deleted_at']);
+        $this->assertDatabaseHas('images', [
+            'id' => $imageId,
+            'user_id' => $user->id,
+            'logo_id' => null,
+            'type' => Image::TYPE_FINAL,
+            'background' => Image::BG_CUSTOM,
+            'width' => 24,
+            'height' => 24,
+            'bleed' => 3,
+            'resolution' => 150,
+        ]);
+
+        $finalFilename = DB::table('images')->find($imageId)->filename;
+        $this->assertFileExists(disk_path(ImageEditorPng::getStorageDir().'/'.$finalFilename));
+        $this->assertFileExists(disk_path(ImageEditorThumbnail::getStorageDir().'/'.$finalFilename));
     }
 
     public function testPutImage__raw__200()
@@ -296,6 +403,7 @@ class ImageTest extends TestCase
             'background' => Image::BG_CUSTOM,
             'type'       => Image::TYPE_RAW,
             'user_id'    => $user->id,
+            'resolution' => null,
         ]);
 
         $filename = 'Image007.png';
@@ -324,7 +432,7 @@ class ImageTest extends TestCase
         $response->assertJsonFragment(['height' => 24]);
 
         $finalFilename = DB::table('images')->find($image->id)->filename;
-        $this->assertFileExists(disk_path(Image::getImageStorageDir().'/'.$finalFilename));
+        $this->assertFileExists(disk_path(ImageEditorPng::getStorageDir().'/'.$finalFilename));
     }
 
     public function testPutImage__rawOriginalId__422()

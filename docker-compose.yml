@@ -11,6 +11,7 @@ services:
     volumes:
       - .:/var/www/html
       - .docker/php.ini:/usr/local/etc/php/php.ini
+      - .docker/policy.xml:/etc/ImageMagick-6/policy.xml
     container_name: imagery
     env_file:
       - .env.docker

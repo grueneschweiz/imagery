@@ -60,8 +60,6 @@ class ImageFileTest extends TestCase
             'user_id' => $user->id
         ]);
 
-        $image->generateThumbnail();
-
         $response = $this->actingAs($user)
                          ->get("/api/1/files/images/$image->id/thumbnail");
 
@@ -89,8 +87,6 @@ class ImageFileTest extends TestCase
             'background'  => Image::BG_CUSTOM,
         ]);
 
-        $final->generateThumbnail();
-
         $response = $this->actingAs($user)
                          ->get("/api/1/files/images/$final->id/thumbnail");
 
@@ -113,8 +109,6 @@ class ImageFileTest extends TestCase
             'background'  => Image::BG_CUSTOM,
         ]);
 
-        $final->generateThumbnail();
-
         $response = $this->actingAs($user)
                          ->get("/api/1/files/images/$final->id/thumbnail");
 
@@ -135,8 +129,6 @@ class ImageFileTest extends TestCase
             'background'  => Image::BG_GRADIENT,
             'user_id'     => $creator->id,
         ]);
-
-        $final->generateThumbnail();
 
         $creator->delete();
 

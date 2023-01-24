@@ -1,26 +1,30 @@
-import {Alignments} from "./../Constants";
+import {Alignments} from "../Constants";
 import Layer from "./Layer";
-import BorderHelper from "../BorderHelper";
 
 const orthogonal = -Math.PI / 2;
 
 export default class CopyrightLayer extends Layer {
-    constructor(canvas) {
-        super(canvas);
+    constructor(canvas, context) {
+        super(canvas, context);
 
         this._alignment = Alignments.left;
         this._border = true;
+        this._borderWidth = 0;
 
         this._x = 0;
         this._y = 0;
     }
 
     set border(bool) {
-        this._border = bool;
+        this._setProperty('_border', bool);
     }
 
     set alignment(alignment) {
-        this._alignment = alignment;
+        this._setProperty('_alignment', alignment);
+    }
+
+    set borderWidth(width) {
+        this._setProperty('_borderWidth', width);
     }
 
     _drawBlock() {
@@ -45,23 +49,22 @@ export default class CopyrightLayer extends Layer {
     }
 
     _determinePos() {
-        const borderWidth = BorderHelper.width(this._canvas.width, this._canvas.height);
         let borderX, borderY;
 
         if (this._border) {
-            borderX = BorderHelper.radius(borderWidth);
+            borderX = this._borderWidth;
             borderY = 0;
         } else {
             borderX = 0;
-            borderY = borderWidth;
+            borderY = this._borderWidth;
         }
 
-        this._x = borderWidth + borderX;
+        this._x = this._borderWidth + borderX + this._bleed;
 
         if (this._alignment === Alignments.right) {
-            this._y = borderY;
+            this._y = borderY + this._bleed;
         } else {
-            this._y = -this._block.height - borderY;
+            this._y = -this._block.height - borderY - this._bleed;
         }
     }
 }
