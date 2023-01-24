@@ -21,11 +21,38 @@
             >
                 <p class="" v-if="loading">{{$t('images.gallery.loading')}}</p>
                 <p v-else v-html="created"/>
-                <a :download="`image.${data.file_type}`" :href="data.src">
-                    <button class="btn btn-outline-primary btn-sm">
-                        {{$t('images.gallery.download')}}
+                <div class="btn-group" role="group">
+                    <button
+                        :aria-expanded="showDownload"
+                        class="btn btn-outline-primary btn-sm dropdown-toggle"
+                        data-toggle="dropdown"
+                        type="button"
+                        @click="showDownload = !showDownload"
+                    >
+                      {{$t('images.gallery.download')}}
                     </button>
-                </a>
+                    <div :class="{'show': showDownload}" class="m-image__download-dropdown dropdown-menu">
+                        <a
+                            :download="`image.${data.file_type}`"
+                           :href="`${data.src}?format=${data.file_type}&color_profile=sRGB&bleed=0`"
+                           class="dropdown-item"
+                           @click="showDownload = false"
+                        >{{$t('images.gallery.digital')}}</a>
+                        <a
+                            :href="`${data.src}?format=pdf&color_profile=FOGRA51&bleed=0&resolution=300`"
+                            class="dropdown-item"
+                            download="image.pdf"
+                            @click="showDownload = false"
+                        >{{$t('images.gallery.selfPrint')}}</a>
+                        <a
+                            :class="{disabled: !data.bleed}"
+                            :href="`${data.src}?format=pdf&color_profile=FOGRA51&bleed=1&resolution=300`"
+                            class="dropdown-item"
+                            download="image.pdf"
+                            @click="showDownload = false"
+                        >{{$t('images.gallery.professionalPrint')}}</a>
+                    </div>
+                </div>
                 <button
                     v-if="canDeleteImage"
                     @click="remove()"
@@ -66,6 +93,7 @@
             return {
                 creator: null,
                 open: this.showDetails,
+                showDownload: false,
             }
         },
 
@@ -135,6 +163,8 @@
 
                 if (this.open) {
                     this.$emit('opened');
+                } else {
+                    this.showDownload = false;
                 }
 
                 if (null === this.creator){
@@ -171,7 +201,6 @@
         width: 100%;
         position: relative;
         cursor: pointer;
-        overflow: hidden;
 
         &__image.transparent {
                 // https://stackoverflow.com/a/35362074
@@ -191,6 +220,10 @@
             width: 100%;
             background: rgba(255, 255, 255, 0.95);
             padding: 0.5em;
+        }
+
+        &__download-dropdown {
+            transform: translateY(0);
         }
     }
 </style>
