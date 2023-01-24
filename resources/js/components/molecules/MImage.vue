@@ -5,7 +5,10 @@
     >
         <img
             class="m-image__image"
-            :class="{transparent: data.background === 'transparent'}"
+            :class="{
+                transparent: data.background === 'transparent',
+                'm-image__image--show-download': showDownload
+            }"
             @click="toggleDetails()"
             :src="data.thumb_src"
             :alt="data.keywords"
@@ -231,6 +234,11 @@
         width: 100%;
         position: relative;
         cursor: pointer;
+        overflow: hidden;
+
+        &__image--show-download {
+            overflow: visible;
+        }
 
         &__image.transparent {
                 // https://stackoverflow.com/a/35362074
