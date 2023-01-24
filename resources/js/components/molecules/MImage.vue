@@ -1,11 +1,17 @@
 <template>
-    <figure class="m-image mb-0">
+    <figure
+        :style="`width: ${thumbWidth}px; height: ${thumbHeight}px;`"
+        class="m-image mb-0"
+    >
         <img
             class="m-image__image"
             :class="{transparent: data.background === 'transparent'}"
             @click="toggleDetails()"
             :src="data.thumb_src"
-            :alt="data.keywords">
+            :alt="data.keywords"
+            :style="`width: ${thumbWidth}px; height: ${thumbHeight}px;`"
+            loading="lazy"
+        >
         <transition name="fade"
                     enter-active-class="fadeInUp"
                     leave-active-class="fadeOutDown">
@@ -41,6 +47,7 @@
     import SnackbarMixin from "../../mixins/SnackbarMixin";
     import escape from 'lodash/escape';
     import UnauthorizedHandlerMixin from "../../mixins/UnauthorizedHandlerMixin";
+    import debounce from "lodash/debounce";
 
     const lang = {
         en: english,
@@ -64,7 +71,8 @@
 
         props: {
             data: {required: true, type: Object},
-            showDetails: {required: true, type: Boolean}
+            showDetails: {required: true, type: Boolean},
+            viewWidth: {required: true, type: Number},
         },
 
         computed: {
@@ -102,6 +110,23 @@
 
                 return superAdmin || myImage;
             },
+
+            thumbWidth() {
+                if (this.viewWidth < 768) {
+                    return this.viewWidth - 30; // see css
+                }
+
+                if (this.viewWidth < 992) {
+                    return (this.viewWidth / 2) - 15; // see css
+                }
+
+                return 300; // see css
+            },
+
+            thumbHeight() {
+                const imgRatio = this.data.width / this.data.height;
+                return this.thumbWidth / imgRatio;
+            },
         },
 
         methods: {
@@ -136,7 +161,7 @@
         watch: {
             showDetails(value) {
                 this.open = value;
-            }
+            },
         }
     }
 </script>
@@ -148,18 +173,7 @@
         cursor: pointer;
         overflow: hidden;
 
-        @include media-breakpoint-up(md) {
-            max-width: calc(50vw - 15px);
-        }
-
-        @include media-breakpoint-up(lg) {
-            max-width: 300px;
-        }
-
-        &__image {
-            width: 100%;
-
-            &.transparent {
+        &__image.transparent {
                 // https://stackoverflow.com/a/35362074
                 background-image: linear-gradient(45deg, #d7d7d7 25%, transparent 25%),
                 linear-gradient(-45deg, #d7d7d7 25%, transparent 25%),
@@ -167,7 +181,6 @@
                 linear-gradient(-45deg, transparent 75%, #d7d7d7 75%);
                 background-size: 20px 20px;
                 background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-            }
         }
 
         &__caption {

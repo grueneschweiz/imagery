@@ -24,6 +24,7 @@
                 :data="image"
                 :key="idx"
                 :showDetails="open === idx"
+                :viewWidth="viewWidth"
                 @opened="open = idx"
                 @removed="removeImage(idx)"
             />
@@ -43,6 +44,7 @@
     import SnackbarMixin from "../../mixins/SnackbarMixin";
     import ALoader from "../atoms/ALoader";
     import UnauthorizedHandlerMixin from "../../mixins/UnauthorizedHandlerMixin";
+    import debounce from "lodash/debounce";
 
     const scrollMargin = 2000;
 
@@ -58,6 +60,7 @@
                 loadingInitial: true,
                 appending: false,
                 open: null,
+                viewWidth: document.documentElement.clientWidth,
             }
         },
 
@@ -170,16 +173,22 @@
             removeImage(idx) {
                 this.images.splice(idx, 1);
                 this.open = null;
-            }
+            },
+
+            setViewWidth() {
+                this.viewWidth = document.documentElement.clientWidth;
+            },
         },
 
         created() {
             this.loadImages();
             this.$store.dispatch('users/load');
+            window.addEventListener('resize', this.setViewWidth);
         },
 
         beforeDestroy() {
             window.removeEventListener('scroll', this.onScroll);
+            window.removeEventListener('resize', this.setViewWidth.bind(this));
         },
 
         watch: {
