@@ -306,6 +306,7 @@ import {
                     filename: this.imageData.filenameFinal,
                     keywords: this.keywords,
                     bleed: this.bleed,
+                    resolution: this.resolution,
                 };
 
                 const cb = resp => this.finalImageSrc = resp.data.src;

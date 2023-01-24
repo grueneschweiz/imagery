@@ -26,6 +26,7 @@ use Illuminate\Support\Carbon;
  * @property int $width
  * @property int $height
  * @property int|null $bleed  pixels
+ * @property int|null $resolution  dpi
  * @property string $src
  * @property string $thumb_src
  * @property string $file_type

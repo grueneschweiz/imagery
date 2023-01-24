@@ -34,19 +34,19 @@
                     <div :class="{'show': showDownload}" class="m-image__download-dropdown dropdown-menu">
                         <a
                             :download="`image.${data.file_type}`"
-                           :href="`${data.src}?format=${data.file_type}&color_profile=sRGB&bleed=0`"
-                           class="dropdown-item"
-                           @click="showDownload = false"
+                            :href="downloadUrlDigital"
+                            class="dropdown-item"
+                            @click="showDownload = false"
                         >{{$t('images.gallery.digital')}}</a>
                         <a
-                            :href="`${data.src}?format=pdf&color_profile=FOGRA51&bleed=0&resolution=300`"
+                            :href="downloadUrlSelfPrint"
                             class="dropdown-item"
                             download="image.pdf"
                             @click="showDownload = false"
                         >{{$t('images.gallery.selfPrint')}}</a>
                         <a
                             :class="{disabled: !data.bleed}"
-                            :href="`${data.src}?format=pdf&color_profile=FOGRA51&bleed=1&resolution=300`"
+                            :href="downloadUrlProfessionalPrint"
                             class="dropdown-item"
                             download="image.pdf"
                             @click="showDownload = false"
@@ -74,7 +74,7 @@
     import SnackbarMixin from "../../mixins/SnackbarMixin";
     import escape from 'lodash/escape';
     import UnauthorizedHandlerMixin from "../../mixins/UnauthorizedHandlerMixin";
-    import debounce from "lodash/debounce";
+    import {ColorEncodings, FileFormats} from "../../service/canvas/Constants";
 
     const lang = {
         en: english,
@@ -154,6 +154,36 @@
             thumbHeight() {
                 const imgRatio = this.data.width / this.data.height;
                 return this.thumbWidth / imgRatio;
+            },
+
+            downloadUrlDigital() {
+                const url = new URL(this.data.src);
+                url.searchParams.append('format', this.data.file_type);
+                url.searchParams.append('color_profile', ColorEncodings.sRGB);
+                url.searchParams.append('bleed', '0');
+                url.searchParams.append('resolution', this.data.resolution);
+
+                return url.href
+            },
+
+            downloadUrlSelfPrint() {
+                const url = new URL(this.data.src);
+                url.searchParams.append('format', FileFormats.pdf);
+                url.searchParams.append('color_profile', ColorEncodings.FOGRA51);
+                url.searchParams.append('bleed', '0');
+                url.searchParams.append('resolution', this.data.resolution);
+
+                return url.href
+            },
+
+            downloadUrlProfessionalPrint() {
+                const url = new URL(this.data.src);
+                url.searchParams.append('format', FileFormats.pdf);
+                url.searchParams.append('color_profile', ColorEncodings.FOGRA51);
+                url.searchParams.append('bleed', '1');
+                url.searchParams.append('resolution', this.data.resolution);
+
+                return url.href
             },
         },
 
