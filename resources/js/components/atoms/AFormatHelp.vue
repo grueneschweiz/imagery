@@ -7,7 +7,8 @@
         <h4 class="alert-heading">{{ heading }}</h4>
         <p>{{ desc }}</p>
         <ul>
-            <li>{{ $t('images.create.fileFormat') }}</li>
+            <li v-if="format === formats.digital">{{ $t('images.create.fileFormatDigital') }}</li>
+            <li v-else>{{ $t('images.create.fileFormatPrint') }}</li>
             <li>{{ $t('images.create.colorProfile', {'profile': colorProfile}) }}</li>
             <template v-if="format !== formats.digital">
                 <li>{{ $t('images.create.resolution') }}</li>
