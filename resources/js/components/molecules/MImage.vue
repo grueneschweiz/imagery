@@ -2,13 +2,11 @@
     <figure
         :style="`width: ${thumbWidth}px; height: ${thumbHeight}px;`"
         class="m-image mb-0"
+        :class="{'m-image--show-download': showDownload}"
     >
         <img
             class="m-image__image"
-            :class="{
-                transparent: data.background === 'transparent',
-                'm-image__image--show-download': showDownload
-            }"
+            :class="{transparent: data.background === 'transparent'}"
             @click="toggleDetails()"
             :src="data.thumb_src"
             :alt="data.keywords"
@@ -236,7 +234,7 @@
         cursor: pointer;
         overflow: hidden;
 
-        &__image--show-download {
+        &--show-download {
             overflow: visible;
         }
 

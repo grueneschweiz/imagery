@@ -215,7 +215,7 @@
             "heightPx": "Höhe (px)",
             "widthMm": "Breite (mm)",
             "heightMm": "Höhe (mm)",
-            "oversizeWarning": "Grosse Bilder können deinen Browser verlangsamen.",
+            "oversizeWarning": "Grosse Bilder sind mit technischen Einschränkungen verbunden: 1) Sie können deinen Browser verlangsamen, 2) sie unterstützen keine transparenten Hintergründe.",
             "oversizeError": "Die maximale Bildgrösse beträgt {maxWidth}x{maxHeight} Pixel.",
             "preview": "Vorschau",
             "dragHelpBar": "Ziehe die Balken in die gewünschte Position.",
