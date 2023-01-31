@@ -215,7 +215,7 @@
             "heightPx": "Hauteur (px)",
             "widthMm": "Largeur (mm)",
             "heightMm": "Hauteur (mm)",
-            "oversizeWarning": "Les grandes images peuvent ralentir la performance de votre navigateur.",
+            "oversizeWarning": "Les grandes images ont quelques limitations techniques : 1) elles peuvent ralentir ton navigateur, 2) elles ne prennent pas en charge les arrière-plans transparents.",
             "oversizeError": "La taille maximale de l'image est de {maxWidth}x{maxHeight} pixels.",
             "preview": "Aperçu",
             "dragHelpBar": "Faites glisser les barres dans la position souhaitée.",
