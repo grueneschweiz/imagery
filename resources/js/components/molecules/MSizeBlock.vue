@@ -80,7 +80,14 @@
             v-if="hugeCanvas"
             class="alert alert-warning mt-3"
             role="alert">
-            {{ $t('images.create.oversizeWarning') }}
+            <p>
+                {{ $t('images.create.oversizeWarning') }}
+            </p>
+            <p>
+                {{$t('images.create.betaLongDesc')}}
+                &rarr;
+                <router-link :to="{name: 'feedbackIndex'}">{{ $t('images.create.feedback') }}</router-link>
+            </p>
         </div>
     </div>
 </template>
