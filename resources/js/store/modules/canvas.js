@@ -39,6 +39,7 @@ const state = {
     fontsLoaded: false,
     copyrightText: '',
     scaleUpLimit: 1,
+    logoIsLoading: false,
     bars: [
         {
             type: BarTypes.headline,
@@ -96,6 +97,7 @@ const getters = {
     getFontsLoaded: state => state.fontsLoaded,
     getCopyrightText: state => state.copyrightText,
     getScaleUpLimit: state => state.scaleUpLimit,
+    getLogoIsLoading: state => state.logoIsLoading,
 };
 
 const mutations = {
@@ -127,6 +129,7 @@ const mutations = {
     setFontsLoaded: (state, loaded) => state.fontsLoaded = loaded,
     setCopyrightText: (state, text) => state.copyrightText = text,
     setScaleUpLimit: (state, limit) => state.scaleUpLimit = limit,
+    setLogoIsLoading: (state, loading) => state.logoIsLoading = loading,
 };
 
 const actions = {
@@ -213,6 +216,9 @@ const actions = {
     },
     setScaleUpLimit({commit}, limit) {
         commit('setScaleUpLimit', limit)
+    },
+    setLogoIsLoading({commit}, loading) {
+        commit('setLogoIsLoading', loading)
     },
 };
 
