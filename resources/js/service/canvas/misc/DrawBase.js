@@ -11,6 +11,8 @@ export default class DrawBase {
         } else {
             this._canvas = document.createElement('canvas');
             this._context = this._canvas.getContext('2d');
+            this._context.imageSmoothingEnabled = true;
+            this._context.imageSmoothingQuality = 'high';
         }
 
         this._dirty = true;

@@ -26,6 +26,7 @@ const state = {
     logoType: null,
     backgroundType: BackgroundTypes.gradient,
     backgroundImage: null,
+    backgroundImageId: false,
     backgroundImageMimeType: null,
     backgroundZoom: 0,
     backgroundWatermarkText: null,
@@ -39,6 +40,8 @@ const state = {
     fontsLoaded: false,
     copyrightText: '',
     scaleUpLimit: 1,
+    backgroundIsLoading: false,
+    logoIsLoading: false,
     bars: [
         {
             type: BarTypes.headline,
@@ -77,6 +80,7 @@ const getters = {
     getLogoType: state => state.logoType,
     getBackgroundType: state => state.backgroundType,
     getBackgroundImage: state => state.backgroundImage,
+    getBackgroundImageId: state => state.backgroundImageId,
     getBackgroundImageMimeType: state => state.backgroundImageMimeType,
     getBackgroundZoom: state => state.backgroundZoom,
     getBackgroundWatermarkText: state => state.backgroundWatermarkText,
@@ -96,6 +100,8 @@ const getters = {
     getFontsLoaded: state => state.fontsLoaded,
     getCopyrightText: state => state.copyrightText,
     getScaleUpLimit: state => state.scaleUpLimit,
+    getBackgroundIsLoading: state => state.backgroundIsLoading,
+    getLogoIsLoading: state => state.logoIsLoading,
 };
 
 const mutations = {
@@ -111,6 +117,7 @@ const mutations = {
     setLogoType: (state, type) => state.logoType = type,
     setBackgroundType: (state, type) => state.backgroundType = type,
     setBackgroundImage: (state, image) => state.backgroundImage = image,
+    setBackgroundImageId: (state, id) => state.backgroundImageId = id,
     setBackgroundImageMimeType: (state, mimeType) => state.backgroundImageMimeType = mimeType,
     setBackgroundZoom: (state, zoom) => state.backgroundZoom = zoom,
     setBackgroundWatermarkText: (state, text) => state.backgroundWatermarkText = text,
@@ -127,6 +134,8 @@ const mutations = {
     setFontsLoaded: (state, loaded) => state.fontsLoaded = loaded,
     setCopyrightText: (state, text) => state.copyrightText = text,
     setScaleUpLimit: (state, limit) => state.scaleUpLimit = limit,
+    setBackgroundIsLoading: (state, loading) => state.backgroundIsLoading = loading,
+    setLogoIsLoading: (state, loading) => state.logoIsLoading = loading,
 };
 
 const actions = {
@@ -165,6 +174,9 @@ const actions = {
     },
     setBackgroundImage({commit}, image) {
         commit('setBackgroundImage', image)
+    },
+    setBackgroundImageId({commit}, id) {
+        commit('setBackgroundImageId', id)
     },
     setBackgroundImageMimeType({commit}, mimeType) {
         commit('setBackgroundImageMimeType', mimeType)
@@ -213,6 +225,12 @@ const actions = {
     },
     setScaleUpLimit({commit}, limit) {
         commit('setScaleUpLimit', limit)
+    },
+    setBackgroundIsLoading({commit}, loading) {
+        commit('setBackgroundIsLoading', loading)
+    },
+    setLogoIsLoading({commit}, loading) {
+        commit('setLogoIsLoading', loading)
     },
 };
 

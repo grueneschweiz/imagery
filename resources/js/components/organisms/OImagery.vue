@@ -5,7 +5,7 @@
             <MStyleSetBlock/>
             <MFormat/>
             <MSizeBlock/>
-            <MBackgroundBlock/>
+            <MBackgroundBlock :bgImageId="bgImageId"/>
         </div>
 
         <div class="o-imagery__preview">
@@ -28,6 +28,7 @@
                     ref="canvas"
                 >You definitely need a newer browser!
                 </canvas>
+                <ALoader v-if="loading" class="o-imagery__canvas-loader"/>
             </div>
             <small v-if="hasImageBackground">{{$t('images.create.dragHelp')}}</small>
             <small v-else>{{$t('images.create.dragHelpBar')}}</small>
@@ -84,12 +85,14 @@ import MCopyright from "../molecules/MCopyright";
 import {mapGetters} from "vuex";
 import MFormat from "../molecules/MFormat.vue";
 import ImageEngine from "../../service/canvas/ImageEngine";
+import ALoader from "../atoms/ALoader.vue";
 
 let requestedAnimationFrame;
 
     export default {
         name: "OImagery",
         components: {
+            ALoader,
             MFormat,
             MCopyright,
             MAlignment,
@@ -101,6 +104,14 @@ let requestedAnimationFrame;
             MLogoBlock,
             MStyleSetBlock,
             MShadowBlock,
+        },
+
+        props: {
+            bgImageId: {
+                type: Number,
+                default: null,
+                required: false,
+            }
         },
 
         data() {
@@ -157,6 +168,8 @@ let requestedAnimationFrame;
                 fontsLoaded: 'canvas/getFontsLoaded',
                 bleed: 'canvas/getBleed',
                 showBleed: 'canvas/getShowBleed',
+                backgroundIsLoading: 'canvas/getBackgroundIsLoading',
+                logoIsLoading: 'canvas/getLogoIsLoading',
             }),
 
             canvasWidth() {
@@ -175,6 +188,7 @@ let requestedAnimationFrame;
                     'transparent': this.backgroundType === BackgroundTypes.transparent,
                     'image': this.backgroundType === BackgroundTypes.image,
                     'huge': this.hugeCanvas,
+                    'disabled': this.loading,
                 }
             },
 
@@ -216,6 +230,10 @@ let requestedAnimationFrame;
             hasImageBackground() {
                 return this.backgroundType === BackgroundTypes.image && this.backgroundImage;
             },
+
+            loading() {
+                return this.backgroundIsLoading || this.logoIsLoading;
+            }
         },
 
         created() {
@@ -631,6 +649,14 @@ let requestedAnimationFrame;
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
+        }
+
+        &__canvas-loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         &__canvas {
@@ -654,8 +680,13 @@ let requestedAnimationFrame;
                 cursor: grab;
 
                 &.dragging {
-                cursor: grabbing !important;
+                    cursor: grabbing !important;
+                }
             }
+
+            &.disabled {
+                pointer-events: none;
+                filter: saturate(30%) contrast(30%) blur(2px) brightness(120%);
             }
         }
     }

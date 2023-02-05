@@ -61,7 +61,6 @@
             return {
                 logoObjSelected: null,
                 logoChoices: [],
-                loadingLogoImage: false,
                 logoDefaultSaving: false,
             }
         },
@@ -102,6 +101,15 @@
                 },
                 set(val) {
                     return this.$store.dispatch('canvas/setLogoType', val)
+                }
+            },
+
+            loadingLogoImage: {
+                get() {
+                    return this.$store.getters['canvas/getLogoIsLoading']
+                },
+                set(val) {
+                    return this.$store.dispatch('canvas/setLogoIsLoading', val)
                 }
             },
 

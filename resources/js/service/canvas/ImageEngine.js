@@ -235,6 +235,7 @@ export default class ImageEngine {
         this._canvas = document.createElement('canvas');
         this._context = this._canvas.getContext('2d');
         this._context.imageSmoothingEnabled = true;
+        this._context.imageSmoothingQuality = 'high';
 
         this._events.on('_canvasWidth', w => this._canvas.width = w);
         this._events.on('_canvasHeight', h => this._canvas.height = h);
