@@ -89,7 +89,8 @@ class Image extends Model
     protected $appends = [
         'src',
         'thumb_src',
-        'file_type'
+        'file_type',
+        'shareable',
     ];
 
     /**
@@ -215,5 +216,18 @@ class Image extends Model
     public function getFileTypeAttribute()
     {
         return substr($this->filename, strpos($this->filename, '.') + 1);
+    }
+
+    public function getShareableAttribute(): bool
+    {
+        if ($this->isFinal()) {
+            if (! $this->original_id) {
+                return false;
+            }
+
+            return self::find($this->original_id)?->isShareable() || false;
+        }
+
+        return $this->isShareable();
     }
 }

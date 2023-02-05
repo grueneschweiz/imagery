@@ -13,6 +13,12 @@
             :style="`width: ${thumbWidth}px; height: ${thumbHeight}px;`"
             loading="lazy"
         >
+        <router-link
+            v-if="data.original_id && data.shareable"
+            :title="$t('images.gallery.reuseInfo')"
+            :to="`/${data.original_id}`"
+            class="m-image__reuse"
+        ><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14.1,9L15,9.9L5.9,19H5V18.1L14.1,9M17.7,3C17.5,3 17.2,3.1 17,3.3L15.2,5.1L18.9,8.9L20.7,7C21.1,6.6 21.1,6 20.7,5.6L18.4,3.3C18.2,3.1 17.9,3 17.7,3M14.1,6.2L3,17.2V21H6.8L17.8,9.9L14.1,6.2M7,2V5H10V7H7V10H5V7H2V5H5V2H7Z" /></svg></router-link>
         <transition name="fade"
                     enter-active-class="fadeInUp"
                     leave-active-class="fadeOutDown">
@@ -22,6 +28,21 @@
             >
                 <p class="" v-if="loading">{{$t('images.gallery.loading')}}</p>
                 <p v-else v-html="created"/>
+
+                <router-link
+                    v-if="data.original_id && data.shareable"
+                    :title="$t('images.gallery.reuseInfo')"
+                    :to="`/${data.original_id}`"
+                    class="btn btn-primary btn-sm"
+                >{{$t('images.gallery.reuse')}}</router-link>
+                <button
+                    v-else
+                    :title="$t('images.gallery.reuseInfoDisabled')"
+                    class="btn btn-primary btn-sm"
+                    disabled
+                    style="cursor: not-allowed"
+                >{{$t('images.gallery.reuse')}}</button>
+
                 <div class="btn-group" role="group">
                     <button
                         :aria-expanded="showDownload"
@@ -246,6 +267,35 @@
                 linear-gradient(-45deg, transparent 75%, #d7d7d7 75%);
                 background-size: 20px 20px;
                 background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+        &__reuse {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3rem;
+            height: 3rem;
+            padding: 0 .75rem .75rem 0;
+            fill: white;
+            background-image:
+                linear-gradient(
+                  -45deg,
+                  transparent 50%, rgba(120, 120, 120, 1) 50%
+                );
+            filter: drop-shadow(0 0 0.1rem rgba(0, 0, 0, 0.5));
+            transition: all .2s ease-in-out;
+        }
+
+        &__reuse:hover, &__reuse:focus {
+            background-image:
+                linear-gradient(
+                  -45deg,
+                  transparent 50%, $primary 50%
+                );
+            filter: drop-shadow(0 0 0.5rem $primary);
+            width: 4rem;
+            height: 4rem;
+            padding: 0 1rem 1rem 0;
         }
 
         &__caption {

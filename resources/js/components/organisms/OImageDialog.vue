@@ -103,6 +103,15 @@ import {
                 format: 'canvas/getFormat',
             }),
 
+            backgroundImageId: {
+                get() {
+                    return this.$store.getters['canvas/getBackgroundImageId']
+                },
+                set(value) {
+                    this.$store.dispatch('canvas/setBackgroundImageId', value)
+                }
+            },
+
             keywords() {
                 return this.$store.getters['canvas/getBars']
                     .map(bar => bar.text)
@@ -112,7 +121,8 @@ import {
 
             hasRawImage() {
                 return this.backgroundType === BackgroundTypes.image
-                    && this.rawImage;
+                    && this.rawImage
+                    && !this.backgroundImageId;
             },
 
             uploadImagesTotalWeight() {
@@ -245,6 +255,7 @@ import {
                 }
 
                 upload.then(() => this.processImage())
+                    .then(() => this.setImageReuse())
                     .then(() => this.downloadButtonShow());
             },
 
@@ -298,11 +309,19 @@ import {
             },
 
             uploadFinalImageMeta() {
+                let originalId;
+
+                if (this.backgroundImageId && this.backgroundType === BackgroundTypes.image) {
+                    originalId = this.backgroundImageId;
+                } else {
+                    originalId = this.imageData.originalId;
+                }
+
                 const payload = {
                     logo_id: this.logoId,
                     background: this.backgroundType,
                     type: 'final',
-                    original_id: this.imageData.originalId,
+                    original_id: originalId,
                     filename: this.imageData.filenameFinal,
                     keywords: this.keywords,
                     bleed: this.bleed,
@@ -357,6 +376,12 @@ import {
                         this.snackErrorRetry(error, this.$t('images.create.uploadFailed'))
                             .then(() => this.uploadImageMeta(payload));
                     });
+            },
+
+            setImageReuse() {
+                if (this.backgroundType === BackgroundTypes.image && this.imageData.originalId) {
+                    this.backgroundImageId = this.imageData.originalId;
+                }
             },
 
             downloadButtonShow() {

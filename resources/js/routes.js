@@ -10,8 +10,10 @@ import FeedbackIndex from "./components/pages/FeedbackIndex";
 
 export const routes = [
     {
-        path: '',
-        component: ImageCreate
+        path: '/:bgImageId?',
+        component: ImageCreate,
+        props: (route) => ({ bgImageId: parseInt(route.params.bgImageId) }),
+        name: 'imageCreate',
     },
     {
         path: '/images/gallery',
