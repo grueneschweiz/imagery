@@ -283,7 +283,7 @@
                   transparent 50%, rgba(120, 120, 120, 1) 50%
                 );
             filter: drop-shadow(0 0 0.1rem rgba(0, 0, 0, 0.5));
-            transition: all .4s ease-in-out;
+            transition: all .2s ease-in-out;
         }
 
         &__reuse:hover, &__reuse:focus {
