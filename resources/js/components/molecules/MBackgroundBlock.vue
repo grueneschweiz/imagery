@@ -76,6 +76,7 @@
             class="custom-file-input"
             ref="uploader"
             type="file"
+            :accept="acceptedMimeTypes"
         >
 
         <div
@@ -184,6 +185,10 @@ import {BackgroundTypes, HugeImageSurfaceLimit, StyleSetTypes} from "../../servi
             gradientBackgroundAvailable() {
                 return this.styleSet === StyleSetTypes.green
                     || this.styleSet === StyleSetTypes.greenCentered;
+            },
+
+            acceptedMimeTypes() {
+                return mimeTypesAllowed.join(',');
             },
         },
 
