@@ -5,7 +5,7 @@
             <MStyleSetBlock/>
             <MFormat/>
             <MSizeBlock/>
-            <MBackgroundBlock/>
+            <MBackgroundBlock :bgImageId="bgImageId"/>
         </div>
 
         <div class="o-imagery__preview">
@@ -101,6 +101,14 @@ let requestedAnimationFrame;
             MLogoBlock,
             MStyleSetBlock,
             MShadowBlock,
+        },
+
+        props: {
+            bgImageId: {
+                type: Number,
+                default: null,
+                required: false,
+            }
         },
 
         data() {

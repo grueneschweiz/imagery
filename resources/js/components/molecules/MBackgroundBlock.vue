@@ -1,38 +1,57 @@
 <template>
     <div class="form-group">
         <label class="mb-0 d-block">{{$t('images.create.background')}}</label>
-        <div class="btn-group btn-group-toggle">
-            <label v-if="gradientBackgroundAvailable"
-                   :class="{'active': backgroundType === backgroundTypes.gradient}"
-                   class="btn btn-secondary btn-sm">
-                <input
-                    :value="backgroundTypes.gradient"
-                    name="background"
-                    type="radio"
-                    v-model="backgroundType"
-                >{{$t('images.create.backgroundGreen')}}
-            </label>
-            <label :class="{'active': backgroundType === backgroundTypes.transparent}"
-                   v-if="!hugeCanvas"
-                   class="btn btn-secondary btn-sm"
+        <div class="d-flex align-items-center">
+            <div class="btn-group btn-group-toggle">
+                <label v-if="gradientBackgroundAvailable"
+                       :class="{
+                            'active': backgroundType === backgroundTypes.gradient,
+                            'disabled': loading,
+                       }"
+                       class="btn btn-secondary btn-sm">
+                    <input
+                        v-model="backgroundType"
+                        :value="backgroundTypes.gradient"
+                        name="background"
+                        type="radio"
+                    >{{$t('images.create.backgroundGreen')}}
+                </label>
+                <label v-if="!hugeCanvas"
+                       :class="{
+                        'active': backgroundType === backgroundTypes.transparent,
+                        'disabled': loading,
+                       }"
+                       class="btn btn-secondary btn-sm"
+                >
+                    <input
+                        v-model="backgroundType"
+                        :value="backgroundTypes.transparent"
+                        name="background"
+                        type="radio"
+                    >{{$t('images.create.backgroundTransparent')}}
+                </label>
+                <label :class="{
+                        'active': backgroundType === backgroundTypes.image,
+                        'disabled': loading,
+                       }"
+                       class="btn btn-secondary btn-sm">
+                    <input
+                        v-model="backgroundType"
+                        :disabled="loading"
+                        :value="backgroundTypes.image"
+                        name="background"
+                        type="radio"
+                        @click="$refs.uploader.click()"
+                    >{{$t('images.create.backgroundImage')}}
+                </label>
+            </div>
+            <div
+                v-if="loading"
+                class="spinner-border spinner-border-sm text-primary ml-2"
+                role="status"
             >
-                <input
-                    :value="backgroundTypes.transparent"
-                    name="background"
-                    type="radio"
-                    v-model="backgroundType"
-                >{{$t('images.create.backgroundTransparent')}}
-            </label>
-            <label :class="{'active': backgroundType === backgroundTypes.image}"
-                   class="btn btn-secondary btn-sm">
-                <input
-                    :value="backgroundTypes.image"
-                    name="background"
-                    type="radio"
-                    v-model="backgroundType"
-                    @click="$refs.uploader.click()"
-                >{{$t('images.create.backgroundImage')}}
-            </label>
+                <span class="sr-only">Loading...</span>
+            </div>
         </div>
 
         <div
@@ -72,7 +91,7 @@
         </div>
 
         <input
-            @change="setImage($event)"
+            @change="setImageFromForm($event)"
             class="custom-file-input"
             ref="uploader"
             type="file"
@@ -90,9 +109,9 @@
 
 <script>
 import {BackgroundTypes, HugeImageSurfaceLimit, StyleSetTypes} from "../../service/canvas/Constants";
-    import SnackbarMixin from "../../mixins/SnackbarMixin";
-    import loadImage from "blueimp-load-image";
-    import {mapGetters} from "vuex";
+import SnackbarMixin from "../../mixins/SnackbarMixin";
+import loadImage from "blueimp-load-image";
+import {mapGetters} from "vuex";
 
     const mimeTypesAllowed = [
         'image/jpeg',
@@ -103,7 +122,6 @@ import {BackgroundTypes, HugeImageSurfaceLimit, StyleSetTypes} from "../../servi
 
     export default {
         name: "MBackgroundBlock",
-        components: {},
         mixins: [SnackbarMixin],
 
         data() {
@@ -111,6 +129,14 @@ import {BackgroundTypes, HugeImageSurfaceLimit, StyleSetTypes} from "../../servi
                 mimeType: null,
                 backgroundTypes: BackgroundTypes,
                 hugeImageSideLenLimit: Math.sqrt(HugeImageSurfaceLimit),
+            }
+        },
+
+        props: {
+            bgImageId: {
+                type: Number,
+                default: null,
+                required: false,
             }
         },
 
@@ -145,12 +171,30 @@ import {BackgroundTypes, HugeImageSurfaceLimit, StyleSetTypes} from "../../servi
                 }
             },
 
+            backgroundImageId: {
+                get() {
+                    return this.$store.getters['canvas/getBackgroundImageId']
+                },
+                set(value) {
+                    this.$store.dispatch('canvas/setBackgroundImageId', value)
+                }
+            },
+
             zoom: {
                 get() {
                     return this.$store.getters['canvas/getBackgroundZoom']
                 },
                 set(value) {
                     this.$store.dispatch('canvas/setBackgroundZoom', value)
+                }
+            },
+
+            loading: {
+                get() {
+                    return this.$store.getters['canvas/getBackgroundIsLoading']
+                },
+                set(value) {
+                    this.$store.commit('canvas/setBackgroundIsLoading', value)
                 }
             },
 
@@ -198,6 +242,10 @@ import {BackgroundTypes, HugeImageSurfaceLimit, StyleSetTypes} from "../../servi
             if (this.styleSet === StyleSetTypes.young) {
                 this.backgroundType = BackgroundTypes.placeholder
             }
+
+            if (this.bgImageId) {
+                this.setImageFromUrl(`/api/1/files/images/${this.bgImageId}`);
+            }
         },
 
         methods: {
@@ -206,22 +254,53 @@ import {BackgroundTypes, HugeImageSurfaceLimit, StyleSetTypes} from "../../servi
                 this.$store.dispatch('canvas/setBackgroundWatermarkText', text)
             },
 
-            setImage(event) {
+            setImageFromForm(event) {
                 if (!event.target.files.length) {
                     return; // no file was selected
                 }
+
+                this.loading = true;
 
                 const blob = event.target.files[0];
 
                 if (this.mimeValidate(blob.type)) {
                     this.mimeType = blob.type;
 
+                    this.setNoImageReuse();
+
                     loadImage(
                         blob,
-                        this.onImageLoaded,
+                        image => {
+                            this.onImageLoaded(image);
+                            this.loading = false;
+                        },
                         {orientation: true, canvas: true}
                     );
+                } else {
+                    this.loading = false;
                 }
+            },
+
+            setImageFromUrl(url) {
+                this.loading = true;
+                loadImage(
+                    url,
+                    (resp) => {
+                        if (resp instanceof Event && resp.type === 'error') {
+                            this.snackErrorDismiss(
+                                new Error('Failed to load image: ' + url),
+                                this.$t('images.create.imageLoadError')
+                            );
+                        } else {
+                            this.onImageLoaded(resp);
+                            this.mimeType = null;
+                            this.backgroundImageId = this.bgImageId;
+                        }
+
+                        this.loading = false;
+                    },
+                    {orientation: true, canvas: true}
+                );
             },
 
             onImageLoaded(image) {
@@ -265,6 +344,16 @@ import {BackgroundTypes, HugeImageSurfaceLimit, StyleSetTypes} from "../../servi
                         new Error(`Max canvas size for transparent background is: ${HugeImageSurfaceLimit}px²`),
                         this.$t('images.create.transparentBackgroundDisabled'),
                     );
+                }
+            },
+
+            setNoImageReuse() {
+                this.backgroundImageId = null;
+
+                if (this.$route.params.bgImageId) {
+                    // remove bgImageId from url. don't use push,
+                    // as navigating back would not re-add the image
+                    this.$router.replace('/');
                 }
             },
         },

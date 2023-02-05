@@ -3,6 +3,7 @@
         <MHeader>{{$t('images.create.title')}}</MHeader>
         <OImagery
             @save="imageData = $event"
+            :bgImageId="bgImageId"
         />
 
         <OImageDialog
@@ -25,6 +26,14 @@
         data() {
             return {
                 imageData: null
+            }
+        },
+
+        props: {
+            bgImageId: {
+                type: Number,
+                default: null,
+                required: false,
             }
         },
     }
