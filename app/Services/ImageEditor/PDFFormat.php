@@ -76,12 +76,14 @@ class PDFFormat
     public function getFormatArray(): array
     {
         $trimBox = $this->getTrimBox();
+        $mediaBox = $this->getMediaBox();
 
         return [
-            'MediaBox' => $this->getMediaBox(),
+            'MediaBox' => $mediaBox,
+            'CropBox'  => $mediaBox,
             'BleedBox' => $this->getBleedBox(),
             'TrimBox'  => $trimBox,
-            'CropBox'  => $trimBox,
+//            'ArtBox'   => $trimBox,
         ];
     }
 
