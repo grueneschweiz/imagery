@@ -186,7 +186,7 @@ import {
                 const url = new URL(this.finalImageSrc);
                 url.searchParams.append('format', this.downloadImageFileExtension);
                 url.searchParams.append('color_profile', this.colorEncoding);
-                url.searchParams.append('bleed', this.bleed > 0 ? '1' : '0');
+                url.searchParams.append('bleed', this.format === Formats.printProfessional ? '1' : '0');
 
                 if (Media.print === this.media) {
                     url.searchParams.append('resolution', this.resolution);
