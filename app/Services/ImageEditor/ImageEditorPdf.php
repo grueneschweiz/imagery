@@ -46,7 +46,7 @@ class ImageEditorPdf extends ImageEditor
     protected function getFilename(): string
     {
         $filename = pathinfo($this->image->filename, PATHINFO_FILENAME);
-        $bleed    = (int) $this->image->bleed;
+        $bleed    = $this->withBleed ? (int) $this->image->bleed : 0;
 
         return $filename
                ."-{$this->colorProfile}"
