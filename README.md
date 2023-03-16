@@ -20,7 +20,7 @@ design.
 
 ### Getting started
 1. Install [docker](https://store.docker.com/search?offering=community&type=edition)
-   and [docker-compose](https://docs.docker.com/compose/install/).
+   and [docker compose](https://docs.docker.com/compose/install/).
 2. Clone this repo `git clone https://github.com/grueneschweiz/cd.gruene.ch_v2`
 3. `cd` into the folder containing the repo
 4. Execute `bash install.sh` and have a ☕️ while it installs.
@@ -62,8 +62,8 @@ provided by Laravel Mix) acts as reverse proxy in front of the app container.
 
 ### Tooling
 #### Docker Cheat Sheet
-- Start up: `docker-compose up -d`
-- Shut down: `docker-compose stop`
+- Start up: `docker compose up -d`
+- Shut down: `docker compose stop`
 - Execute CLI commands (enter container): `docker exec -it imagery bash`. 
   Use `exit` to escape the container.
 

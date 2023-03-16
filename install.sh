@@ -9,20 +9,20 @@ if [ ! -f .env ]; then
 fi
 
 # get containers ready
-docker-compose pull
-docker-compose build app
+docker compose pull
+docker compose build app
 
 # install dependencies
-docker-compose run app composer install
-docker-compose run -uroot node npm install -g cross-env
-docker-compose run -uroot node chown -R node:node /home/node/app
-docker-compose run node yarn install --frozen-lockfile --production=false
+docker compose run app composer install
+docker compose run -uroot node npm install -g cross-env
+docker compose run -uroot node chown -R node:node /home/node/app
+docker compose run node yarn install --frozen-lockfile --production=false
 
 # start up containers
-docker-compose up -d
+docker compose up -d
 
 # set application key
-docker-compose exec -T app php artisan key:generate
+docker compose exec -T app php artisan key:generate
 
 # get params to create test database
 TEST_MYSQL_ROOT_PASSWORD=$(grep MYSQL_ROOT_PASSWORD .env.docker | cut -d '=' -f2 | sed -e 's/[[:space:]]*$//')
@@ -55,15 +55,15 @@ else
 fi
 
 # setup database and seed with demo data
-docker-compose exec -T app php artisan migrate:fresh
-docker-compose exec -T app php artisan db:seed --class=DemoSeeder
+docker compose exec -T app php artisan migrate:fresh
+docker compose exec -T app php artisan db:seed --class=DemoSeeder
 
 # generate mix manifest
-docker-compose run node yarn production
+docker compose run node yarn production
 
 # fully restart all containers (else there is a problem with the application key)
-docker-compose down
-docker-compose up -d
+docker compose down
+docker compose up -d
 
 # set colors if script is executed by a tty
 GREEN=

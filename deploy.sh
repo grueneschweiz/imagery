@@ -150,14 +150,14 @@ sync() {
         --exclude='/proprietary.tar.gz.enc' \
         --exclude='/.htaccess' \
         --filter=':- .gitignore' \
-        . "${host}:\"${target}\""
+        . "${host}:${target}"
 
     echo "Upload for ${name} completed."
 }
 
 buildassets() {
     echo 'Start building assets'
-    docker-compose up -d node
+    docker compose up -d node
     docker exec imagery_node yarn production
     echo 'Assets built'
 }

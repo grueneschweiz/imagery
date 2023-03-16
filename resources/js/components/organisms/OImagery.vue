@@ -30,7 +30,7 @@
                 </canvas>
                 <ALoader v-if="loading" class="o-imagery__canvas-loader"/>
             </div>
-            <small v-if="hasImageBackground">{{$t('images.create.dragHelp')}}</small>
+            <small v-if="backgroundIsDraggable">{{$t('images.create.dragHelp')}}</small>
             <small v-else>{{$t('images.create.dragHelpBar')}}</small>
         </div>
 
@@ -229,6 +229,15 @@ let requestedAnimationFrame;
 
             hasImageBackground() {
                 return this.backgroundType === BackgroundTypes.image && this.backgroundImage;
+            },
+
+            backgroundIsDraggable() {
+                if (!this.hasImageBackground) {
+                    return false;
+                }
+
+                return this.visibleWidth < this.backgroundImage.width
+                    || this.visibleHeight < this.backgroundImage.height;
             },
 
             loading() {
