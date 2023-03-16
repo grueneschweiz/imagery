@@ -150,7 +150,7 @@ sync() {
         --exclude='/proprietary.tar.gz.enc' \
         --exclude='/.htaccess' \
         --filter=':- .gitignore' \
-        . "${host}:\"${target}\""
+        . "${host}:${target}"
 
     echo "Upload for ${name} completed."
 }
