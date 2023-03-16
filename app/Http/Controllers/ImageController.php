@@ -301,7 +301,7 @@ class ImageController extends Controller
             'bleed'         => ['requiredIf:format,'.ImageEditorPdf::FILE_FORMAT, 'between:0,1']
         ])->validate();
 
-        $format       = $request->query('format', ImageEditorPng::FILE_FORMAT);
+        $format       = $request->query('format', $image->getFileTypeAttribute());
         $withBleed    = (bool) $request->query('bleed', false);
         $resolution   = $request->query('resolution');
         $colorProfile = $request->query('color_profile', ImageEditorPng::COLOR_PROFILE);
