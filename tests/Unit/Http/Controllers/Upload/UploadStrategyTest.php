@@ -31,7 +31,7 @@ class UploadStrategyTest extends TestCase
         $imgOld = $uploadDirPath.DIRECTORY_SEPARATOR.Str::random().'-1.jpg';
         $imgNew = $uploadDirPath.DIRECTORY_SEPARATOR.Str::random().'-2.jpg';
 
-        $srcImg = database_path('factories'.DIRECTORY_SEPARATOR.'Image.jpg');
+        $srcImg = database_path('factories'.DIRECTORY_SEPARATOR.'Image.jpeg');
 
         copy($srcImg, $imgOld);
         copy($srcImg, $imgNew);

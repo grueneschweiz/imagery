@@ -18,9 +18,9 @@ $factory->define(Image::class, function (Faker $faker) {
     Storage::makeDirectory($relDir);
 
     $absDir   = disk_path($relDir);
-    $filename = \Illuminate\Support\Str::random().'.jpg';
+    $filename = \Illuminate\Support\Str::random().'.jpeg';
 
-    copy(__DIR__.DIRECTORY_SEPARATOR.'Image.jpg', $absDir.DIRECTORY_SEPARATOR.$filename);
+    copy(__DIR__.DIRECTORY_SEPARATOR.'Image.jpeg', $absDir.DIRECTORY_SEPARATOR.$filename);
 
     Storage::setVisibility($relDir.DIRECTORY_SEPARATOR.$filename, 'private');
 
