@@ -78,16 +78,16 @@ export const routes = [
         name: 'logosDownload'
     },
     {
-        path: '/logout',
+        path: '/user/logout',
         component: UserLogout,
     },
     {
-        path: '/translate',
+        path: '/help/translate',
         component: TranslateIndex,
         name: 'translateIndex'
     },
     {
-        path: '/feedback',
+        path: '/help/feedback',
         component: FeedbackIndex,
         name: 'feedbackIndex'
     },
