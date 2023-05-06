@@ -129,6 +129,8 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/laravel/ui" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/tecnickcom/tcpdf" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/guzzlehttp/uri-template" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/league/flysystem-local" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpstan/phpdoc-parser" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
