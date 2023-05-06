@@ -22,11 +22,11 @@
             </li>
             <MMenuItem :to="`/admin/users/${id}`" materialIcon="account-box">{{$t('route.profile')}}</MMenuItem>
             <MMenuItem :to="`/logos/download`" svgIcon="/images/logo-icon.svg">{{$t('route.logos_download')}}</MMenuItem>
-            <MMenuItem materialIcon="power-settings-new" to="/logout">{{$t('route.logout')}}</MMenuItem>
+            <MMenuItem materialIcon="power-settings-new" to="/user/logout">{{$t('route.logout')}}</MMenuItem>
         </ul>
         <ul class="o-menu__item-list o-menu__item-list--small o-menu__item-list--horizontal list-unstyled mt-3">
-            <MMenuItem :exact="false" class="pr-4" to="/translate">{{$t('route.translate')}}</MMenuItem>
-            <MMenuItem :exact="false" class="pr-4" to="/feedback">{{$t('route.feedback')}}</MMenuItem>
+            <MMenuItem :exact="false" class="pr-4" to="/help/translate">{{$t('route.translate')}}</MMenuItem>
+            <MMenuItem :exact="false" class="pr-4" to="/help/feedback">{{$t('route.feedback')}}</MMenuItem>
         </ul>
     </nav>
 </template>

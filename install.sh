@@ -13,6 +13,7 @@ docker compose pull
 docker compose build app
 
 # install dependencies
+docker compose run -uroot app chown -R www-data:www-data /var/www/html
 docker compose run app composer install
 docker compose run -uroot node npm install -g cross-env
 docker compose run -uroot node chown -R node:node /home/node/app

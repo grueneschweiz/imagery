@@ -30,7 +30,7 @@
         methods: {
             logout() {
                 Api().post('users/logout')
-                    .then(this.redirect)
+                    .then(resp => this.redirect(resp.data.redirect))
                     .catch(error => this.handleUnauthorized(error))
                     .catch(error =>
                         this.snackErrorRetry(error, this.$t('logoutError'))
@@ -38,9 +38,9 @@
                     );
             },
 
-            redirect() {
+            redirect(href) {
                 this.title = this.$t('users.logout.redirecting');
-                window.location.href = '/';
+                window.location.href = href;
             }
         }
     }

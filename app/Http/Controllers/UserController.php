@@ -180,7 +180,21 @@ class UserController extends Controller
     {
         Auth::logout();
 
-        return response(null, 204);
+        $ssoLogoutUrl = config('keycloak-web.base_url')
+                        .rtrim('/')
+                        .'/realms/'
+                        .config('keycloak-web.realm')
+                        .'/protocol/openid-connect/logout'
+                        .'?post_logout_redirect_uri='
+                        .urlencode(app('url')->to('/login'))
+                        .'&client_id='
+                        .config('keycloak-web.client_id');
+
+        $resp = [
+            'redirect' => $ssoLogoutUrl,
+        ];
+
+        return response($resp, 200);
     }
 
     /**
