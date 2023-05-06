@@ -180,7 +180,21 @@ class UserController extends Controller
     {
         Auth::logout();
 
-        return response(null, 204);
+        $ssoLogoutUrl = env('KEYCLOAK_BASE_URL')
+                        .rtrim('/')
+                        .'/realms/'
+                        .env('KEYCLOAK_REALM')
+                        .'/protocol/openid-connect/logout'
+                        .'?post_logout_redirect_uri='
+                        .urlencode(app('url')->to('/login'))
+                        .'&client_id='
+                        .env('KEYCLOAK_CLIENT_ID');
+
+        $resp = [
+            'redirect' => $ssoLogoutUrl,
+        ];
+
+        return response($resp, 200);
     }
 
     /**
