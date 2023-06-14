@@ -18,7 +18,7 @@ class Verdi extends AbstractFlowerLogo
 
     protected function getRelSublineOffsetX(): float
     {
-        return 32;
+        return 35.5;
     }
 
     protected function getRelSublineOffsetY(): float
@@ -35,7 +35,7 @@ class Verdi extends AbstractFlowerLogo
 
     protected function getSublineFontSize(): float
     {
-        return 7.35;
+        return 8.25;
     }
 
     protected function getTestOverlayPath(): ?string
