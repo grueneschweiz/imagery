@@ -19,7 +19,7 @@
         "laravel-mix-bundle-analyzer": "^1.0.5",
         "lodash": "^4.17.13",
         "popper.js": "^1.12",
-        "postcss": "^8.1",
+        "postcss": "^8.4",
         "resolve-url-loader": "^4.0.0",
         "sass": "^1.15.2",
         "sass-loader": "^12.1.0",
