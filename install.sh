@@ -71,8 +71,8 @@ GREEN=
 YELLOW=
 NC=
 if [ -t 1 ]; then
-    GREEN="$(tput setf 2)"
-    YELLOW="$(tput setf 3)"
+    GREEN="$(tput setaf 2)"
+    YELLOW="$(tput setaf 3)"
     NC="$(tput sgr0)"
 fi
 
@@ -82,4 +82,3 @@ echo -e "${GREEN}Yupii, installation successful!${NC}\n"
 echo -e "${YELLOW}NOTE:${NC} You'll need to add the proprietary fonts, to get this working properly."
 echo -e "Ask ${YELLOW}admin at gruene dot ch${NC} for more information.\n"
 echo -e "Now visit ${GREEN}http://localhost:3000${NC}"
-echo -e "Login with the email ${GREEN}superadmin@user.login${NC} and ${GREEN}password${NC} as password"
