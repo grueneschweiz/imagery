@@ -26,9 +26,10 @@ class AuthServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
-        $this->registerPolicies();
+        // https://laravel.com/docs/10.x/upgrade#register-policies
+        // $this->registerPolicies();
 
         //
     }
