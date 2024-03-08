@@ -106,12 +106,12 @@ class ChunkUploadStrategyTest extends TestCase
 
         $filename = 'test.txt';
 
-        $chunk = 'data:application/octet-stream;base64,MTIzNA=='; // 1234
+        $chunk = $chunk = base64_encode('1234'); // 4 bytes
 
         $request = new \Illuminate\Http\Request([
             'filename'   => $filename,
             'part'       => 0,
-            'base64data' => $chunk,
+            'base64data' => 'data:application/octet-stream;base64,' . $chunk,
         ]);
 
         $uploader = new ChunkUploadStrategy(['txt']);
