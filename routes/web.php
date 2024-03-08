@@ -239,7 +239,7 @@ Route::get('users/register/sso', 'UserController@register')
     ->middleware(['auth:web-sso'])
     ->name('register-sso-user');
 
-Route::get('users/register/error', 'UserController@registrationError')
+Route::get( 'users/register/error', 'UserController@registrationError')
     ->name('registration-error');
 
 Route::get('users/account/error', 'UserController@accountError')
