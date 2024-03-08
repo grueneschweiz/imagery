@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
+use Illuminate\Http\Request;
 
+/**
+ * @deprecated since Sep 13, 2020. Use keycloak instead.
+ */
 class ForgotPasswordController extends Controller
 {
     /*
@@ -18,15 +21,17 @@ class ForgotPasswordController extends Controller
     |
     */
 
-    use SendsPasswordResetEmails;
+    //use SendsPasswordResetEmails;
 
     /**
-     * Create a new controller instance.
+     * Redirect any request to this controller to the application's root. This Controller should no longer be used.
      *
-     * @return void
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function __construct()
+    public function __invoke(Request $request)
     {
-        $this->middleware('guest');
+        trigger_error('ForgotPasswordController is deprecated since Sep 13, 2020', E_USER_DEPRECATED);
+        return redirect('/');
     }
 }

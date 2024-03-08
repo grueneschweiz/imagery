@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Rules\PasswordRule;
-use Illuminate\Foundation\Auth\ResetsPasswords;
+use Illuminate\Http\Request;
 
+/**
+ * @deprecated since Sep 13, 2020. Use keycloak instead.
+ */
 class ResetPasswordController extends Controller
 {
     /*
@@ -19,36 +21,17 @@ class ResetPasswordController extends Controller
     |
     */
 
-    use ResetsPasswords;
+    //use ResetsPasswords;
 
     /**
-     * Where to redirect users after resetting their password.
+     * Redirect any request to this controller to the application's root. This Controller should no longer be used.
      *
-     * @var string
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
      */
-    protected $redirectTo = '/';
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    public function __invoke(Request $request)
     {
-        $this->middleware('guest');
-    }
-
-    /**
-     * Get the password reset validation rules.
-     *
-     * @return array
-     */
-    protected function rules()
-    {
-        return [
-            'token'    => 'required',
-            'email'    => 'required|email',
-            'password' => ['required', 'confirmed', new PasswordRule()],
-        ];
+        trigger_error('ResetPasswordController is deprecated since Sep 13, 2020', E_USER_DEPRECATED);
+        return redirect('/');
     }
 }
