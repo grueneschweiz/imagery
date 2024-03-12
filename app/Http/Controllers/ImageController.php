@@ -22,6 +22,7 @@ use App\Services\ImageEditor\ImageEditorPng;
 use App\Services\ImageEditor\ImageEditorThumbnail;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -36,7 +37,7 @@ class ImageController extends Controller
     /**
      * Return paginated list of all shareable raw images.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function indexRaw()
     {
@@ -55,7 +56,7 @@ class ImageController extends Controller
      *
      * @param  string  $terms
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Pagination\LengthAwarePaginator<Image>|Response
      */
     public function searchFinal(string $terms)
     {
@@ -76,7 +77,7 @@ class ImageController extends Controller
     /**
      * Return paginated list of all final images.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Pagination\LengthAwarePaginator<Image>|Response
      */
     public function indexFinal()
     {
@@ -89,9 +90,9 @@ class ImageController extends Controller
     /**
      * Return single raw image.
      *
-     * @param  \App\Image  $image
+     * @param  Image  $image
      *
-     * @return \Illuminate\Http\Response
+     * @return Image|Response
      */
     public function show(Image $image)
     {
@@ -103,7 +104,7 @@ class ImageController extends Controller
      *
      * @param  Image  $image
      *
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|Response
      * @throws \Exception
      */
     public function destroy(Image $image)
@@ -125,9 +126,9 @@ class ImageController extends Controller
      * Update the specified resource in storage.
      *
      * @param  Request  $request
-     * @param  \App\Image  $image
+     * @param  Image  $image
      *
-     * @return \Illuminate\Http\Response
+     * @return Image|Response
      */
     public function update(Request $request, Image $image)
     {
@@ -196,7 +197,7 @@ class ImageController extends Controller
      * @param  Request  $request
      * @param  Image  $image
      *
-     * @return \Illuminate\Http\Response
+     * @return Image|Response
      */
     public function store(Request $request, Image $image)
     {

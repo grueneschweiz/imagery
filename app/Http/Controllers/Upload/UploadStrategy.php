@@ -32,7 +32,7 @@ abstract class UploadStrategy
     /**
      * The allowed maximum file size in Byte
      *
-     * @var int
+     * @var float
      */
     protected $allowedFileSize;
 
