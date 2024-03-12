@@ -7,10 +7,15 @@ parameters:
         - app/
 
     # Level 9 is the highest level
-    level: 2
+    level: 3
     reportUnmatchedIgnoredErrors: false
     ignoreErrors:
         #- '#PHPDoc tag @var#' # recommended in laravel 10
         - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Builder#' # local Scope recognition is not good enough in larastan
+        # phpstan is not yet very good with laravels magic, so undefined properties happen
+        - '#Access to an undefined property App\\KeycloakUser#'
+        - '#Access to an undefined property Illuminate#'
+
+
 
     checkMissingIterableValueType: false
