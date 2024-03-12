@@ -22,12 +22,12 @@ jobs:
         if: ${{ failure() }}
         run: cat storage/logs/laravel-*.log
 
-      - name: PHPStan Analysis
+      - name: PHPStan Analysis | Level 1
         run: |
           docker exec imagery ./vendor/bin/phpstan analyse --memory-limit=2G --error-format=github --no-progress --level 1
         continue-on-error: false
 
-      - name: PHPStan Analysis
+      - name: PHPStan Analysis | Higher Level, see phpstan.neon
         run: |
           docker exec imagery ./vendor/bin/phpstan analyse --memory-limit=2G --error-format=github --no-progress
         continue-on-error: true
