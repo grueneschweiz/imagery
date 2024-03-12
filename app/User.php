@@ -441,7 +441,7 @@ class User extends Authenticatable
     /**
      * Add the given subject if none is present.
      *
-     * @throws UserSubjectMissmatchException
+     * @throws \App\Exceptions\UserSubjectMissmatchException
      */
     public function complementSub(string $sub): void
     {
