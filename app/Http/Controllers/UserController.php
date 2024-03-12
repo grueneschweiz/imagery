@@ -45,7 +45,7 @@ class UserController extends Controller
      * @param Request $request
      * @param User $managed the user to update
      *
-     * @return Response
+     * @return Response|User
      */
     public function store(Request $request, User $managed)
     {
@@ -118,7 +118,7 @@ class UserController extends Controller
      * @param Request $request
      * @param User $managed the user to update
      *
-     * @return User
+     * @return Response|User
      */
     public function update(Request $request, User $managed)
     {
