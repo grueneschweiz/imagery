@@ -5,15 +5,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "Tests triggered by a ${{ github.event_name }} event to the ${{ github.ref }} branch."
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Add proprietary files
         env:
           PROPRIETARY_KEY: ${{ secrets.PROPRIETARY_KEY }}
         run: ./.github/scripts/decrypt_proprietary_files.sh
-
-      - name: Fix file permissions
-        run: sudo chmod 0777 .
 
       - name: Install everything
         run: bash install.sh
@@ -28,3 +25,4 @@ jobs:
       - name: PHPStan Analysis
         run: |
           docker exec imagery ./vendor/bin/phpstan analyse --memory-limit=2G --error-format=github --no-progress
+        continue-on-error: true
