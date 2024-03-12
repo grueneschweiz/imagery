@@ -93,7 +93,7 @@ class User extends Authenticatable
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $fillable = [
         'first_name',
@@ -112,7 +112,7 @@ class User extends Authenticatable
     /**
      * The attributes that should be hidden for arrays.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $hidden = [
         'password',
@@ -123,7 +123,7 @@ class User extends Authenticatable
     /**
      * The attributes that should be cast to native types.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $casts = [
         'super_admin'       => 'boolean',
@@ -135,7 +135,7 @@ class User extends Authenticatable
     /**
      * Expose those accessors
      *
-     * @var array
+     * @var array<int, string> 
      */
     protected $appends = [
         'is_admin'
