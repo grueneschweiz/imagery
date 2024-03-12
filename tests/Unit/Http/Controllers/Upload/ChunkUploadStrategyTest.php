@@ -18,13 +18,13 @@ class ChunkUploadStrategyTest extends TestCase
     {
         $filename = 'test.txt';
 
-        $PAyload = 'data:application/octet-stream;base64,MTIzNA'; // 1234
+        $chunk1 = 'data:application/octet-stream;base64,MTIzNA'; // 1234
         $chunk2 = 'YXNkZg=='; // asdf
 
         $request1 = new \Illuminate\Http\Request([
             'filename'   => $filename,
             'part'       => 0,
-            'base64data' => $PAyload,
+            'base64data' => $chunk1,
         ]);
         $request2 = new \Illuminate\Http\Request([
             'filename'   => $filename,
