@@ -1,7 +1,7 @@
-name: Tests
+name: CI
 on: [push]
 jobs:
-  laravel-tests:
+  build-test-analyse:
     runs-on: ubuntu-latest
     steps:
       - run: echo "Tests triggered by a ${{ github.event_name }} event to the ${{ github.ref }} branch."
@@ -18,7 +18,7 @@ jobs:
       - name: Run PHPUnit
         run: docker exec imagery vendor/bin/phpunit
 
-      - name: Something failed
+      - name: "Report: Some test(s) failed"
         if: ${{ failure() }}
         run: cat storage/logs/laravel-*.log
 
