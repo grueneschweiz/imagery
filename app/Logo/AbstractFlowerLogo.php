@@ -200,12 +200,12 @@ abstract class AbstractFlowerLogo implements LogoCompositor
         );
     }
 
-    #[Pure] private function getBaseLogoWidth(): int
+    private function getBaseLogoWidth(): int
     {
         return $this->baseLogoIm->getImageWidth();
     }
 
-    #[Pure] private function getBaseLogoHeight(): int
+    private function getBaseLogoHeight(): int
     {
         return $this->baseLogoIm->getImageHeight();
     }
@@ -227,7 +227,7 @@ abstract class AbstractFlowerLogo implements LogoCompositor
                * $this->getBaseLogoHeight();
     }
 
-    #[Pure] private function getSublineHeight(): int
+    private function getSublineHeight(): int
     {
         return $this->sublineIm->getImageHeight();
     }

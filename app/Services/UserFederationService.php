@@ -43,7 +43,7 @@ class UserFederationService
         Auth::shouldUse('web-local');
         Auth::setUser($user);
         Auth::login($user, true);
-        KeycloakWeb::forgetToken();
+        KeycloakWeb::forgetToken(); /** @phpstan-ignore-line | Static calling is normal here https://github.com/mariovalney/laravel-keycloak-web-guard*/
     }
 
     public function isLocalUserLoaded(): bool
@@ -53,7 +53,8 @@ class UserFederationService
 
     private function retrieveLocalUser($authenticated): ?User
     {
-        $user = User::whereSub($authenticated->sub)->first();
+        // not using the magic method here, since there is a private method with the same name
+        $user = User::where('sub', $authenticated->sub)->first();
 
         if (!$user) {
             $user = User::whereEmail($authenticated->id)->first();

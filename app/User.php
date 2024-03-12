@@ -359,7 +359,7 @@ class User extends Authenticatable
     {
         $groups = collect();
         foreach ($this->adminRoles as $role) {
-            $roleGroups = Group::descendantsAndSelf($role->group_id);
+            $roleGroups = Group::descendantsAndSelf($role->group_id); /** @phpstan-ignore-line |Usage as documented by third party: https://github.com/lazychaser/laravel-nestedset*/
             $roleGroups->each(function ($item) use ($groups) {
                 $groups->add($item);
             });
