@@ -24,3 +24,7 @@ jobs:
       - name: Something failed
         if: ${{ failure() }}
         run: cat storage/logs/laravel-*.log
+
+      - name: PHPStan Analysis
+        run: |
+          docker exec imagery ./vendor/bin/phpstan analyse --memory-limit=2G --error-format=github --no-progress
