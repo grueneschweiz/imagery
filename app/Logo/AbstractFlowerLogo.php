@@ -212,7 +212,7 @@ abstract class AbstractFlowerLogo implements LogoCompositor
 
     private function getSublineWidth(): int
     {
-        return ceil($this->getAbsSublineX()) + $this->sublineIm->getImageWidth();
+        return (int) (ceil($this->getAbsSublineX()) + $this->sublineIm->getImageWidth());
     }
 
     private function getAbsSublineX(): float
