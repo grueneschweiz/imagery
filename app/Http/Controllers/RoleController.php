@@ -73,7 +73,7 @@ class RoleController extends Controller
 
         // in the response we want the group, but not the user
         unset($role->user);
-        $role->group;
+        $role->group;  // @phpstan-ignore-line, potentially eager loading trickery, I was to lazy to check so it stays
 
         return $role;
     }

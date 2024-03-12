@@ -324,9 +324,9 @@ class ImageController extends Controller
      *
      * @param  string  $string
      *
-     * @return string|null
+     * @return string
      */
-    private function prepareTerms(string $string): ?string
+    private function prepareTerms(string $string): string
     {
         $query = '';
 

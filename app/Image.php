@@ -225,7 +225,7 @@ class Image extends Model
                 return false;
             }
 
-            return self::find($this->original_id)?->isShareable() || false;
+            return (bool)self::find($this->original_id)?->isShareable();
         }
 
         return $this->isShareable();
