@@ -8,6 +8,7 @@ parameters:
 
     # Level 9 is the highest level
     level: 2
+    reportUnmatchedIgnoredErrors: false
     ignoreErrors:
         #- '#PHPDoc tag @var#' # recommended in laravel 10
         - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Builder#' # local Scope recognition is not good enough in larastan
