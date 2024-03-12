@@ -30,7 +30,6 @@ class LoadLocalUser
      *
      * @param \Illuminate\Http\Request $request
      * @param \Closure $next
-     * @param UserFederationService $federationService
      * @return mixed
      */
     public function handle($request, Closure $next)

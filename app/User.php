@@ -17,10 +17,10 @@ use Illuminate\Support\Facades\Mail;
  *
  * @package App
  * @property int $id
- * @property string first_name
- * @property string last_name
- * @property string sub
- * @property string email
+ * @property string $first_name
+ * @property string $last_name
+ * @property string $sub
+ * @property string $email
  * @property Carbon $email_verified_at
  * @property string $password
  * @property int $added_by
@@ -234,6 +234,7 @@ class User extends Authenticatable
         }
 
         $users = collect();
+        /** @var \App\Role $role */
         foreach ($this->adminRoles()->get() as $role) {
             $users->push($role->usersBelow());
         }
@@ -263,6 +264,7 @@ class User extends Authenticatable
             return true;
         }
 
+        /** @var \App\Role $role */
         foreach ($this->adminRoles()->get() as $role) {
             if ($role->isGroupBelow($group)) {
                 return true;
