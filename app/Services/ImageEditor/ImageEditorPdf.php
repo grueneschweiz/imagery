@@ -95,10 +95,11 @@ class ImageEditorPdf extends ImageEditor
         // set document information
         $user   = $this->image->user;
         $author = $user ? $user->first_name.' '.$user->last_name : config('app.name');
+        $title = $this->image->logo?->name ?? config('app.name');
 
         $pdf->setCreator(config('app.url'));
         $pdf->setAuthor($author);
-        $pdf->setTitle($this->image->logo?->name || config('app.name'));
+        $pdf->setTitle($title);
         $pdf->setSubject($this->image->keywords);
 
         // configure pdf
