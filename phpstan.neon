@@ -6,16 +6,15 @@ parameters:
     paths:
         - app/
 
-    # Level 9 is the highest level
-    level: 5
+    excludePaths:
+        - app/Logo/AbstractFlowerLogo.php # https://github.com/grueneschweiz/cd.gruene.ch_v2/issues/73
+
+    level: 6
     reportUnmatchedIgnoredErrors: false
     ignoreErrors:
-        #- '#PHPDoc tag @var#' # recommended in laravel 10
         - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Builder#' # local Scope recognition is not good enough in larastan
         # phpstan is not yet very good with laravels magic, so undefined properties happen
         - '#Access to an undefined property App\\KeycloakUser#'
         - '#Access to an undefined property Illuminate#'
-
-
 
     checkMissingIterableValueType: false

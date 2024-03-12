@@ -303,8 +303,8 @@ class ImageController extends Controller
         ])->validate();
 
         $format       = $request->query('format', $image->getFileTypeAttribute());
-        $withBleed    = (bool) $request->query('bleed', false);
-        $resolution   = $request->query('resolution');
+        $withBleed    = (bool) $request->query('bleed', null);
+        $resolution   = is_numeric($request->query('resolution')) ? (int)$request->query('resolution') : null;
         $colorProfile = $request->query('color_profile', ImageEditorPng::COLOR_PROFILE);
 
         try {

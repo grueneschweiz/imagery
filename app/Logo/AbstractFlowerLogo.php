@@ -63,7 +63,7 @@ abstract class AbstractFlowerLogo implements LogoCompositor
         $adjustedWidth = ($width / $malsizedIm->getImageWidth()) * $width;
         unset($malsizedIm);
 
-        $im = $this->composeInternal(floor($adjustedWidth));
+        $im = $this->composeInternal((int)floor($adjustedWidth));
 
         $this->addTestOverlay($im, $width);
 
