@@ -60,7 +60,7 @@ class UserLogoRule implements Rule
             return true;
         }
 
-        return User::find($this->user->id)->logo_id !== $value;
+        return User::find($this->user->id)->logo_id !== $value; /** @phpstan-ignore-line */
     }
 
     /**

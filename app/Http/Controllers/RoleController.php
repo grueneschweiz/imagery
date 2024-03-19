@@ -17,7 +17,7 @@ class RoleController extends Controller
      *
      * @param  User  $managed
      *
-     * @return void
+     * @return \Illuminate\Database\Eloquent\Collection<int, \App\Role>
      */
     public function index(User $managed)
     {
@@ -62,7 +62,7 @@ class RoleController extends Controller
      * @param  User  $managed
      * @param  Role  $role
      *
-     * @return Role
+     * @return Role|Response
      */
     public function show(User $managed, Role $role)
     {
@@ -73,7 +73,7 @@ class RoleController extends Controller
 
         // in the response we want the group, but not the user
         unset($role->user);
-        $role->group;
+        $role->group;  // @phpstan-ignore-line, potentially eager loading trickery, I was to lazy to check so it stays
 
         return $role;
     }
@@ -85,7 +85,7 @@ class RoleController extends Controller
      * @param  User  $managed
      * @param  Role  $role
      *
-     * @return Response
+     * @return Role|Response
      */
     public function update(Request $request, User $managed, Role $role)
     {

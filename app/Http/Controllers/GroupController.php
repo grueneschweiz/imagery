@@ -55,7 +55,7 @@ class GroupController extends Controller
      *
      * @param  Group  $group
      *
-     * @return Logo[]
+     * @return \Illuminate\Database\Eloquent\Collection<int, Logo>
      */
     public function logos(Group $group)
     {

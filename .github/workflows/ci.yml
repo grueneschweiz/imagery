@@ -1,0 +1,33 @@
+name: CI
+on: [push]
+jobs:
+  build-test-analyse:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Tests triggered by a ${{ github.event_name }} event to the ${{ github.ref }} branch."
+      - uses: actions/checkout@v4
+
+      - name: Add proprietary files
+        env:
+          PROPRIETARY_KEY: ${{ secrets.PROPRIETARY_KEY }}
+        run: ./.github/scripts/decrypt_proprietary_files.sh
+
+      - name: Install everything
+        run: bash install.sh
+
+      - name: Run PHPUnit
+        run: docker exec imagery vendor/bin/phpunit
+
+      - name: "Report: Some test(s) failed"
+        if: ${{ failure() }}
+        run: cat storage/logs/laravel-*.log
+
+      - name: PHPStan Analysis | Level 5
+        run: |
+          docker exec imagery ./vendor/bin/phpstan analyse --memory-limit=2G --error-format=github --no-progress --level 5
+        continue-on-error: false
+
+      - name: PHPStan Analysis | Higher Level, see phpstan.neon
+        run: |
+          docker exec imagery ./vendor/bin/phpstan analyse --memory-limit=2G --error-format=github --no-progress
+        continue-on-error: true

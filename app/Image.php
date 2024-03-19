@@ -74,7 +74,7 @@ class Image extends Model
     /**
      * The attributes that should be hidden for arrays.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $hidden = [
         'filename',
@@ -84,7 +84,7 @@ class Image extends Model
     /**
      * The accessors to append to the model's array form.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $appends = [
         'src',
@@ -96,7 +96,7 @@ class Image extends Model
     /**
      * The attributes that aren't mass assignable.
      *
-     * @var array
+     * @var array<string>|bool
      */
     protected $guarded = [];
 
@@ -225,7 +225,7 @@ class Image extends Model
                 return false;
             }
 
-            return self::find($this->original_id)?->isShareable() || false;
+            return (bool)self::find($this->original_id)?->isShareable();
         }
 
         return $this->isShareable();
