@@ -18,13 +18,11 @@ class RouteServiceProvider extends ServiceProvider
 
     /**
      * Define your route model bindings, pattern filters, etc.
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         parent::boot();
-
+        
         // Bind user and role explicitly because we use both models at once
         // in the role routes
         Route::model('user', \App\User::class);

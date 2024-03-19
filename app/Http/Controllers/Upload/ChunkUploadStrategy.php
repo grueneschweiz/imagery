@@ -9,6 +9,7 @@ use App\Rules\FileExtensionRule;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class ChunkUploadStrategy extends UploadStrategy
 {
@@ -57,43 +58,50 @@ class ChunkUploadStrategy extends UploadStrategy
      */
     private function setValidatedData(Request $request)
     {
-        $data = $request->validate([
-            self::KEY_PART     => 'required|integer|min:0',
+        // Initial validation for part and filename
+        $validator = Validator::make($request->all(), [
+            self::KEY_PART => 'required|integer|min:0',
             self::KEY_FILENAME => [
                 'bail',
                 'required',
                 'string',
-                new FileExtensionRule($this->allowedFileExt)
+                new FileExtensionRule($this->allowedFileExt),
             ],
         ]);
 
-        $this->part     = $data[self::KEY_PART];
-        $this->filename = $data[self::KEY_FILENAME];
+        $validated = $validator->validated();
+        $this->part = $validated[self::KEY_PART];
+        $this->filename = $validated[self::KEY_FILENAME];
 
-        // we do need the properties above to be able to validate the data
-        $data = $request->validate([
+        // Additional validation for base64data
+        $validator = Validator::make($request->all(), [
             self::KEY_DATA => [
                 'bail',
                 'required',
                 'string',
                 function ($attribute, $value, $fail) {
-                    $current  = $this->getCurrentTmpFileSize();
-                    $fileMax  = $this->allowedFileSize;
+                    $current = $this->getCurrentTmpFileSize();
+                    $fileMax = $this->allowedFileSize;
                     $chunkMax = config('app.uploads_max_chunk_size') * 1024 * 1024;
 
-                    $max       = min($fileMax - $current, $chunkMax);
+                    $max = min($fileMax - $current, $chunkMax);
                     $base64max = ceil($max * 4 / 3);
 
                     $base64value = rtrim($this->extractData($value), '=');
 
                     if (strlen($base64value) > $base64max) {
-                        $this->validationErrorAbort($attribute, 'Max file size exceeded.');
+                        $fail("The {$attribute} exceeds the maximum allowed size.");
                     }
                 },
-            ]
+            ],
         ]);
 
-        $this->data = $data[self::KEY_DATA];
+        if ($validator->fails()) {
+            $this->validationErrorAbort("base64value", 'Max file size exceeded.');
+        }
+
+        $validated = $validator->validated();
+        $this->data = $validated[self::KEY_DATA];
     }
 
     /**
