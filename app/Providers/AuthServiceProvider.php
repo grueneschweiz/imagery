@@ -14,7 +14,7 @@ class AuthServiceProvider extends ServiceProvider
     /**
      * The policy mappings for the application.
      *
-     * @var array
+     * @var array<class-string, class-string>
      */
     protected $policies = [
         User::class => UserPolicy::class,
@@ -26,9 +26,10 @@ class AuthServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
-        $this->registerPolicies();
+        // https://laravel.com/docs/10.x/upgrade#register-policies
+        // $this->registerPolicies();
 
         //
     }

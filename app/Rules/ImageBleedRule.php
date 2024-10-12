@@ -12,7 +12,7 @@ class ImageBleedRule implements Rule
     public function __construct(Image $model)
     {
         $this->model = clone $model;
-        $this->model->fill(request()?->toArray() ?? []);
+        $this->model->fill(request()?->toArray() ?? []); // @phpstan-ignore-line // -> could probably be used instead of ?-> if laravel request lifecycle is to be trusted
     }
 
     /**

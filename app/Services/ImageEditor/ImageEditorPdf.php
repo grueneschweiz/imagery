@@ -95,10 +95,11 @@ class ImageEditorPdf extends ImageEditor
         // set document information
         $user   = $this->image->user;
         $author = $user ? $user->first_name.' '.$user->last_name : config('app.name');
+        $title = $this->image->logo?->name ?? config('app.name');
 
         $pdf->setCreator(config('app.url'));
         $pdf->setAuthor($author);
-        $pdf->setTitle($this->image->logo?->name || config('app.name'));
+        $pdf->setTitle($title);
         $pdf->setSubject($this->image->keywords);
 
         // configure pdf
@@ -118,10 +119,11 @@ class ImageEditorPdf extends ImageEditor
         // add crop marks
         if ($this->withBleed) {
             $pos = $format->getCropMarkPosArray();
-            $pdf->cropMark(...$pos['TL'], type: 'TL');
-            $pdf->cropMark(...$pos['TR'], type: 'TR');
-            $pdf->cropMark(...$pos['BL'], type: 'BL');
-            $pdf->cropMark(...$pos['BR'], type: 'BR');
+            // since all arguments are named, using the spread operator is discouraged here
+            $pdf->cropMark(x: $pos['TL']['x'], y: $pos['TL']['y'], w: $pos['TL']['w'], h: $pos['TL']['h'], type: 'TL');
+            $pdf->cropMark(x: $pos['TR']['x'], y: $pos['TR']['y'], w: $pos['TR']['w'], h: $pos['TR']['h'], type: 'TR');
+            $pdf->cropMark(x: $pos['BL']['x'], y: $pos['BL']['y'], w: $pos['BL']['w'], h: $pos['BL']['h'], type: 'BL');
+            $pdf->cropMark(x: $pos['BR']['x'], y: $pos['BR']['y'], w: $pos['BR']['w'], h: $pos['BR']['h'], type: 'BR');
         }
 
         // save pdf file
@@ -141,8 +143,8 @@ class ImageEditorPdf extends ImageEditor
      */
     private function transformToCmyk(\Imagick $im): bool
     {
-        $srgb = $this->getColorProfileString(static::SRC_COLOR_PROFILE_FILENAME);
-        $cmyk = $this->getColorProfileString(static::DST_COLOR_PROFILE_FILENAME);
+        $srgb = $this->getColorProfileString(self::SRC_COLOR_PROFILE_FILENAME);
+        $cmyk = $this->getColorProfileString(self::DST_COLOR_PROFILE_FILENAME);
 
         // the following lines correspond to the following command:
         // `convert src.png -profile sRGB_ICC_v4_Appearance.icc -profile PSOcoated_v3.icc cmyk.jpg`

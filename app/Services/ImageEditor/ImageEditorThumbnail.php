@@ -9,8 +9,8 @@ class ImageEditorThumbnail extends ImageEditorPng
 {
     public const BASE_DIR = 'thumb';
 
-    private const THUMB_MAX_WIDTH = 600;
-    private const THUMB_MAX_HEIGHT = 5000;
+    protected const THUMB_MAX_WIDTH = 600;
+    protected const THUMB_MAX_HEIGHT = 5000;
     private const FILE_EXTENSION = 'png';
 
     protected function getFilename(): string

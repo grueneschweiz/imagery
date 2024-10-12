@@ -24,8 +24,9 @@ design.
 2. Clone this repo `git clone https://github.com/grueneschweiz/cd.gruene.ch_v2`
 3. `cd` into the folder containing the repo
 4. Execute `bash install.sh` and have a ☕️ while it installs.
-5. Visit [localhost:3000/](http://localhost:3000/)
-6. Use `superadmin@user.login` and `password` to login.
+5. Update the `.env` with your keycloak settings.
+5. Visit [localhost:3000/](http://localhost:3000/) and login.
+6. Enable your account via [phpmyadmin}(http://localhost:8010).
 7. As the font used in the corporate design is proprietary, you'll need to get a 
    licenced copy of the Sanuk font (fat and bold). Store it as follows:
    ```
@@ -70,7 +71,11 @@ provided by Laravel Mix) acts as reverse proxy in front of the app container.
 #### PHPUnit
 All tests are based on PHPUnit. It may be used as follows:
 1. Make sure your containers are up and running.
-1. Run `docker exec imagery vendor/bin/phpunit`.
+2. Run `docker exec -it imagery vendor/bin/phpunit`.
+
+#### phpstan
+The static analysis tool phpstan (with larastan) is used to check the code. It may be used as follows:
+`docker exec -it  imagery bash -c "vendor/bin/phpstan analyze --memory-limit=2G"`
 
 #### MySQL
 Use the handy [phpMyAdmin](http://localhost:8010) or access the mysql CLI using
@@ -83,7 +88,7 @@ The node container is watching the js, css and scss files and building the asset
 
 #### Composer
 The PHP Composer runs directly on the `imagery` container.
-- Access it using `docker exec imagery composer YOUR_COMPOSER_SUBCOMMAND`.
+- Access it using `docker exec -it imagery composer YOUR_COMPOSER_SUBCOMMAND`.
 
 #### Mailhog
 All mail you send out of the application will be caught by Mailhog. Access it

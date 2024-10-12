@@ -57,7 +57,7 @@ abstract class ImageEditor
         return create_dir($dir);
     }
 
-    private static function getBaseDir(): string
+    protected static function getBaseDir(): string
     {
         return trim(config('app.image_dir'), '/');
     }

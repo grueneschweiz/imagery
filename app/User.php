@@ -17,10 +17,10 @@ use Illuminate\Support\Facades\Mail;
  *
  * @package App
  * @property int $id
- * @property string first_name
- * @property string last_name
- * @property string sub
- * @property string email
+ * @property string $first_name
+ * @property string $last_name
+ * @property string $sub
+ * @property string $email
  * @property Carbon $email_verified_at
  * @property string $password
  * @property int $added_by
@@ -93,7 +93,7 @@ class User extends Authenticatable
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $fillable = [
         'first_name',
@@ -112,7 +112,7 @@ class User extends Authenticatable
     /**
      * The attributes that should be hidden for arrays.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $hidden = [
         'password',
@@ -121,29 +121,21 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be mutated to dates.
-     *
-     * @var array
-     */
-    protected $dates = [
-        'email_verified_at',
-        'last_login',
-    ];
-
-    /**
      * The attributes that should be cast to native types.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $casts = [
-        'super_admin' => 'boolean',
-        'enabled'     => 'boolean',
+        'super_admin'       => 'boolean',
+        'enabled'           => 'boolean',
+        'email_verified_at' => 'datetime',
+        'last_login'        => 'datetime',
     ];
 
     /**
      * Expose those accessors
      *
-     * @var array
+     * @var array<int, string> 
      */
     protected $appends = [
         'is_admin'
@@ -242,6 +234,7 @@ class User extends Authenticatable
         }
 
         $users = collect();
+        /** @var \App\Role $role */
         foreach ($this->adminRoles()->get() as $role) {
             $users->push($role->usersBelow());
         }
@@ -271,6 +264,7 @@ class User extends Authenticatable
             return true;
         }
 
+        /** @var \App\Role $role */
         foreach ($this->adminRoles()->get() as $role) {
             if ($role->isGroupBelow($group)) {
                 return true;
@@ -367,7 +361,7 @@ class User extends Authenticatable
     {
         $groups = collect();
         foreach ($this->adminRoles as $role) {
-            $roleGroups = Group::descendantsAndSelf($role->group_id);
+            $roleGroups = Group::descendantsAndSelf($role->group_id); /** @phpstan-ignore-line |Usage as documented by third party: https://github.com/lazychaser/laravel-nestedset*/
             $roleGroups->each(function ($item) use ($groups) {
                 $groups->add($item);
             });
@@ -447,7 +441,7 @@ class User extends Authenticatable
     /**
      * Add the given subject if none is present.
      *
-     * @throws UserSubjectMissmatchException
+     * @throws \App\Exceptions\UserSubjectMissmatchException
      */
     public function complementSub(string $sub): void
     {

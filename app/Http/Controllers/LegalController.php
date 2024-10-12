@@ -6,17 +6,18 @@ use App\Image;
 use App\Legal;
 use App\Rules\ImmutableRule;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class LegalController extends Controller
 {
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  Image  $image
      * @param  Legal  $legal
      *
-     * @return \Illuminate\Http\Response
+     * @return Legal|Response
      */
     public function store(Request $request, Image $image, Legal $legal)
     {
@@ -80,9 +81,9 @@ class LegalController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Image  $image
+     * @param  Image  $image
      *
-     * @return \Illuminate\Http\Response
+     * @return Legal|Response
      */
     public function show(Image $image)
     {
@@ -96,10 +97,10 @@ class LegalController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Image  $legal
+     * @param  Request  $request
+     * @param  Image  $image
      *
-     * @return \Illuminate\Http\Response
+     * @return Legal|Response
      */
     public function update(Request $request, Image $image)
     {

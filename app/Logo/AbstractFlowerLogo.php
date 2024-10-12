@@ -63,7 +63,7 @@ abstract class AbstractFlowerLogo implements LogoCompositor
         $adjustedWidth = ($width / $malsizedIm->getImageWidth()) * $width;
         unset($malsizedIm);
 
-        $im = $this->composeInternal(floor($adjustedWidth));
+        $im = $this->composeInternal((int)floor($adjustedWidth));
 
         $this->addTestOverlay($im, $width);
 
@@ -200,19 +200,19 @@ abstract class AbstractFlowerLogo implements LogoCompositor
         );
     }
 
-    #[Pure] private function getBaseLogoWidth(): int
+    private function getBaseLogoWidth(): int
     {
         return $this->baseLogoIm->getImageWidth();
     }
 
-    #[Pure] private function getBaseLogoHeight(): int
+    private function getBaseLogoHeight(): int
     {
         return $this->baseLogoIm->getImageHeight();
     }
 
     private function getSublineWidth(): int
     {
-        return ceil($this->getAbsSublineX()) + $this->sublineIm->getImageWidth();
+        return (int) (ceil($this->getAbsSublineX()) + $this->sublineIm->getImageWidth());
     }
 
     private function getAbsSublineX(): float
@@ -227,7 +227,7 @@ abstract class AbstractFlowerLogo implements LogoCompositor
                * $this->getBaseLogoHeight();
     }
 
-    #[Pure] private function getSublineHeight(): int
+    private function getSublineHeight(): int
     {
         return $this->sublineIm->getImageHeight();
     }
