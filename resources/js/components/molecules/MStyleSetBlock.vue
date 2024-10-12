@@ -11,6 +11,15 @@
                     type="radio"
                 >{{$t('images.create.styleSetGreen')}}
             </label>
+            <label :class="{'active': styleSet === styleSetTypes.greenV2}"
+                   class="btn btn-secondary btn-sm">
+                <input
+                    v-model="styleSet"
+                    :value="styleSetTypes.greenV2"
+                    name="styleSet"
+                    type="radio"
+                >{{$t('images.create.styleSetGreenV2')}}
+            </label>
             <label :class="{'active': styleSet === styleSetTypes.young}"
                    class="btn btn-secondary btn-sm">
                 <input
@@ -68,12 +77,13 @@
                 if (logoTypes.length === 0) {
                     return [
                         StyleSetTypes.green,
+                        StyleSetTypes.greenV2,
                         StyleSetTypes.young
                     ]
                 }
 
                 return logoTypes
-                  .map(this.getStyleSetFromLogoType)
+                  .flatMap(this.getStyleSetFromLogoType)
             },
 
             logoDefaultStyleSet() {
@@ -81,7 +91,7 @@
                     return null;
                 }
 
-                return this.getStyleSetFromLogoType(this.logoType);
+                return this.getStyleSetFromLogoType(this.logoType)[0];
             },
 
             greenStyleSetButtonValue() {
@@ -102,10 +112,10 @@
                     case LogoTypes["giovani-verdi"]:
                     case LogoTypes["jeunes-vert-e-s"]:
                     case LogoTypes["junge-gruene"]:
-                        return StyleSetTypes.young
+                        return [StyleSetTypes.young]
 
                     default:
-                      return StyleSetTypes.green
+                      return [StyleSetTypes.green, StyleSetTypes.greenV2]
                 }
             },
 

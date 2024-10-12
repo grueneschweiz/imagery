@@ -1,24 +1,32 @@
 export const StyleSetTypes = {
     green: 'green',
+    greenV2: 'greenV2',
     greenCentered: 'greenCentered',
+    greenV2Centered: 'greenV2Centered',
     young: 'young'
 }
 
 export const MinFontSizeFactors = {
     [StyleSetTypes.green]: 0.0625, // the correct 175% would be 0.0925
+    [StyleSetTypes.greenV2]: 0.0625, // the correct 175% would be 0.0925
     [StyleSetTypes.greenCentered]: 0.0625, // the correct 175% would be 0.0925
+    [StyleSetTypes.greenV2Centered]: 0.0625, // the correct 175% would be 0.0925
     [StyleSetTypes.young]: 0.0575,
 }
 
 export const MaxFontSizeFactors = {
     [StyleSetTypes.green]: 0.99,
+    [StyleSetTypes.greenV2]: 0.99,
     [StyleSetTypes.greenCentered]: 0.99,
+    [StyleSetTypes.greenV2Centered]: 0.99,
     [StyleSetTypes.young]: 0.9,
 }
 
 export const MinToMaxFontSizeFactors = {
     [StyleSetTypes.green]: 4,
+    [StyleSetTypes.greenV2]: 4,
     [StyleSetTypes.greenCentered]: 4,
+    [StyleSetTypes.greenV2Centered]: 4,
     [StyleSetTypes.young]: 4,
 }
 
@@ -94,6 +102,10 @@ export const BarSchemes = {
     green: {
         background: '#84b414',
         text: '#ffffff',
+    },
+    greenV2: {
+        background: '#840000', //TODO MSC
+        text: '#ff0000', // TODO MSC
     },
     magenta: {
         background: '#e10078',

@@ -3,9 +3,13 @@ import {BarTypes, StyleSetTypes} from "../Constants";
 import BarLayerYoung from "../layers/bar/BarLayerYoung";
 import BarLayerGreenCenter from "../layers/bar/BarLayerGreenCenter";
 import BarLayerGreen from "../layers/bar/BarLayerGreen";
+import BarLayerGreenV2 from "../layers/bar/BarLayerGreenV2";
+import BarLayerGreenV2Center from "../layers/bar/BarLayerGreenV2Center";
 import BarYoung from "../elements/bar/BarYoung";
 import BarGreenCentered from "../elements/bar/BarGreenCentered";
+import BarGreenV2Centered from "../elements/bar/BarGreenV2Centered";
 import BarGreen from "../elements/bar/BarGreen";
+import BarGreenV2 from "../elements/bar/BarGreenV2";
 import BarBlockYoung from "../blocks/bar/BarBlockYoung";
 import BarBlockGreenCenter from "../blocks/bar/BarBlockGreenCenter";
 import BarBlockGreen from "../blocks/bar/BarBlockGreen";
@@ -163,6 +167,8 @@ export default class BarEngine extends DraggableSubEngine {
                 return new BarYoung();
             case StyleSetTypes.greenCentered:
                 return new BarGreenCentered();
+            case StyleSetTypes.greenV2Centered:
+                return new BarGreenV2Centered();
             default:
                 return new BarGreen();
         }
@@ -187,6 +193,10 @@ export default class BarEngine extends DraggableSubEngine {
                 return new BarLayerYoung(this._canvas, this._context);
             case StyleSetTypes.greenCentered:
                 return new BarLayerGreenCenter(this._canvas, this._context);
+            case StyleSetTypes.greenV2:
+                return new BarLayerGreenV2(this._canvas, this._context);
+            case StyleSetTypes.greenV2Centered:
+                return new BarLayerGreenV2Center(this._canvas, this._context);
             default:
                 return new BarLayerGreen(this._canvas, this._context);
         }
