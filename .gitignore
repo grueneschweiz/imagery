@@ -13,6 +13,7 @@
 /storage/*.key
 /storage/test
 /vendor
+app/fonts/*
 .env
 .env.backup
 .phpunit.result.cache
