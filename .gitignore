@@ -13,6 +13,7 @@
 /storage/*.key
 /storage/test
 /vendor
+/app/fonts/*
 .env
 .env.backup
 .phpunit.result.cache
@@ -26,3 +27,4 @@ _ide_helper*.php
 .docker/mysql
 deploy.conf
 proprietary.key
+.phpunit.cache/
