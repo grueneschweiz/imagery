@@ -42,7 +42,7 @@
             />
 
             <MAlignment
-                v-if="styleSet === styleSetTypes.green"
+                v-if="styleSet === styleSetTypes.green || styleSet === styleSetTypes.greenV2"
             />
 
             <MColorScheme/>

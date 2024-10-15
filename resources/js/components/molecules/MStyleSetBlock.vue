@@ -3,31 +3,31 @@
         <label class="mb-0 d-block">{{$t('images.create.styleSet')}}</label>
         <div class="btn-group btn-group-toggle">
             <label :class="{'active': isGreenStyleSet}"
-                   class="btn btn-secondary btn-sm">
-                <input
-                    v-model="styleSet"
-                    :value="greenStyleSetButtonValue"
-                    name="styleSet"
-                    type="radio"
-                >{{$t('images.create.styleSetGreen')}}
+               class="btn btn-secondary btn-sm">
+            <input
+                v-model="styleSet"
+                :value="greenStyleSetButtonValue"
+                name="styleSet"
+                type="radio"
+            >{{$t('images.create.styleSetGreen')}}
             </label>
-            <label :class="{'active': styleSet === styleSetTypes.greenV2}"
-                   class="btn btn-secondary btn-sm">
-                <input
-                    v-model="styleSet"
-                    :value="styleSetTypes.greenV2"
-                    name="styleSet"
-                    type="radio"
-                >{{$t('images.create.styleSetGreenV2')}}
+            <label :class="{'active': isGreenV2StyleSet}"
+               class="btn btn-secondary btn-sm">
+            <input
+                v-model="styleSet"
+                :value="styleSetTypes.greenV2"
+                name="styleSet"
+                type="radio"
+            >{{$t('images.create.styleSetGreenV2')}}
             </label>
             <label :class="{'active': styleSet === styleSetTypes.young}"
-                   class="btn btn-secondary btn-sm">
-                <input
-                    v-model="styleSet"
-                    :value="styleSetTypes.young"
-                    name="styleSet"
-                    type="radio"
-                >{{$t('images.create.styleSetYoung')}}
+               class="btn btn-secondary btn-sm">
+            <input
+                v-model="styleSet"
+                :value="styleSetTypes.young"
+                name="styleSet"
+                type="radio"
+            >{{$t('images.create.styleSetYoung')}}
             </label>
         </div>
     </div>
@@ -54,6 +54,7 @@
               currentLogoId: 'canvas/getLogoId',
               selectedImageSize: 'canvas/getSelectedImageSize',
               logoType: 'canvas/getLogoType',
+              centered: true,
             }),
 
             styleSet: {
@@ -100,9 +101,20 @@
                     : StyleSetTypes.green;
             },
 
+            greenV2StyleSetButtonValue() {
+                return this.centered
+                    ? StyleSetTypes.greenV2Centered
+                    : StyleSetTypes.greenV2;
+            },
+
             isGreenStyleSet() {
                 return this.styleSet === StyleSetTypes.green
                     || this.styleSet === StyleSetTypes.greenCentered
+            },
+
+            isGreenV2StyleSet() {
+                return this.styleSet === StyleSetTypes.greenV2
+                    || this.styleSet === StyleSetTypes.greenV2Centered
             }
         },
 

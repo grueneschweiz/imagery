@@ -167,6 +167,8 @@ export default class BarEngine extends DraggableSubEngine {
                 return new BarYoung();
             case StyleSetTypes.greenCentered:
                 return new BarGreenCentered();
+            case StyleSetTypes.greenV2: // TODO MSC centered / non centered separate button?
+                return new BarGreenV2();
             case StyleSetTypes.greenV2Centered:
                 return new BarGreenV2Centered();
             default:
@@ -194,7 +196,7 @@ export default class BarEngine extends DraggableSubEngine {
             case StyleSetTypes.greenCentered:
                 return new BarLayerGreenCenter(this._canvas, this._context);
             case StyleSetTypes.greenV2:
-                return new BarLayerGreenV2(this._canvas, this._context);
+                return new BarLayerGreenV2(this._canvas, this._context); // TODO MSC: Replace BarLayerGreenV2Center with BarLayerGreenV2
             case StyleSetTypes.greenV2Centered:
                 return new BarLayerGreenV2Center(this._canvas, this._context);
             default:

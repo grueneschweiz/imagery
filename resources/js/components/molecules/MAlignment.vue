@@ -28,12 +28,24 @@
                 return this.$store.getters['canvas/getBars'].filter(bar => bar.text.length).length > 0
             },
 
+            getStyleSet() {
+                return this.$store.getters['canvas/getStyleSet']
+            },
+
             options() {
                 if (this.hasBars) {
-                    return [
-                        {value: Alignments.left, text: this.$t('images.create.barsLeft')},
-                        {value: Alignments.right, text: this.$t('images.create.barsRight')},
-                    ];
+                    if(this.getStyleSet === 'greenV2') {
+                        return [
+                            {value: Alignments.left, text: this.$t('images.create.barsLeft')},
+                            {value: Alignments.center, text: this.$t('images.create.barsCentered')},
+                            {value: Alignments.right, text: this.$t('images.create.barsRight')},
+                        ];
+                    } else {
+                        return [
+                            {value: Alignments.right, text: this.$t('images.create.barsLeft')},
+                            {value: Alignments.left, text: this.$t('images.create.barsRight')},
+                        ];
+                    }
                 } else {
                     return [
                         {value: Alignments.right, text: this.$t('images.create.logoLeft')},
