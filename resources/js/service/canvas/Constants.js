@@ -185,7 +185,7 @@ export const BarSizeFactor = 0.2;
 /**
  * For greenV2 (non-centered) we use a different factor.
  */
-export const BarSizeFactorV2 = 0.05;
+export const BarSizeFactorV2 = 0.05; //TODO MSC set factor
 
 /**
  * If anything is rotated use this angle.

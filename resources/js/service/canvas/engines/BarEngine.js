@@ -1,5 +1,5 @@
 import DraggableSubEngine from "./DraggableSubEngine";
-import {BarTypes, StyleSetTypes} from "../Constants";
+import {Alignments, BarTypes, StyleSetTypes} from "../Constants";
 import BarLayerYoung from "../layers/bar/BarLayerYoung";
 import BarLayerGreenCenter from "../layers/bar/BarLayerGreenCenter";
 import BarLayerGreen from "../layers/bar/BarLayerGreen";
@@ -13,6 +13,8 @@ import BarGreenV2 from "../elements/bar/BarGreenV2";
 import BarBlockYoung from "../blocks/bar/BarBlockYoung";
 import BarBlockGreenCenter from "../blocks/bar/BarBlockGreenCenter";
 import BarBlockGreen from "../blocks/bar/BarBlockGreen";
+import BarBlockGreenV2 from "../blocks/bar/BarBlockGreenV2";
+import BarBlockGreenV2Center from "../blocks/bar/BarBlockGreenV2Center";
 import FontSizeHelper from "../misc/FontSizeHelper";
 
 export default class BarEngine extends DraggableSubEngine {
@@ -167,7 +169,7 @@ export default class BarEngine extends DraggableSubEngine {
                 return new BarYoung();
             case StyleSetTypes.greenCentered:
                 return new BarGreenCentered();
-            case StyleSetTypes.greenV2: // TODO MSC centered / non centered separate button?
+            case StyleSetTypes.greenV2:
                 return new BarGreenV2();
             case StyleSetTypes.greenV2Centered:
                 return new BarGreenV2Centered();
@@ -184,6 +186,10 @@ export default class BarEngine extends DraggableSubEngine {
                 return new BarBlockYoung(barCanvasses);
             case StyleSetTypes.greenCentered:
                 return new BarBlockGreenCenter(barCanvasses);
+            case StyleSetTypes.greenV2:
+                return new BarBlockGreenV2(barCanvasses);
+            case StyleSetTypes.greenV2Centered:
+                return new BarBlockGreenV2Center(barCanvasses);
             default:
                 return new BarBlockGreen(barCanvasses);
         }
@@ -196,7 +202,7 @@ export default class BarEngine extends DraggableSubEngine {
             case StyleSetTypes.greenCentered:
                 return new BarLayerGreenCenter(this._canvas, this._context);
             case StyleSetTypes.greenV2:
-                return new BarLayerGreenV2(this._canvas, this._context); // TODO MSC: Replace BarLayerGreenV2Center with BarLayerGreenV2
+                return new BarLayerGreenV2(this._canvas, this._context);
             case StyleSetTypes.greenV2Centered:
                 return new BarLayerGreenV2Center(this._canvas, this._context);
             default:

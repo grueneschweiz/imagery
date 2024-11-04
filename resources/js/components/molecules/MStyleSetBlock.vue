@@ -15,7 +15,7 @@
                class="btn btn-secondary btn-sm">
             <input
                 v-model="styleSet"
-                :value="styleSetTypes.greenV2"
+                :value="greenV2StyleSetButtonValue"
                 name="styleSet"
                 type="radio"
             >{{$t('images.create.styleSetGreenV2')}}
@@ -34,7 +34,7 @@
 </template>
 
 <script>
-    import {StyleSetTypes, LogoTypes} from "../../service/canvas/Constants";
+    import {StyleSetTypes, LogoTypes, Alignments} from "../../service/canvas/Constants";
     import {ImageSizeIds, ImageSizes} from "../../service/canvas/ImageSizes";
     import {mapGetters} from "vuex";
 
@@ -79,6 +79,7 @@
                     return [
                         StyleSetTypes.green,
                         StyleSetTypes.greenV2,
+                        StyleSetTypes.greenV2Centered,
                         StyleSetTypes.young
                     ]
                 }
@@ -138,7 +139,14 @@
                     this.styleSet = StyleSetTypes.young;
                 } else if (ImageSizeIds.fbCoverGreen === this.selectedImageSize.id) {
                     this.styleSet = StyleSetTypes.greenCentered;
-                } else {
+                } else if (StyleSetTypes.greenV2 === style || StyleSetTypes.greenV2Centered === style) {
+                    if(this.centered) {
+                        this.styleSet = StyleSetTypes.greenV2Centered;
+                    } else {
+                        this.styleSet = StyleSetTypes.greenV2;
+                    }
+                }
+                else {
                     this.styleSet = StyleSetTypes.green;
                 }
             },

@@ -5,6 +5,6 @@ export default class BarGreenV2Centered extends BarGreenCentered {
 
     constructor() {
         super();
-        this._schema = Schemes.greenV2
+        this._schema = Schemes.BarGreenV2Centered
     }
 }
