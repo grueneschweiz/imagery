@@ -72,6 +72,10 @@
             },
 
             barSchema() {
+                if(!this.isSubline && ColorSchemes.greenV2 === this.colorSchema) {
+                    return BarSchemes.greenV2
+                }
+
                 if (BarSchemes.magenta === this.bar.schema) {
                     return BarSchemes.magenta
                 }
@@ -126,6 +130,9 @@
 
                     case BarSchemes.transparent:
                         return 'btn-outline-dark'
+
+                    default:
+                        return 'btn-secondary' //TODO MSC
                 }
             },
 
@@ -136,6 +143,9 @@
 
                     case BarSchemes.transparent:
                         return 'dark'
+
+                    case BarSchemes.greenV2:
+                        return 'greenV2' //TODO MSC
 
                     default:
                         return 'green'

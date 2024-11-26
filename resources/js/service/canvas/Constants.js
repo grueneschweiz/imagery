@@ -60,6 +60,7 @@ export const Alignments = {
 export const BackgroundTypes = {
     placeholder: 'placeholder',
     gradient: 'gradient',
+    icons: 'icons',
     transparent: 'transparent',
     image: 'custom'
 };
@@ -79,7 +80,7 @@ export const BorderRadiusFactor = 1;
 
 export const HugeImageJpegQuality = 0.9;
 export const RegularImageQuality = 1; // jpeg AND png
-export const HugeImageSurfaceLimit = 5000**2; // 5000px x 5000px
+export const HugeImageSurfaceLimit = 5000 ** 2; // 5000px x 5000px
 
 /**
  * How much can the background image be zoomed up?
@@ -104,8 +105,8 @@ export const BarSchemes = {
         text: '#ffffff',
     },
     greenV2: {
-        background: '#840000', //TODO MSC
-        text: '#ff0000', // TODO MSC
+        background: '#f8e6f0',
+        text: '#e10078',
     },
     magenta: {
         background: '#e10078',
@@ -125,6 +126,7 @@ export const CopyrightColors = {
 export const ColorSchemes = {
     white: 'white',
     green: 'green',
+    greenV2: 'greenV2',
     greengreen: 'green-green',
 };
 
@@ -181,11 +183,6 @@ export const LogoTypeRatios = {
  * @type {number}
  */
 export const BarSizeFactor = 0.2;
-
-/**
- * For greenV2 (non-centered) we use a different factor.
- */
-export const BarSizeFactorV2 = 0.05; //TODO MSC set factor
 
 /**
  * If anything is rotated use this angle.

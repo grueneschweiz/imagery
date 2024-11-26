@@ -16,6 +16,19 @@
                         type="radio"
                     >{{$t('images.create.backgroundGreen')}}
                 </label>
+                <label v-if="iconsBackgroundAvailable"
+                       :class="{
+                            'active': backgroundType === backgroundTypes.icons,
+                            'disabled': loading,
+                       }"
+                       class="btn btn-secondary btn-sm">
+                    <input
+                        v-model="backgroundType"
+                        :value="backgroundTypes.icons"
+                        name="background"
+                        type="radio"
+                    >{{$t('images.create.backgroundIcons')}}
+                </label>
                 <label v-if="!hugeCanvas"
                        :class="{
                         'active': backgroundType === backgroundTypes.transparent,
@@ -231,6 +244,11 @@ import {mapGetters} from "vuex";
                     || this.styleSet === StyleSetTypes.greenCentered;
             },
 
+            iconsBackgroundAvailable() {
+                return this.styleSet === StyleSetTypes.greenV2
+                    || this.styleSet === StyleSetTypes.greenV2Centered;
+            },
+
             acceptedMimeTypes() {
                 return mimeTypesAllowed.join(',');
             },
@@ -374,9 +392,13 @@ import {mapGetters} from "vuex";
                 if (StyleSetTypes.young === valueNew && BackgroundTypes.gradient === this.backgroundType) {
                     this.backgroundType = BackgroundTypes.placeholder
                 }
-                if ((StyleSetTypes.green === valueNew || StyleSetTypes.greenCentered === valueNew )
+                if ((StyleSetTypes.green === valueNew || StyleSetTypes.greenCentered === valueNew)
                     && BackgroundTypes.placeholder === this.backgroundType) {
                     this.backgroundType = BackgroundTypes.gradient
+                }
+                if ((StyleSetTypes.greenV2 === valueNew || StyleSetTypes.greenV2Centered === valueNew)
+                    && BackgroundTypes.gradient === this.backgroundType) {
+                    this.backgroundType = BackgroundTypes.icons //TODO msc only when the button itself is clicked, the icon Background is loaded
                 }
             },
             user() {

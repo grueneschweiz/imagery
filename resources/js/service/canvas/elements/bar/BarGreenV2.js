@@ -8,7 +8,7 @@ export default class BarGreenV2 extends BarGreen {
 
     constructor() {
         super();
-        this._schema = Schemes.greenV2
+        this._schema = Schemes.greenV2;
     }
 
     _setBarOversize() {
